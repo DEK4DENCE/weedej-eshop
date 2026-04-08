@@ -66,6 +66,31 @@ export default async function HomePage() {
           </div>
         </section>
 
+        {/* Bestsellers */}
+        {products.length > 0 && (
+          <section className="py-12 px-4">
+            <div className="container mx-auto">
+              <div className="flex items-end justify-between mb-6">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-[#2E7D32] mb-1">Our Products</p>
+                  <h2 className="text-3xl font-bold text-[#1d1d1f] font-playfair">Bestsellers</h2>
+                </div>
+                <Link
+                  href="/products"
+                  className="inline-flex items-center gap-1.5 border border-[#DEE2E6] hover:border-[#2E7D32] text-[#6e6e73] hover:text-[#2E7D32] text-sm font-medium px-4 py-2 rounded-xl transition-colors"
+                >
+                  View all <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                {products.map((product: any) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Features strip — horizontal inline */}
         <section className="bg-white border-y border-[#DEE2E6]">
           <div className="container mx-auto px-4">
@@ -88,31 +113,6 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
-
-        {/* Bestsellers */}
-        {products.length > 0 && (
-          <section className="py-16 px-4">
-            <div className="container mx-auto">
-              <div className="flex items-end justify-between mb-8">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-widest text-[#2E7D32] mb-1">Our Products</p>
-                  <h2 className="text-3xl font-bold text-[#1d1d1f] font-playfair">Bestsellers</h2>
-                </div>
-                <Link
-                  href="/products"
-                  className="inline-flex items-center gap-1.5 border border-[#DEE2E6] hover:border-[#2E7D32] text-[#6e6e73] hover:text-[#2E7D32] text-sm font-medium px-4 py-2 rounded-xl transition-colors"
-                >
-                  View all <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                {products.map((product: any) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
 
         {/* CTA banner */}
         <section className="py-16 px-4 bg-[#F0FAF0]">
