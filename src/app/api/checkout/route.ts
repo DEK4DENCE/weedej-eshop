@@ -69,8 +69,8 @@ export async function POST(req: NextRequest) {
     }
 
     const shippingCents = deliveryType === "PICKUP_IN_STORE" ? 0
-      : items.reduce((s: number, i: any) => s + Number(i.price ?? i.variant?.price ?? 0) * i.quantity, 0) >= 75
-      ? 0 : 499
+      : items.reduce((s: number, i: any) => s + Number(i.price ?? i.variant?.price ?? 0) * i.quantity, 0) >= 1500
+      ? 0 : 9900
 
     const origin = req.headers.get("origin") ?? process.env.NEXTAUTH_URL ?? "http://localhost:3000"
 
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
       const price = item.variant?.price ?? item.price ?? 0
       return {
         price_data: {
-          currency: "eur",
+          currency: "czk",
           product_data: {
             name,
             ...(image ? { images: [image] } : {}),
@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
             shipping_options: [{
               shipping_rate_data: {
                 type: "fixed_amount",
-                fixed_amount: { amount: shippingCents, currency: "eur" },
+                fixed_amount: { amount: shippingCents, currency: "czk" },
                 display_name: "Standard Delivery (3–5 business days)",
               },
             }],

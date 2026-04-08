@@ -53,8 +53,8 @@ export function CheckoutForm({ user, addresses }: Props) {
     phone: user?.phone ?? "",
   })
 
-  const shippingCents = deliveryType === "PICKUP_IN_STORE" ? 0 : totalPrice >= 75 ? 0 : 499
-  const shippingEur = shippingCents / 100
+  const shippingCents = deliveryType === "PICKUP_IN_STORE" ? 0 : totalPrice >= 1500 ? 0 : 99
+  const shippingEur = shippingCents
   const total = totalPrice + shippingEur
 
   const handleSubmit = async (e: React.FormEvent) => {

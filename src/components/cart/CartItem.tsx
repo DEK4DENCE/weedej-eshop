@@ -62,7 +62,7 @@ export default function CartItem({ item, itemId, onUpdateQty, onRemove }: CartIt
       {/* Price + Remove */}
       <div className="flex flex-col items-end gap-2 flex-shrink-0">
         <span className="text-sm font-bold text-[#b8860b] font-mono">
-          €{(price * item.quantity).toFixed(2)}
+          {Math.round(price * item.quantity).toLocaleString('cs-CZ')} Kč
         </span>
         <button
           onClick={() => onRemove(itemId, variantId)}

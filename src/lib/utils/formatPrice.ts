@@ -1,23 +1,23 @@
 /**
- * Formats a number as a currency string in EUR
- * @param amount - Amount in full currency units (e.g., 9.99)
- * @param currency - Currency code (default: 'EUR')
- * @returns Formatted currency string (e.g., '€9.99')
+ * Formats a number as a currency string in CZK
+ * @param amount - Amount in full currency units (e.g., 499)
+ * @param currency - Currency code (default: 'CZK')
+ * @returns Formatted currency string (e.g., '499 Kč')
  */
-export function formatPrice(amount: number, currency: string = 'EUR'): string {
-  return new Intl.NumberFormat('de-DE', {
+export function formatPrice(amount: number, currency: string = 'CZK'): string {
+  return new Intl.NumberFormat('cs-CZ', {
     style: 'currency',
     currency,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   }).format(amount)
 }
 
 /**
- * Formats a price stored as cents/integers
- * @param amountInCents - Amount in smallest currency unit (cents)
- * @param currency - Currency code (default: 'EUR')
+ * Formats a price stored as hellers/integers
+ * @param amountInCents - Amount in smallest currency unit (hellers)
+ * @param currency - Currency code (default: 'CZK')
  */
-export function formatPriceFromCents(amountInCents: number, currency: string = 'EUR'): string {
+export function formatPriceFromCents(amountInCents: number, currency: string = 'CZK'): string {
   return formatPrice(amountInCents / 100, currency)
 }

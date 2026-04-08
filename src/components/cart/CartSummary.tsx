@@ -9,12 +9,12 @@ interface CartSummaryProps {
   compact?: boolean
 }
 
-const FREE_SHIPPING_THRESHOLD = 75
+const FREE_SHIPPING_THRESHOLD = 1500
 
 export default function CartSummary({ totalPrice, itemCount, onCheckout, compact = false }: CartSummaryProps) {
   const router = useRouter()
   const shippingFree = totalPrice >= FREE_SHIPPING_THRESHOLD
-  const shipping = shippingFree ? 0 : 4.99
+  const shipping = shippingFree ? 0 : 99
   const total = totalPrice + shipping
 
   const handleCheckout = () => {
@@ -28,7 +28,7 @@ export default function CartSummary({ totalPrice, itemCount, onCheckout, compact
 
       <div className="flex items-center justify-between py-1.5">
         <span className="text-sm text-[#6e6e73]">Subtotal ({itemCount} {itemCount === 1 ? 'item' : 'items'})</span>
-        <span className="text-sm font-medium text-[#1d1d1f]">€{totalPrice.toFixed(2)}</span>
+        <span className="text-sm font-medium text-[#1d1d1f]">{totalPrice.toLocaleString('cs-CZ')} Kč</span>
       </div>
 
       <div className="flex items-start justify-between py-1.5 border-t border-[#DEE2E6]">
@@ -37,20 +37,20 @@ export default function CartSummary({ totalPrice, itemCount, onCheckout, compact
           {!shippingFree && (
             <p className="text-xs text-[#aeaeb2] mt-0.5 flex items-center gap-1">
               <Truck size={11} />
-              Free shipping on orders over €{FREE_SHIPPING_THRESHOLD}
+              Doprava zdarma nad 1 500 Kč
             </p>
           )}
         </div>
         {shippingFree ? (
           <span className="text-sm font-medium text-[#2E7D32]">Free</span>
         ) : (
-          <span className="text-sm font-medium text-[#1d1d1f]">€{shipping.toFixed(2)}</span>
+          <span className="text-sm font-medium text-[#1d1d1f]">{shipping} Kč</span>
         )}
       </div>
 
       <div className="flex items-center justify-between py-2.5 border-t border-[#DEE2E6] mt-1">
         <span className="text-base font-bold text-[#1d1d1f]">Total</span>
-        <span className="text-lg font-bold text-[#b8860b] font-mono">€{total.toFixed(2)}</span>
+        <span className="text-lg font-bold text-[#b8860b] font-mono">{total.toLocaleString('cs-CZ')} Kč</span>
       </div>
 
       <button

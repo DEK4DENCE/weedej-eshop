@@ -9,10 +9,12 @@ interface OrderCardProps {
   order: Order
 }
 
-function formatPrice(cents: number, currency: string = 'EUR'): string {
-  return new Intl.NumberFormat('en-EU', {
+function formatPrice(cents: number, currency: string = 'CZK'): string {
+  return new Intl.NumberFormat('cs-CZ', {
     style: 'currency',
     currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   }).format(cents / 100)
 }
 
