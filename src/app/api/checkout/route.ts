@@ -13,6 +13,19 @@ export async function POST(req: NextRequest) {
 
     if (!items?.length) return NextResponse.json({ error: "Cart is empty" }, { status: 400 })
 
+    // Stock validation
+    for (const item of items) {
+      const variantId = item.variantId ?? item.variant?.id
+      if (!variantId) continue
+      const variant = await db.productVariant.findUnique({ where: { id: variantId } })
+      if (!variant || variant.stock < item.quantity) {
+        return NextResponse.json(
+          { error: `${item.productName ?? item.product?.name ?? 'Product'} is out of stock or insufficient quantity` },
+          { status: 400 }
+        )
+      }
+    }
+
     // Handle address
     let resolvedAddressId: string | null = null
     if (deliveryType === "COURIER" && address) {

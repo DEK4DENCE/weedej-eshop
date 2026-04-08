@@ -44,6 +44,22 @@ export function ProductDetailClient({ product }: { product: Product }) {
 
       {selectedVariant && (
         <div className="space-y-4">
+          {/* Stock status badge */}
+          <div>
+            {selectedVariant.stock === 0 ? (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-700">
+                Není skladem
+              </span>
+            ) : selectedVariant.stock <= 5 ? (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-700">
+                Posledních {selectedVariant.stock} ks
+              </span>
+            ) : (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-[#2E7D32]">
+                Skladem
+              </span>
+            )}
+          </div>
           <div className="text-3xl font-bold text-[#b8860b] font-mono">
             {formatPrice(selectedVariant.price)}
           </div>

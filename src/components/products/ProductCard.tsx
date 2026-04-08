@@ -110,6 +110,25 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
             </div>
           )}
 
+          {/* Stock status */}
+          {defaultVariant && (
+            <div>
+              {defaultVariant.stock === 0 ? (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                  Není skladem
+                </span>
+              ) : defaultVariant.stock <= 5 ? (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+                  Posledních {defaultVariant.stock} ks
+                </span>
+              ) : (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-[#2E7D32]">
+                  Skladem
+                </span>
+              )}
+            </div>
+          )}
+
           <div className="flex items-center justify-between mt-1">
             <span className="text-xl font-bold text-[#b8860b] font-mono">
               {formatPrice(Number(price))}

@@ -140,6 +140,30 @@ export async function POST(req: NextRequest) {
       console.error("Failed to send order confirmation email:", emailError)
     }
 
+    // Deduct stock and log movements for each order item
+    try {
+      const createdOrder = await db.order.findUnique({ where: { id: order.id }, include: { items: true } })
+      if (createdOrder) {
+        for (const item of createdOrder.items) {
+          await db.productVariant.update({
+            where: { id: item.variantId },
+            data: { stock: { decrement: item.quantity } },
+          })
+          await db.stockMovement.create({
+            data: {
+              variantId: item.variantId,
+              type: "RESERVED",
+              quantity: item.quantity,
+              orderId: order.id,
+              reason: "Order paid",
+            },
+          })
+        }
+      }
+    } catch (stockError) {
+      console.error("Failed to update stock:", stockError)
+    }
+
     // Clear user's cart after successful order
     try {
       await db.cartItem.deleteMany({ where: { cart: { userId } } })
