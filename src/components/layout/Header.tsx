@@ -41,7 +41,7 @@ export function Header() {
             Edibles
           </Link>
           <Link href="/contact" className="text-sm font-medium text-[#6e6e73] hover:text-[#1d1d1f] transition-colors">
-            Kontakt
+            Contact
           </Link>
           <Link href="/blog" className="text-sm font-medium text-[#6e6e73] hover:text-[#1d1d1f] transition-colors">
             Blog
