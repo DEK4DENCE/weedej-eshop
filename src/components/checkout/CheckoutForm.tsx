@@ -241,20 +241,24 @@ export function CheckoutForm({ user, addresses }: Props) {
             <CardHeader><CardTitle>Order Summary</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               {items.map((item: any) => {
-                const name = item.variant?.product?.name ?? item.productName
-                const variantName = item.variant?.name ?? item.variantName
+                const productName = item.variant?.product?.name ?? item.productName ?? ""
+                const variantName = item.variant?.name ?? item.variantName ?? ""
                 const price = item.variant?.price ?? item.price ?? 0
                 const image = item.variant?.product?.imageUrls?.[0] ?? item.imageUrl
+                const displayName = productName
+                  ? variantName
+                    ? `${productName} — ${variantName}`
+                    : productName
+                  : variantName
                 return (
                   <div key={item.id ?? item.variantId} className="flex items-center gap-3">
                     {image && (
-                      <div className="relative h-12 w-12 rounded-lg overflow-hidden bg-muted shrink-0">
-                        <Image src={image} alt={name} fill className="object-cover" />
-                      </div>
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={image} alt={displayName} className="h-12 w-12 rounded-lg object-cover shrink-0 bg-muted" />
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{name}</p>
-                      <p className="text-xs text-muted-foreground">{variantName} × {item.quantity}</p>
+                      <p className="text-sm font-medium truncate">{displayName}</p>
+                      <p className="text-xs text-muted-foreground">× {item.quantity}</p>
                     </div>
                     <p className="text-sm font-medium shrink-0">{formatPrice(Number(price) * item.quantity)}</p>
                   </div>

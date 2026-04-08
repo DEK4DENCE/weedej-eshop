@@ -32,49 +32,49 @@ export function OrderCard({ order }: OrderCardProps) {
   const thumbnailItems = order.items.slice(0, 3)
 
   return (
-    <div className="bg-[#111714] border border-[#1F3D1F] rounded-2xl p-6 hover:border-[#22A829]/50 transition-colors duration-200">
+    <div className="bg-white border border-[#e8e8ed] rounded-2xl p-6 hover:border-[#22A829]/50 transition-colors duration-200 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
       <div className="flex items-start justify-between gap-4">
         {/* Left: order info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3 mb-2">
-            <span className="font-mono text-sm font-semibold text-[#F0F5F0]">
+            <span className="font-mono text-sm font-semibold text-[#1d1d1f]">
               #{order.id.slice(-8).toUpperCase()}
             </span>
             <OrderStatusBadge status={order.status} />
           </div>
 
-          <p className="text-xs text-[#6B8A6B] mb-4">
+          <p className="text-xs text-[#6e6e73] mb-4">
             Placed on {formatDate(order.createdAt)}
           </p>
 
           {/* Thumbnail strip */}
           <div className="flex items-center gap-2 mb-4">
-            {thumbnailItems.map((item, index) => (
+            {thumbnailItems.map((item) => (
               <div
                 key={item.id}
-                className="w-12 h-12 rounded-lg bg-[#1A2219] border border-[#1F3D1F] flex items-center justify-center overflow-hidden flex-shrink-0"
+                className="w-12 h-12 rounded-lg bg-[#f5f5f7] border border-[#e8e8ed] flex items-center justify-center overflow-hidden flex-shrink-0"
                 title={item.productName}
               >
-                <Package className="w-5 h-5 text-[#3D5C3D]" />
+                <Package className="w-5 h-5 text-[#6e6e73]" />
               </div>
             ))}
             {order.items.length > 3 && (
-              <div className="w-12 h-12 rounded-lg bg-[#1A2219] border border-[#1F3D1F] flex items-center justify-center flex-shrink-0">
-                <span className="text-xs font-medium text-[#6B8A6B]">
+              <div className="w-12 h-12 rounded-lg bg-[#f5f5f7] border border-[#e8e8ed] flex items-center justify-center flex-shrink-0">
+                <span className="text-xs font-medium text-[#6e6e73]">
                   +{order.items.length - 3}
                 </span>
               </div>
             )}
           </div>
 
-          <p className="text-xs text-[#B8C8B8]">
+          <p className="text-xs text-[#6e6e73]">
             {itemCount} {itemCount === 1 ? 'item' : 'items'}
           </p>
         </div>
 
         {/* Right: total + CTA */}
         <div className="flex flex-col items-end gap-3 flex-shrink-0">
-          <span className="font-mono text-lg font-bold text-[#D4A017]">
+          <span className="font-mono text-lg font-bold text-[#1d1d1f]">
             {formatPrice(order.totalAmount, order.currency)}
           </span>
           <Link
