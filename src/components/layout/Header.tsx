@@ -1,8 +1,9 @@
 "use client"
 
 import Link from "next/link"
+import { useState } from "react"
 import { useSession, signOut } from "next-auth/react"
-import { ShoppingBag, User, LogOut, Settings, Package } from "lucide-react"
+import { ShoppingBag, User, LogOut, Settings, Package, Menu, X } from "lucide-react"
 import { useCart } from "@/hooks/useCart"
 import {
   DropdownMenu,
@@ -13,42 +14,42 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useRouter } from "next/navigation"
 
+const navLinks = [
+  { href: "/products", label: "Vše" },
+  { href: "/products?category=flowers", label: "Flowers" },
+  { href: "/products?category=extracts", label: "Extracts" },
+  { href: "/products?category=edibles", label: "Edibles" },
+  { href: "/contact", label: "Kontakt" },
+  { href: "/blog", label: "Blog" },
+]
+
 export function Header() {
   const { data: session } = useSession()
   const { totalItems, toggleSidebar } = useCart()
   const router = useRouter()
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#DEE2E6] bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
           <span className="text-2xl font-bold text-[#2E7D32] font-playfair">
             Weedej
           </span>
         </Link>
 
+        {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-6">
-          <Link href="/products" className="text-sm font-medium text-[#6e6e73] hover:text-[#1d1d1f] transition-colors">
-            Vše
-          </Link>
-          <Link href="/products?category=flowers" className="text-sm font-medium text-[#6e6e73] hover:text-[#1d1d1f] transition-colors">
-            Flowers
-          </Link>
-          <Link href="/products?category=extracts" className="text-sm font-medium text-[#6e6e73] hover:text-[#1d1d1f] transition-colors">
-            Extracts
-          </Link>
-          <Link href="/products?category=edibles" className="text-sm font-medium text-[#6e6e73] hover:text-[#1d1d1f] transition-colors">
-            Edibles
-          </Link>
-          <Link href="/contact" className="text-sm font-medium text-[#6e6e73] hover:text-[#1d1d1f] transition-colors">
-            Kontakt
-          </Link>
-          <Link href="/blog" className="text-sm font-medium text-[#6e6e73] hover:text-[#1d1d1f] transition-colors">
-            Blog
-          </Link>
+          {navLinks.map(({ href, label }) => (
+            <Link key={href} href={href} className="text-sm font-medium text-[#6e6e73] hover:text-[#1d1d1f] transition-colors">
+              {label}
+            </Link>
+          ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        {/* Right icons */}
+        <div className="flex items-center gap-1">
           <button
             onClick={toggleSidebar}
             className="relative p-2 text-[#6e6e73] hover:text-[#1d1d1f] transition-colors"
@@ -70,45 +71,85 @@ export function Header() {
               <DropdownMenuContent align="end" className="bg-white border-[#DEE2E6]">
                 <div className="px-2 py-1.5 text-sm font-medium text-[#6e6e73]">{session.user?.email}</div>
                 <DropdownMenuSeparator className="bg-[#DEE2E6]" />
-                <DropdownMenuItem
-                  className="text-[#6e6e73] hover:text-[#1d1d1f] cursor-pointer"
-                  onClick={() => router.push("/account")}
-                >
+                <DropdownMenuItem className="text-[#6e6e73] hover:text-[#1d1d1f] cursor-pointer" onClick={() => router.push("/account")}>
                   <User className="mr-2 h-4 w-4" />Můj účet
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="text-[#6e6e73] hover:text-[#1d1d1f] cursor-pointer"
-                  onClick={() => router.push("/account/orders")}
-                >
+                <DropdownMenuItem className="text-[#6e6e73] hover:text-[#1d1d1f] cursor-pointer" onClick={() => router.push("/account/orders")}>
                   <Package className="mr-2 h-4 w-4" />Objednávky
                 </DropdownMenuItem>
                 {(session.user as any)?.role === "ADMIN" && (
-                  <DropdownMenuItem
-                    className="text-[#6e6e73] hover:text-[#1d1d1f] cursor-pointer"
-                    onClick={() => router.push("/admin")}
-                  >
+                  <DropdownMenuItem className="text-[#6e6e73] hover:text-[#1d1d1f] cursor-pointer" onClick={() => router.push("/admin")}>
                     <Settings className="mr-2 h-4 w-4" />Admin
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator className="bg-[#DEE2E6]" />
-                <DropdownMenuItem
-                  onClick={() => signOut({ callbackUrl: "/" })}
-                  className="text-[#6e6e73] hover:text-[#1d1d1f] cursor-pointer"
-                >
+                <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })} className="text-[#6e6e73] hover:text-[#1d1d1f] cursor-pointer">
                   <LogOut className="mr-2 h-4 w-4" />Odhlásit se
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Link
-              href="/login"
-              className="text-sm font-medium text-[#6e6e73] hover:text-[#1d1d1f] transition-colors px-3 py-2"
-            >
+            <Link href="/login" className="hidden md:block text-sm font-medium text-[#6e6e73] hover:text-[#1d1d1f] transition-colors px-3 py-2">
               Přihlásit se
             </Link>
           )}
+
+          {/* Hamburger — mobile only */}
+          <button
+            className="md:hidden p-2 text-[#6e6e73] hover:text-[#1d1d1f] transition-colors"
+            onClick={() => setMobileOpen((o) => !o)}
+            aria-label={mobileOpen ? "Zavřít menu" : "Otevřít menu"}
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <div className="md:hidden border-t border-[#DEE2E6] bg-white/98 backdrop-blur">
+          <nav className="container mx-auto px-4 py-4 flex flex-col gap-1">
+            {navLinks.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                onClick={() => setMobileOpen(false)}
+                className="text-sm font-medium text-[#1d1d1f] hover:text-[#2E7D32] hover:bg-[#E8F5E9] px-3 py-2.5 rounded-xl transition-colors"
+              >
+                {label}
+              </Link>
+            ))}
+            <div className="border-t border-[#DEE2E6] mt-2 pt-3">
+              {session ? (
+                <>
+                  <div className="text-xs text-[#6e6e73] px-3 pb-2">{session.user?.email}</div>
+                  <Link href="/account" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 text-sm font-medium text-[#1d1d1f] hover:text-[#2E7D32] hover:bg-[#E8F5E9] px-3 py-2.5 rounded-xl transition-colors">
+                    <User className="h-4 w-4" />Můj účet
+                  </Link>
+                  <Link href="/account/orders" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 text-sm font-medium text-[#1d1d1f] hover:text-[#2E7D32] hover:bg-[#E8F5E9] px-3 py-2.5 rounded-xl transition-colors">
+                    <Package className="h-4 w-4" />Objednávky
+                  </Link>
+                  {(session.user as any)?.role === "ADMIN" && (
+                    <Link href="/admin" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 text-sm font-medium text-[#1d1d1f] hover:text-[#2E7D32] hover:bg-[#E8F5E9] px-3 py-2.5 rounded-xl transition-colors">
+                      <Settings className="h-4 w-4" />Admin
+                    </Link>
+                  )}
+                  <button
+                    onClick={() => { setMobileOpen(false); signOut({ callbackUrl: "/" }) }}
+                    className="flex items-center gap-2 w-full text-sm font-medium text-[#6e6e73] hover:text-red-600 hover:bg-red-50 px-3 py-2.5 rounded-xl transition-colors mt-1"
+                  >
+                    <LogOut className="h-4 w-4" />Odhlásit se
+                  </button>
+                </>
+              ) : (
+                <Link href="/login" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 text-sm font-medium text-white bg-[#2E7D32] hover:bg-[#1a9020] px-4 py-2.5 rounded-xl transition-colors">
+                  Přihlásit se
+                </Link>
+              )}
+            </div>
+          </nav>
+        </div>
+      )}
     </header>
   )
 }
