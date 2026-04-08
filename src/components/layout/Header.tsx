@@ -40,6 +40,9 @@ export function Header() {
           <Link href="/products?category=edibles" className="text-sm font-medium text-[#6e6e73] hover:text-[#1d1d1f] transition-colors">
             Edibles
           </Link>
+          <Link href="/contact" className="text-sm font-medium text-[#6e6e73] hover:text-[#1d1d1f] transition-colors">
+            Kontakt
+          </Link>
         </nav>
 
         <div className="flex items-center gap-2">
