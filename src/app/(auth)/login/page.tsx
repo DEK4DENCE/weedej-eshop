@@ -12,14 +12,14 @@ export default function LoginPage() {
   useEffect(() => {
     if (searchParams.get('registered') === 'true') {
       toast({
-        title: 'Account created!',
-        description: 'Please check your email to verify your account before signing in.',
+        title: 'Účet vytvořen!',
+        description: 'Zkontrolujte prosím svůj e-mail a ověřte účet před přihlášením.',
       })
     }
     if (searchParams.get('reset') === 'true') {
       toast({
-        title: 'Password updated',
-        description: 'Your password has been updated. You can now sign in.',
+        title: 'Heslo aktualizováno',
+        description: 'Vaše heslo bylo aktualizováno. Nyní se můžete přihlásit.',
       })
     }
   }, [searchParams, toast])

@@ -7,7 +7,7 @@ export const metadata = { title: "Settings — Weedej" }
 export default function SettingsPage() {
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold font-playfair">Account Settings</h1>
+      <h1 className="text-2xl font-bold font-playfair">Nastavení účtu</h1>
       <AccountSettingsClient />
     </div>
   )

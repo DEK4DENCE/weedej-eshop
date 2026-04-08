@@ -24,10 +24,10 @@ export default async function OrdersPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold font-playfair">Order History</h1>
+      <h1 className="text-2xl font-bold font-playfair">Historie objednávek</h1>
       {orders.length === 0 ? (
         <div className="text-center py-16 text-muted-foreground">
-          <p>No orders yet</p>
+          <p>Zatím žádné objednávky</p>
         </div>
       ) : (
         <div className="space-y-4">

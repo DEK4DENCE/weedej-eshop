@@ -33,10 +33,10 @@ export function ProductGrid({ products, onAddToCart, emptyMessage }: ProductGrid
       <div className="flex flex-col items-center justify-center py-24 text-center">
         <Leaf size={48} className="text-[#1F3D1F] mb-4" />
         <p className="text-lg font-medium text-[#6B8A6B]">
-          {emptyMessage ?? 'No products found'}
+          {emptyMessage ?? 'Žádné produkty nenalezeny'}
         </p>
         <p className="text-sm text-[#3D5C3D] mt-1">
-          Try adjusting your filters or check back later.
+          Zkuste upravit filtry nebo se vraťte později.
         </p>
       </div>
     )

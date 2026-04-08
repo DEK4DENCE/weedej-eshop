@@ -84,7 +84,7 @@ export function ProductFilters() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-[#1d1d1f] font-semibold">
           <SlidersHorizontal size={16} className="text-[#2E7D32]" />
-          Filters
+          Filtry
         </div>
         {hasActiveFilters && (
           <button
@@ -92,7 +92,7 @@ export function ProductFilters() {
             className="flex items-center gap-1 text-xs text-[#6e6e73] hover:text-[#2E7D32] transition-colors"
           >
             <RotateCcw size={12} />
-            Reset
+            Resetovat
           </button>
         )}
       </div>
@@ -100,7 +100,7 @@ export function ProductFilters() {
       {/* Category */}
       {categories.length > 0 && (
         <div>
-          <p className="text-sm font-medium text-[#515154] mb-3">Category</p>
+          <p className="text-sm font-medium text-[#515154] mb-3">Kategorie</p>
           <div className="flex flex-col gap-2">
             {categories.map((cat) => (
               <label key={cat.id} className="flex items-center gap-2.5 cursor-pointer group">
@@ -121,13 +121,13 @@ export function ProductFilters() {
 
       {/* Price Range */}
       <div>
-        <p className="text-sm font-medium text-[#515154] mb-3">Price Range</p>
+        <p className="text-sm font-medium text-[#515154] mb-3">Cenové rozmezí</p>
         <div className="flex items-center gap-2">
           <input
             type="number"
             value={minPrice}
             onChange={(e) => setMinPrice(e.target.value)}
-            placeholder="Min"
+            placeholder="Min Kč"
             min={0}
             className="w-full bg-[#fafafa] border border-[#DEE2E6] rounded-xl px-3 py-2 text-sm text-[#1d1d1f] placeholder:text-[#aeaeb2] focus:outline-none focus:border-[#2E7D32] focus:ring-1 focus:ring-[#2E7D32]/30"
           />
@@ -136,7 +136,7 @@ export function ProductFilters() {
             type="number"
             value={maxPrice}
             onChange={(e) => setMaxPrice(e.target.value)}
-            placeholder="Max"
+            placeholder="Max Kč"
             min={0}
             className="w-full bg-[#fafafa] border border-[#DEE2E6] rounded-xl px-3 py-2 text-sm text-[#1d1d1f] placeholder:text-[#aeaeb2] focus:outline-none focus:border-[#2E7D32] focus:ring-1 focus:ring-[#2E7D32]/30"
           />
@@ -152,13 +152,13 @@ export function ProductFilters() {
           className="w-4 h-4 rounded border border-[#DEE2E6] accent-[#2E7D32] cursor-pointer"
         />
         <span className="text-sm text-[#6e6e73] group-hover:text-[#1d1d1f] transition-colors">
-          In Stock Only
+          Pouze skladem
         </span>
       </label>
 
       {/* Strain Type */}
       <div>
-        <p className="text-sm font-medium text-[#515154] mb-3">Strain Type</p>
+        <p className="text-sm font-medium text-[#515154] mb-3">Typ odrůdy</p>
         <div className="flex flex-wrap gap-2">
           {STRAIN_TYPES.map(({ value, label }) => (
             <button
@@ -182,7 +182,7 @@ export function ProductFilters() {
         onClick={applyFilters}
         className="w-full bg-[#2E7D32] hover:bg-[#1a9020] text-white font-semibold py-2.5 rounded-xl text-sm transition-all duration-200 hover:shadow-[0_4px_16px_rgba(34,168,41,0.3)]"
       >
-        Apply Filters
+        Použít filtry
       </button>
     </aside>
   )

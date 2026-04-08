@@ -16,7 +16,7 @@ export default function VerifyEmailPage() {
   useEffect(() => {
     if (!token) {
       setState('error')
-      setErrorMessage('No verification token found in the URL.')
+      setErrorMessage('V URL nebyl nalezen ověřovací token.')
       return
     }
 
@@ -33,11 +33,11 @@ export default function VerifyEmailPage() {
           setTimeout(() => router.push('/login'), 3000)
         } else {
           setState('error')
-          setErrorMessage(data.error ?? 'Invalid or expired verification link.')
+          setErrorMessage(data.error ?? 'Neplatný nebo vypršelý ověřovací odkaz.')
         }
       } catch {
         setState('error')
-        setErrorMessage('Something went wrong. Please try again.')
+        setErrorMessage('Něco se pokazilo. Zkuste to prosím znovu.')
       }
     }
 
@@ -49,8 +49,8 @@ export default function VerifyEmailPage() {
       {state === 'loading' && (
         <>
           <div className="w-12 h-12 border-2 border-[#2E7D32] border-t-transparent rounded-full animate-spin mx-auto mb-6" />
-          <h1 className="text-xl font-semibold text-[#F0F5F0] mb-2">Verifying your email…</h1>
-          <p className="text-[#6B8F6B] text-sm">This should only take a moment.</p>
+          <h1 className="text-xl font-semibold text-[#F0F5F0] mb-2">Ověřování e-mailu…</h1>
+          <p className="text-[#6B8F6B] text-sm">Mělo by to trvat jen chvíli.</p>
         </>
       )}
 
@@ -61,15 +61,15 @@ export default function VerifyEmailPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 className="text-xl font-semibold text-[#F0F5F0] mb-2">Email verified!</h1>
+          <h1 className="text-xl font-semibold text-[#F0F5F0] mb-2">E-mail ověřen!</h1>
           <p className="text-[#6B8F6B] text-sm mb-6">
-            Your account is now active. Redirecting you to sign in…
+            Váš účet je nyní aktivní. Přesměrováváme vás na přihlášení…
           </p>
           <Link
             href="/login"
             className="inline-block bg-[#2E7D32] hover:bg-[#38C424] text-black font-semibold rounded-xl px-6 py-3 transition-colors"
           >
-            Sign In Now
+            Přihlásit se
           </Link>
         </>
       )}
@@ -81,14 +81,14 @@ export default function VerifyEmailPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </div>
-          <h1 className="text-xl font-semibold text-[#F0F5F0] mb-2">Verification failed</h1>
+          <h1 className="text-xl font-semibold text-[#F0F5F0] mb-2">Ověření selhalo</h1>
           <p className="text-[#6B8F6B] text-sm mb-6">{errorMessage}</p>
           <div className="flex flex-col gap-3">
             <Link
               href="/login"
               className="inline-block bg-[#2E7D32] hover:bg-[#38C424] text-black font-semibold rounded-xl px-6 py-3 transition-colors text-center"
             >
-              Back to Sign In
+              Zpět na přihlášení
             </Link>
           </div>
         </>

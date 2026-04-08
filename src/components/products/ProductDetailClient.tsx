@@ -77,7 +77,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
 
       {product.effects.length > 0 && (
         <div>
-          <p className="text-sm font-medium text-[#515154] mb-2">Effects</p>
+          <p className="text-sm font-medium text-[#515154] mb-2">Účinky</p>
           <div className="flex flex-wrap gap-2">
             {product.effects.map((effect) => (
               <span key={effect} className="px-3 py-1 rounded-full text-xs font-medium bg-[#2E7D32]/10 border border-[#2E7D32]/20 text-[#2E7D32]">
@@ -90,7 +90,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
 
       {product.flavours.length > 0 && (
         <div>
-          <p className="text-sm font-medium text-[#515154] mb-2">Flavours</p>
+          <p className="text-sm font-medium text-[#515154] mb-2">Chutě</p>
           <div className="flex flex-wrap gap-2">
             {product.flavours.map((flavour) => (
               <span key={flavour} className="px-3 py-1 rounded-full text-xs font-medium bg-[#b8860b]/10 border border-[#b8860b]/20 text-[#b8860b]">
@@ -103,7 +103,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
 
       {product.terpenes.length > 0 && (
         <div>
-          <p className="text-sm font-medium text-[#515154] mb-2">Terpenes</p>
+          <p className="text-sm font-medium text-[#515154] mb-2">Terpeny</p>
           <div className="flex flex-wrap gap-2">
             {product.terpenes.map((t) => (
               <span key={t} className="px-3 py-1 rounded-full text-xs font-medium bg-[#F8F9FA] border border-[#DEE2E6] text-[#515154]">

@@ -61,7 +61,7 @@ export default async function SearchPage({ searchParams }: Props) {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6 font-playfair text-[#F0F5F0]">
-        {query ? `Results for "${query}"` : "Search"}
+        {query ? `Výsledky pro „${query}"` : "Hledat"}
       </h1>
       <div className="mb-6">
         <Suspense>
@@ -70,7 +70,7 @@ export default async function SearchPage({ searchParams }: Props) {
       </div>
       <ProductGrid
         products={products}
-        emptyMessage={query ? `No products found for "${query}"` : "Enter a search term to find products"}
+        emptyMessage={query ? `Pro „${query}" nebyly nalezeny žádné produkty` : "Zadejte hledaný výraz pro vyhledání produktů"}
       />
     </div>
   )

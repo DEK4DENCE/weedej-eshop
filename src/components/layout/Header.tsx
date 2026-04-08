@@ -29,7 +29,7 @@ export function Header() {
 
         <nav className="hidden md:flex items-center gap-6">
           <Link href="/products" className="text-sm font-medium text-[#6e6e73] hover:text-[#1d1d1f] transition-colors">
-            All
+            Vše
           </Link>
           <Link href="/products?category=flowers" className="text-sm font-medium text-[#6e6e73] hover:text-[#1d1d1f] transition-colors">
             Flowers
@@ -41,7 +41,7 @@ export function Header() {
             Edibles
           </Link>
           <Link href="/contact" className="text-sm font-medium text-[#6e6e73] hover:text-[#1d1d1f] transition-colors">
-            Contact
+            Kontakt
           </Link>
           <Link href="/blog" className="text-sm font-medium text-[#6e6e73] hover:text-[#1d1d1f] transition-colors">
             Blog
@@ -74,13 +74,13 @@ export function Header() {
                   className="text-[#6e6e73] hover:text-[#1d1d1f] cursor-pointer"
                   onClick={() => router.push("/account")}
                 >
-                  <User className="mr-2 h-4 w-4" />Account
+                  <User className="mr-2 h-4 w-4" />Můj účet
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="text-[#6e6e73] hover:text-[#1d1d1f] cursor-pointer"
                   onClick={() => router.push("/account/orders")}
                 >
-                  <Package className="mr-2 h-4 w-4" />Orders
+                  <Package className="mr-2 h-4 w-4" />Objednávky
                 </DropdownMenuItem>
                 {(session.user as any)?.role === "ADMIN" && (
                   <DropdownMenuItem
@@ -95,7 +95,7 @@ export function Header() {
                   onClick={() => signOut({ callbackUrl: "/" })}
                   className="text-[#6e6e73] hover:text-[#1d1d1f] cursor-pointer"
                 >
-                  <LogOut className="mr-2 h-4 w-4" />Sign out
+                  <LogOut className="mr-2 h-4 w-4" />Odhlásit se
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -104,7 +104,7 @@ export function Header() {
               href="/login"
               className="text-sm font-medium text-[#6e6e73] hover:text-[#1d1d1f] transition-colors px-3 py-2"
             >
-              Sign in
+              Přihlásit se
             </Link>
           )}
         </div>

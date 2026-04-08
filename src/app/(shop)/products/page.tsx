@@ -89,7 +89,7 @@ export default async function ProductsPage({ searchParams }: Props) {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6 font-playfair text-[#1d1d1f]">Products</h1>
+      <h1 className="text-3xl font-bold mb-6 font-playfair text-[#1d1d1f]">Produkty</h1>
       <div className="flex flex-col md:flex-row gap-8">
         <aside className="w-full md:w-64 shrink-0">
           <Suspense>

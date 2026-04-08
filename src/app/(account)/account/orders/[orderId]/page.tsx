@@ -31,7 +31,7 @@ export default async function OrderDetailPage({ params }: Props) {
   if (!order) notFound()
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold font-playfair">Order Details</h1>
+      <h1 className="text-2xl font-bold font-playfair">Detail objednávky</h1>
       <OrderDetail order={order as any} />
     </div>
   )

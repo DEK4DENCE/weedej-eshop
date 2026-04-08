@@ -22,13 +22,13 @@ export function CartPageClient() {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-6">
         <ShoppingBag className="w-16 h-16 text-[#2D5C2D]" />
-        <h2 className="text-2xl font-semibold text-[#F0F5F0]">Your cart is empty</h2>
-        <p className="text-[#6B8A6B]">Add some products to get started</p>
+        <h2 className="text-2xl font-semibold text-[#F0F5F0]">Váš košík je prázdný</h2>
+        <p className="text-[#6B8A6B]">Přidejte produkty pro zahájení nákupu</p>
         <Link
           href="/products"
           className="bg-[#2E7D32] hover:bg-[#38C424] text-black font-semibold px-6 py-3 rounded-xl text-sm transition-colors"
         >
-          Browse Products
+          Procházet produkty
         </Link>
       </div>
     )
@@ -39,13 +39,13 @@ export function CartPageClient() {
       <div className="lg:col-span-2 space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold text-[#F0F5F0]">
-            Cart Items ({items.length})
+            Položky košíku ({items.length})
           </h2>
           <button
             onClick={clearCart}
             className="text-sm text-[#6B8A6B] hover:text-[#E53E3E] transition-colors"
           >
-            Clear cart
+            Vyprázdnit košík
           </button>
         </div>
         <div className="bg-[#111714] border border-[#1F3D1F] rounded-2xl p-4">

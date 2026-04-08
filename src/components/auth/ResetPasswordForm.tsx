@@ -41,28 +41,28 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       const json = await res.json()
 
       if (!res.ok) {
-        setServerError(json.error ?? 'Something went wrong. Please try again.')
+        setServerError(json.error ?? 'Něco se pokazilo. Zkuste to prosím znovu.')
         return
       }
 
       router.push('/login?reset=true')
     } catch {
-      setServerError('Something went wrong. Please try again.')
+      setServerError('Něco se pokazilo. Zkuste to prosím znovu.')
     }
   }
 
   if (!token) {
     return (
       <div className="bg-[#111714] border border-[#1F3D1F] rounded-2xl p-8 w-full max-w-md text-center">
-        <h1 className="text-xl font-semibold text-[#F0F5F0] mb-2">Invalid link</h1>
+        <h1 className="text-xl font-semibold text-[#F0F5F0] mb-2">Neplatný odkaz</h1>
         <p className="text-[#6B8F6B] text-sm mb-6">
-          This reset link is invalid or missing. Please request a new one.
+          Tento odkaz pro reset je neplatný nebo chybí. Vyžádejte si prosím nový.
         </p>
         <Link
           href="/forgot-password"
           className="inline-block bg-[#2E7D32] hover:bg-[#38C424] text-black font-semibold rounded-xl px-6 py-3 transition-colors"
         >
-          Request New Link
+          Vyžádat nový odkaz
         </Link>
       </div>
     )
@@ -71,8 +71,8 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   return (
     <div className="bg-[#111714] border border-[#1F3D1F] rounded-2xl p-8 w-full max-w-md">
       <div className="mb-8 text-center">
-        <h1 className="text-2xl font-bold text-[#F0F5F0] mb-1">Choose a New Password</h1>
-        <p className="text-[#6B8F6B] text-sm">Your new password must be at least 8 characters</p>
+        <h1 className="text-2xl font-bold text-[#F0F5F0] mb-1">Zvolte nové heslo</h1>
+        <p className="text-[#6B8F6B] text-sm">Nové heslo musí mít alespoň 8 znaků</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
@@ -86,13 +86,13 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 
         <div className="space-y-1.5">
           <Label htmlFor="password" className="text-[#A8C5A0] text-sm">
-            New password
+            Nové heslo
           </Label>
           <div className="relative">
             <Input
               id="password"
               type={showPassword ? 'text' : 'password'}
-              placeholder="Create a secure password"
+              placeholder="Vytvořte bezpečné heslo"
               autoComplete="new-password"
               className="bg-[#1A2219] border border-[#1F3D1F] focus:border-[#2E7D32] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#F0F5F0] placeholder:text-[#3D5C3D] rounded-xl h-11 pr-11"
               {...register('password')}
@@ -101,7 +101,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
               type="button"
               onClick={() => setShowPassword((v) => !v)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B8F6B] hover:text-[#A8C5A0] transition-colors"
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              aria-label={showPassword ? 'Skrýt heslo' : 'Zobrazit heslo'}
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
@@ -113,13 +113,13 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 
         <div className="space-y-1.5">
           <Label htmlFor="confirmPassword" className="text-[#A8C5A0] text-sm">
-            Confirm new password
+            Potvrdit nové heslo
           </Label>
           <div className="relative">
             <Input
               id="confirmPassword"
               type={showConfirm ? 'text' : 'password'}
-              placeholder="Repeat your password"
+              placeholder="Zopakujte heslo"
               autoComplete="new-password"
               className="bg-[#1A2219] border border-[#1F3D1F] focus:border-[#2E7D32] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#F0F5F0] placeholder:text-[#3D5C3D] rounded-xl h-11 pr-11"
               {...register('confirmPassword')}
@@ -128,7 +128,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
               type="button"
               onClick={() => setShowConfirm((v) => !v)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B8F6B] hover:text-[#A8C5A0] transition-colors"
-              aria-label={showConfirm ? 'Hide password' : 'Show password'}
+              aria-label={showConfirm ? 'Skrýt heslo' : 'Zobrazit heslo'}
             >
               {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
@@ -143,7 +143,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
           disabled={isSubmitting}
           className="w-full bg-[#2E7D32] hover:bg-[#38C424] text-black font-semibold rounded-xl h-11 transition-colors disabled:opacity-60"
         >
-          {isSubmitting ? 'Updating…' : 'Update Password'}
+          {isSubmitting ? 'Ukládání…' : 'Aktualizovat heslo'}
         </Button>
       </form>
     </div>

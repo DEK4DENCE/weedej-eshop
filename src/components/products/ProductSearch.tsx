@@ -9,7 +9,7 @@ interface ProductSearchProps {
   className?: string
 }
 
-export function ProductSearch({ placeholder = 'Search products…', className = '' }: ProductSearchProps) {
+export function ProductSearch({ placeholder = 'Hledat produkty…', className = '' }: ProductSearchProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()

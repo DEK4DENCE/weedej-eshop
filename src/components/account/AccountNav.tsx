@@ -6,9 +6,9 @@ import { cn } from "@/lib/utils"
 import { User, Package, Settings } from "lucide-react"
 
 const links = [
-  { href: "/account", label: "Profile", icon: User },
-  { href: "/account/orders", label: "Orders", icon: Package },
-  { href: "/account/settings", label: "Settings", icon: Settings },
+  { href: "/account", label: "Profil", icon: User },
+  { href: "/account/orders", label: "Objednávky", icon: Package },
+  { href: "/account/settings", label: "Nastavení", icon: Settings },
 ]
 
 export function AccountNav() {

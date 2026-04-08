@@ -93,8 +93,8 @@ export function CheckoutForm({ user, addresses }: Props) {
   if (items.length === 0) {
     return (
       <div className="text-center py-16">
-        <p className="text-muted-foreground mb-4">Your cart is empty</p>
-        <Button asChild><Link href="/products">Browse Products</Link></Button>
+        <p className="text-muted-foreground mb-4">Váš košík je prázdný</p>
+        <Button asChild><Link href="/products">Procházet produkty</Link></Button>
       </div>
     )
   }
@@ -107,11 +107,11 @@ export function CheckoutForm({ user, addresses }: Props) {
 
           {/* Delivery type */}
           <Card>
-            <CardHeader><CardTitle className="flex items-center gap-2"><Truck className="h-5 w-5 text-green-400" />Delivery Method</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="flex items-center gap-2"><Truck className="h-5 w-5 text-green-400" />Způsob doručení</CardTitle></CardHeader>
             <CardContent className="grid grid-cols-2 gap-3">
               {([
-                { value: "COURIER", label: "Home Delivery", desc: "Delivered to your address", icon: Truck },
-                { value: "PICKUP_IN_STORE", label: "Pickup in Store", desc: "Free — collect at our shop", icon: Store },
+                { value: "COURIER", label: "Doručení domů", desc: "Doručíme na vaši adresu", icon: Truck },
+                { value: "PICKUP_IN_STORE", label: "Vyzvednutí v prodejně", desc: "Zdarma — vyzvedněte v naší prodejně", icon: Store },
               ] as const).map(({ value, label, desc, icon: Icon }) => (
                 <button
                   key={value}
@@ -134,7 +134,7 @@ export function CheckoutForm({ user, addresses }: Props) {
           {/* Address — only for courier */}
           {deliveryType === "COURIER" && (
             <Card>
-              <CardHeader><CardTitle className="flex items-center gap-2"><MapPin className="h-5 w-5 text-green-400" />Delivery Address</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="flex items-center gap-2"><MapPin className="h-5 w-5 text-green-400" />Dodací adresa</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 {addresses.length > 0 && (
                   <div className="space-y-2">
@@ -155,7 +155,7 @@ export function CheckoutForm({ user, addresses }: Props) {
                           <p className="text-muted-foreground">{addr.line1}{addr.line2 ? `, ${addr.line2}` : ""}</p>
                           <p className="text-muted-foreground">{addr.postalCode} {addr.city}, {addr.country}</p>
                         </div>
-                        {addr.isDefault && <span className="ml-auto text-xs text-green-400 shrink-0">Default</span>}
+                        {addr.isDefault && <span className="ml-auto text-xs text-green-400 shrink-0">Výchozí</span>}
                       </button>
                     ))}
                     <button
@@ -167,7 +167,7 @@ export function CheckoutForm({ user, addresses }: Props) {
                           : "border-[#DEE2E6] hover:border-[#2E7D32]"
                       }`}
                     >
-                      <Plus className="h-4 w-4" />Enter a new address
+                      <Plus className="h-4 w-4" />Zadat novou adresu
                     </button>
                   </div>
                 )}
@@ -176,38 +176,38 @@ export function CheckoutForm({ user, addresses }: Props) {
                   <div className="space-y-3 pt-2">
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1 col-span-2">
-                        <Label>Full Name</Label>
+                        <Label>Celé jméno</Label>
                         <Input value={newAddress.fullName} onChange={(e) => setNewAddress((p) => ({ ...p, fullName: e.target.value }))} required />
                       </div>
                       <div className="space-y-1 col-span-2">
-                        <Label>Phone</Label>
+                        <Label>Telefon</Label>
                         <Input value={newAddress.phone} onChange={(e) => setNewAddress((p) => ({ ...p, phone: e.target.value }))} placeholder="+420 ..." />
                       </div>
                       <div className="space-y-1 col-span-2">
-                        <Label>Street Address</Label>
-                        <Input value={newAddress.line1} onChange={(e) => setNewAddress((p) => ({ ...p, line1: e.target.value }))} required placeholder="Street and house number" />
+                        <Label>Ulice a číslo domu</Label>
+                        <Input value={newAddress.line1} onChange={(e) => setNewAddress((p) => ({ ...p, line1: e.target.value }))} required placeholder="Ulice a číslo domu" />
                       </div>
                       <div className="space-y-1">
-                        <Label>Postal Code</Label>
+                        <Label>PSČ</Label>
                         <Input value={newAddress.postalCode} onChange={(e) => setNewAddress((p) => ({ ...p, postalCode: e.target.value }))} required placeholder="110 00" />
                       </div>
                       <div className="space-y-1">
-                        <Label>City</Label>
+                        <Label>Město</Label>
                         <Input value={newAddress.city} onChange={(e) => setNewAddress((p) => ({ ...p, city: e.target.value }))} required />
                       </div>
                       <div className="space-y-1 col-span-2">
-                        <Label>Country</Label>
+                        <Label>Země</Label>
                         <select
                           value={newAddress.country}
                           onChange={(e) => setNewAddress((p) => ({ ...p, country: e.target.value }))}
                           className="w-full h-10 px-3 rounded-md border border-[#DEE2E6] bg-[#F8F9FA] text-[#1d1d1f] text-sm outline-none focus:border-[#2E7D32]"
                           required
                         >
-                          <option value="CZ">Czech Republic</option>
-                          <option value="SK">Slovakia</option>
-                          <option value="DE">Germany</option>
-                          <option value="AT">Austria</option>
-                          <option value="PL">Poland</option>
+                          <option value="CZ">Česká republika</option>
+                          <option value="SK">Slovensko</option>
+                          <option value="DE">Německo</option>
+                          <option value="AT">Rakousko</option>
+                          <option value="PL">Polsko</option>
                         </select>
                       </div>
                     </div>
@@ -220,12 +220,12 @@ export function CheckoutForm({ user, addresses }: Props) {
           {/* Pickup info */}
           {deliveryType === "PICKUP_IN_STORE" && (
             <Card>
-              <CardHeader><CardTitle className="flex items-center gap-2"><Store className="h-5 w-5 text-green-400" />Pickup Location</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="flex items-center gap-2"><Store className="h-5 w-5 text-green-400" />Místo vyzvednutí</CardTitle></CardHeader>
               <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p className="font-medium text-foreground">Weedej Store</p>
-                <p>Václavské náměstí 1, 110 00 Praha 1</p>
-                <p>Mon–Sat: 10:00–20:00 | Sun: 12:00–18:00</p>
-                <p className="text-green-400 text-xs mt-2">✓ Free pickup — no shipping fee</p>
+                <p className="font-medium text-foreground">Prodejna Weedej</p>
+                <p>Benešovská 432/3, 405 02 Děčín 2</p>
+                <p>Po–Pá: 11:00–19:00 | So: 11:00–17:00</p>
+                <p className="text-green-400 text-xs mt-2">✓ Vyzvednutí zdarma — bez poplatku za dopravu</p>
               </CardContent>
             </Card>
           )}
@@ -238,7 +238,7 @@ export function CheckoutForm({ user, addresses }: Props) {
         {/* Right: order summary */}
         <div className="lg:col-span-2">
           <Card className="sticky top-24">
-            <CardHeader><CardTitle>Order Summary</CardTitle></CardHeader>
+            <CardHeader><CardTitle>Shrnutí objednávky</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               {items.map((item: any) => {
                 const productName = item.variant?.product?.name ?? item.productName ?? ""
@@ -269,15 +269,15 @@ export function CheckoutForm({ user, addresses }: Props) {
 
               <div className="space-y-1.5 text-sm">
                 <div className="flex justify-between text-muted-foreground">
-                  <span>Subtotal</span><span>{formatPrice(totalPrice)}</span>
+                  <span>Mezisoučet</span><span>{formatPrice(totalPrice)}</span>
                 </div>
                 <div className="flex justify-between text-muted-foreground">
-                  <span>Shipping</span>
-                  <span>{shippingEur === 0 ? <span className="text-green-400">Free</span> : formatPrice(shippingEur)}</span>
+                  <span>Doprava</span>
+                  <span>{shippingEur === 0 ? <span className="text-green-400">Zdarma</span> : formatPrice(shippingEur)}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between font-semibold text-base pt-1">
-                  <span>Total</span><span>{formatPrice(total)}</span>
+                  <span>Celkem</span><span>{formatPrice(total)}</span>
                 </div>
               </div>
 
@@ -288,11 +288,11 @@ export function CheckoutForm({ user, addresses }: Props) {
                 size="lg"
               >
                 {loading
-                  ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Redirecting to payment...</>
-                  : `Pay ${formatPrice(total)}`}
+                  ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Přesměrování na platbu...</>
+                  : `Zaplatit ${formatPrice(total)}`}
               </Button>
               <p className="text-xs text-center text-muted-foreground">
-                🔒 Secure payment via Stripe
+                🔒 Bezpečná platba přes Stripe
               </p>
             </CardContent>
           </Card>

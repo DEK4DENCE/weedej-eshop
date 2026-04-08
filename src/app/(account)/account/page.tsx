@@ -17,16 +17,16 @@ export default async function AccountPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold font-playfair">My Account</h1>
+      <h1 className="text-2xl font-bold font-playfair">Můj účet</h1>
       <Card>
-        <CardHeader><CardTitle>Profile Information</CardTitle></CardHeader>
+        <CardHeader><CardTitle>Informace o profilu</CardTitle></CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-500/10">
               <User className="h-6 w-6 text-green-400" />
             </div>
             <div>
-              <p className="font-medium">{user?.name ?? "Anonymous"}</p>
+              <p className="font-medium">{user?.name ?? "Anonymní uživatel"}</p>
               <Badge variant="outline" className="text-xs mt-1">{user?.role}</Badge>
             </div>
           </div>
@@ -34,11 +34,11 @@ export default async function AccountPage() {
             <div className="flex items-center gap-2 text-muted-foreground">
               <Mail className="h-4 w-4" />
               <span>{user?.email}</span>
-              {user?.emailVerified && <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-xs">Verified</Badge>}
+              {user?.emailVerified && <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-xs">Ověřeno</Badge>}
             </div>
             <div className="flex items-center gap-2 text-muted-foreground">
               <Calendar className="h-4 w-4" />
-              <span>Member since {user?.createdAt ? new Date(user.createdAt).toLocaleDateString("en-GB", { month: "long", year: "numeric" }) : "N/A"}</span>
+              <span>Zákazník od {user?.createdAt ? new Date(user.createdAt).toLocaleDateString("cs-CZ", { month: "long", year: "numeric" }) : "N/A"}</span>
             </div>
           </div>
         </CardContent>

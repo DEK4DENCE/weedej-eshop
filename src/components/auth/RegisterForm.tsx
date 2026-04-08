@@ -19,7 +19,7 @@ function PasswordStrength({ password }: { password: string }) {
     /[^A-Za-z0-9]/.test(password),
   ]
   const strength = checks.filter(Boolean).length
-  const labels = ['Too short', 'Weak', 'Fair', 'Good', 'Strong']
+  const labels = ['Příliš krátké', 'Slabé', 'Průměrné', 'Dobré', 'Silné']
   const colors = ['bg-[#DEE2E6]', 'bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-[#2E7D32]']
 
   if (!password) return null
@@ -67,21 +67,21 @@ export function RegisterForm() {
       const json = await res.json()
 
       if (!res.ok) {
-        setServerError(json.error ?? 'Something went wrong. Please try again.')
+        setServerError(json.error ?? 'Něco se pokazilo. Zkuste to prosím znovu.')
         return
       }
 
       router.push('/login?registered=true')
     } catch {
-      setServerError('Something went wrong. Please try again.')
+      setServerError('Něco se pokazilo. Zkuste to prosím znovu.')
     }
   }
 
   return (
     <div className="bg-white border border-[#DEE2E6] rounded-2xl p-8 w-full max-w-md">
       <div className="mb-8 text-center">
-        <h1 className="text-2xl font-bold text-[#1d1d1f] mb-1">Create Your Account</h1>
-        <p className="text-[#6e6e73] text-sm">Join thousands of satisfied customers</p>
+        <h1 className="text-2xl font-bold text-[#1d1d1f] mb-1">Vytvořte si účet</h1>
+        <p className="text-[#6e6e73] text-sm">Připojte se k tisícům spokojených zákazníků</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
@@ -93,7 +93,7 @@ export function RegisterForm() {
 
         <div className="space-y-1.5">
           <Label htmlFor="name" className="text-[#515154] text-sm">
-            Full name
+            Celé jméno
           </Label>
           <Input
             id="name"
@@ -110,7 +110,7 @@ export function RegisterForm() {
 
         <div className="space-y-1.5">
           <Label htmlFor="email" className="text-[#515154] text-sm">
-            Email address
+            E-mailová adresa
           </Label>
           <Input
             id="email"
@@ -127,7 +127,7 @@ export function RegisterForm() {
 
         <div className="space-y-1.5">
           <Label htmlFor="dateOfBirth" className="text-[#515154] text-sm">
-            Date of birth
+            Datum narození
           </Label>
           <Input
             id="dateOfBirth"
@@ -143,13 +143,13 @@ export function RegisterForm() {
 
         <div className="space-y-1.5">
           <Label htmlFor="password" className="text-[#515154] text-sm">
-            Password
+            Heslo
           </Label>
           <div className="relative">
             <Input
               id="password"
               type={showPassword ? 'text' : 'password'}
-              placeholder="Create a secure password"
+              placeholder="Vytvořte bezpečné heslo"
               autoComplete="new-password"
               className="bg-[#F8F9FA] border border-[#DEE2E6] focus:border-[#2E7D32] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#1d1d1f] placeholder:text-[#aeaeb2] rounded-xl h-11 pr-11"
               {...register('password')}
@@ -158,7 +158,7 @@ export function RegisterForm() {
               type="button"
               onClick={() => setShowPassword((v) => !v)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-[#aeaeb2] hover:text-[#6e6e73] transition-colors"
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              aria-label={showPassword ? 'Skrýt heslo' : 'Zobrazit heslo'}
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
@@ -171,13 +171,13 @@ export function RegisterForm() {
 
         <div className="space-y-1.5">
           <Label htmlFor="confirmPassword" className="text-[#515154] text-sm">
-            Confirm password
+            Potvrdit heslo
           </Label>
           <div className="relative">
             <Input
               id="confirmPassword"
               type={showConfirm ? 'text' : 'password'}
-              placeholder="Repeat your password"
+              placeholder="Zopakujte heslo"
               autoComplete="new-password"
               className="bg-[#F8F9FA] border border-[#DEE2E6] focus:border-[#2E7D32] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#1d1d1f] placeholder:text-[#aeaeb2] rounded-xl h-11 pr-11"
               {...register('confirmPassword')}
@@ -186,7 +186,7 @@ export function RegisterForm() {
               type="button"
               onClick={() => setShowConfirm((v) => !v)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-[#aeaeb2] hover:text-[#6e6e73] transition-colors"
-              aria-label={showConfirm ? 'Hide password' : 'Show password'}
+              aria-label={showConfirm ? 'Skrýt heslo' : 'Zobrazit heslo'}
             >
               {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
@@ -201,14 +201,14 @@ export function RegisterForm() {
           disabled={isSubmitting}
           className="w-full bg-[#2E7D32] hover:bg-[#1a9020] text-white font-semibold rounded-xl h-11 transition-colors disabled:opacity-60"
         >
-          {isSubmitting ? 'Creating account…' : 'Create Account'}
+          {isSubmitting ? 'Vytváření účtu…' : 'Vytvořit účet'}
         </Button>
       </form>
 
       <p className="mt-6 text-center text-sm text-[#6e6e73]">
-        Already have an account?{' '}
+        Již máte účet?{' '}
         <Link href="/login" className="text-[#2E7D32] hover:text-[#1a9020] font-medium transition-colors">
-          Sign in
+          Přihlásit se
         </Link>
       </p>
     </div>

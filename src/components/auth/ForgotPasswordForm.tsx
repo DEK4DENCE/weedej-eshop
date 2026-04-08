@@ -31,12 +31,12 @@ export function ForgotPasswordForm() {
       })
       if (!res.ok) {
         const json = await res.json()
-        setServerError(json.error ?? 'Something went wrong. Please try again.')
+        setServerError(json.error ?? 'Něco se pokazilo. Zkuste to prosím znovu.')
         return
       }
       setSubmitted(true)
     } catch {
-      setServerError('Something went wrong. Please try again.')
+      setServerError('Něco se pokazilo. Zkuste to prosím znovu.')
     }
   }
 
@@ -48,15 +48,15 @@ export function ForgotPasswordForm() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
           </svg>
         </div>
-        <h1 className="text-xl font-semibold text-[#F0F5F0] mb-2">Check your inbox</h1>
+        <h1 className="text-xl font-semibold text-[#F0F5F0] mb-2">Zkontrolujte svou e-mailovou schránku</h1>
         <p className="text-[#6B8F6B] text-sm mb-6">
-          Check your inbox — a reset link is on its way.
+          Odkaz pro reset hesla je na cestě do vaší schránky.
         </p>
         <Link
           href="/login"
           className="text-[#2E7D32] hover:text-[#38C424] text-sm font-medium transition-colors"
         >
-          Back to sign in
+          Zpět na přihlášení
         </Link>
       </div>
     )
@@ -65,8 +65,8 @@ export function ForgotPasswordForm() {
   return (
     <div className="bg-[#111714] border border-[#1F3D1F] rounded-2xl p-8 w-full max-w-md">
       <div className="mb-8 text-center">
-        <h1 className="text-2xl font-bold text-[#F0F5F0] mb-1">Reset Your Password</h1>
-        <p className="text-[#6B8F6B] text-sm">Enter your email and we&apos;ll send you a reset link</p>
+        <h1 className="text-2xl font-bold text-[#F0F5F0] mb-1">Obnovit heslo</h1>
+        <p className="text-[#6B8F6B] text-sm">Zadejte svůj e-mail a my vám pošleme odkaz pro reset hesla</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
@@ -78,7 +78,7 @@ export function ForgotPasswordForm() {
 
         <div className="space-y-1.5">
           <Label htmlFor="email" className="text-[#A8C5A0] text-sm">
-            Email address
+            E-mailová adresa
           </Label>
           <Input
             id="email"
@@ -98,13 +98,13 @@ export function ForgotPasswordForm() {
           disabled={isSubmitting}
           className="w-full bg-[#2E7D32] hover:bg-[#38C424] text-black font-semibold rounded-xl h-11 transition-colors disabled:opacity-60"
         >
-          {isSubmitting ? 'Sending…' : 'Send Reset Link'}
+          {isSubmitting ? 'Odesílání…' : 'Odeslat odkaz pro reset'}
         </Button>
       </form>
 
       <p className="mt-6 text-center">
         <Link href="/login" className="text-[#2E7D32] hover:text-[#38C424] text-sm font-medium transition-colors">
-          Back to sign in
+          Zpět na přihlášení
         </Link>
       </p>
     </div>
