@@ -307,3 +307,16 @@ model OrderItem {
 
   @@index([orderId])
 }
+
+model ShippingMethod {
+  id            String   @id @default(cuid())
+  name          String
+  description   String
+  price         Decimal  @db.Decimal(10, 2)
+  freeThreshold Decimal? @db.Decimal(10, 2)
+  isActive      Boolean  @default(true)
+  estimatedDays String
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useCart } from "@/hooks/useCart"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -9,10 +9,18 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { formatPrice } from "@/lib/utils/formatPrice"
 import { Loader2, Truck, Store, MapPin, Plus } from "lucide-react"
-import Image from "next/image"
 import Link from "next/link"
 
 type DeliveryType = "COURIER" | "PICKUP_IN_STORE"
+
+interface ShippingMethod {
+  id: string
+  name: string
+  description: string
+  price: number
+  freeThreshold: number | null
+  estimatedDays: string
+}
 
 interface Address {
   id: string
@@ -41,6 +49,8 @@ export function CheckoutForm({ user, addresses }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [deliveryType, setDeliveryType] = useState<DeliveryType>("COURIER")
+  const [shippingMethods, setShippingMethods] = useState<ShippingMethod[]>([])
+  const [selectedShippingId, setSelectedShippingId] = useState<string | null>(null)
   const defaultAddr = addresses.find((a) => a.isDefault) ?? addresses[0] ?? null
   const [selectedAddressId, setSelectedAddressId] = useState<string>(defaultAddr?.id ?? "new")
   const [newAddress, setNewAddress] = useState({
@@ -53,9 +63,24 @@ export function CheckoutForm({ user, addresses }: Props) {
     phone: user?.phone ?? "",
   })
 
-  const shippingCents = deliveryType === "PICKUP_IN_STORE" ? 0 : totalPrice >= 1500 ? 0 : 99
-  const shippingEur = shippingCents
-  const total = totalPrice + shippingEur
+  useEffect(() => {
+    fetch("/api/shipping")
+      .then((r) => r.json())
+      .then((data: any[]) => {
+        const methods = data.map((m) => ({ ...m, price: Number(m.price), freeThreshold: m.freeThreshold != null ? Number(m.freeThreshold) : null }))
+        setShippingMethods(methods)
+        if (methods.length > 0) setSelectedShippingId(methods[0].id)
+      })
+      .catch(() => {})
+  }, [])
+
+  const selectedMethod = shippingMethods.find((m) => m.id === selectedShippingId) ?? null
+  const methodPrice = deliveryType === "PICKUP_IN_STORE"
+    ? 0
+    : selectedMethod
+      ? (selectedMethod.freeThreshold != null && totalPrice >= selectedMethod.freeThreshold ? 0 : selectedMethod.price)
+      : (totalPrice >= 1500 ? 0 : 99)
+  const total = totalPrice + methodPrice
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -78,6 +103,7 @@ export function CheckoutForm({ user, addresses }: Props) {
           items,
           deliveryType,
           address: addressPayload,
+          shippingMethodId: deliveryType === "COURIER" ? selectedShippingId : null,
         }),
       })
       const data = await res.json()
@@ -108,26 +134,50 @@ export function CheckoutForm({ user, addresses }: Props) {
           {/* Delivery type */}
           <Card>
             <CardHeader><CardTitle className="flex items-center gap-2"><Truck className="h-5 w-5 text-green-400" />Způsob doručení</CardTitle></CardHeader>
-            <CardContent className="grid grid-cols-2 gap-3">
-              {([
-                { value: "COURIER", label: "Doručení domů", desc: "Doručíme na vaši adresu", icon: Truck },
-                { value: "PICKUP_IN_STORE", label: "Vyzvednutí v prodejně", desc: "Zdarma — vyzvedněte v naší prodejně", icon: Store },
-              ] as const).map(({ value, label, desc, icon: Icon }) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => setDeliveryType(value)}
-                  className={`flex flex-col items-start gap-1 p-4 rounded-xl border-2 text-left transition-colors ${
-                    deliveryType === value
-                      ? "border-[#2E7D32] bg-[#f0faf0]"
-                      : "border-[#DEE2E6] hover:border-[#2E7D32]"
-                  }`}
-                >
-                  <Icon className={`h-5 w-5 mb-1 ${deliveryType === value ? "text-[#2E7D32]" : "text-[#6e6e73]"}`} />
-                  <span className="font-medium text-sm">{label}</span>
-                  <span className="text-xs text-muted-foreground">{desc}</span>
-                </button>
-              ))}
+            <CardContent className="space-y-3">
+              {/* Dynamic shipping methods */}
+              {shippingMethods.map((method) => {
+                const isFree = method.freeThreshold != null && totalPrice >= method.freeThreshold
+                const displayPrice = isFree ? "Zdarma" : `${method.price} Kč`
+                return (
+                  <button
+                    key={method.id}
+                    type="button"
+                    onClick={() => { setDeliveryType("COURIER"); setSelectedShippingId(method.id) }}
+                    className={`w-full flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-colors ${
+                      deliveryType === "COURIER" && selectedShippingId === method.id
+                        ? "border-[#2E7D32] bg-[#f0faf0]"
+                        : "border-[#DEE2E6] hover:border-[#2E7D32]"
+                    }`}
+                  >
+                    <Truck className={`h-5 w-5 mt-0.5 shrink-0 ${deliveryType === "COURIER" && selectedShippingId === method.id ? "text-[#2E7D32]" : "text-[#6e6e73]"}`} />
+                    <div className="flex-1">
+                      <p className="font-medium text-sm">{method.name}</p>
+                      <p className="text-xs text-muted-foreground">{method.description}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{method.estimatedDays}</p>
+                    </div>
+                    <span className={`text-sm font-semibold shrink-0 ${isFree ? "text-green-600" : ""}`}>{displayPrice}</span>
+                  </button>
+                )
+              })}
+
+              {/* Always show PICKUP_IN_STORE */}
+              <button
+                type="button"
+                onClick={() => setDeliveryType("PICKUP_IN_STORE")}
+                className={`w-full flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-colors ${
+                  deliveryType === "PICKUP_IN_STORE"
+                    ? "border-[#2E7D32] bg-[#f0faf0]"
+                    : "border-[#DEE2E6] hover:border-[#2E7D32]"
+                }`}
+              >
+                <Store className={`h-5 w-5 mt-0.5 shrink-0 ${deliveryType === "PICKUP_IN_STORE" ? "text-[#2E7D32]" : "text-[#6e6e73]"}`} />
+                <div className="flex-1">
+                  <p className="font-medium text-sm">Vyzvednutí v prodejně</p>
+                  <p className="text-xs text-muted-foreground">Vyzvedněte objednávku osobně v naší prodejně</p>
+                </div>
+                <span className="text-sm font-semibold shrink-0 text-green-600">Zdarma</span>
+              </button>
             </CardContent>
           </Card>
 
@@ -273,7 +323,7 @@ export function CheckoutForm({ user, addresses }: Props) {
                 </div>
                 <div className="flex justify-between text-muted-foreground">
                   <span>Doprava</span>
-                  <span>{shippingEur === 0 ? <span className="text-green-400">Zdarma</span> : formatPrice(shippingEur)}</span>
+                  <span>{methodPrice === 0 ? <span className="text-green-400">Zdarma</span> : formatPrice(methodPrice)}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between font-semibold text-base pt-1">
