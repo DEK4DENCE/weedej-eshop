@@ -24,6 +24,8 @@ export default async function OrderDetailPage({ params }: Props) {
           },
         },
       },
+      address: true,
+      user: { select: { name: true, email: true, phone: true } },
     },
   })
   if (!order) notFound()

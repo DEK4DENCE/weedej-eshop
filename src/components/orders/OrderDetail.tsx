@@ -1,10 +1,24 @@
 import React from 'react'
-import { MapPin, CreditCard } from 'lucide-react'
+import { MapPin, CreditCard, User, Package } from 'lucide-react'
 import { Order } from '@/types/order'
 import { OrderStatusBadge } from './OrderStatusBadge'
 
 interface OrderDetailProps {
-  order: Order
+  order: Order & {
+    address?: {
+      fullName: string
+      line1: string
+      line2?: string | null
+      city: string
+      postalCode: string
+      country: string
+    } | null
+    user?: {
+      name?: string | null
+      email?: string | null
+      phone?: string | null
+    } | null
+  }
 }
 
 function formatPrice(cents: number, currency: string = 'EUR'): string {
@@ -28,13 +42,13 @@ export function OrderDetail({ order }: OrderDetailProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-[#111714] border border-[#1F3D1F] rounded-2xl p-6">
+      <div className="bg-white border border-[#e8e8ed] rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h2 className="text-xl font-semibold text-[#F0F5F0] mb-1">
+            <h2 className="text-xl font-semibold text-[#1d1d1f] mb-1">
               Order #{order.id.slice(-8).toUpperCase()}
             </h2>
-            <p className="text-sm text-[#6B8A6B]">
+            <p className="text-sm text-[#6e6e73]">
               Placed on {formatDate(order.createdAt)}
             </p>
           </div>
@@ -43,52 +57,42 @@ export function OrderDetail({ order }: OrderDetailProps) {
       </div>
 
       {/* Items table */}
-      <div className="bg-[#111714] border border-[#1F3D1F] rounded-2xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-[#1F3D1F]">
-          <h3 className="text-sm font-semibold text-[#F0F5F0]">Items</h3>
+      <div className="bg-white border border-[#e8e8ed] rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
+        <div className="px-6 py-4 border-b border-[#e8e8ed]">
+          <h3 className="text-sm font-semibold text-[#1d1d1f] flex items-center gap-2">
+            <Package className="w-4 h-4 text-[#22A829]" /> Items
+          </h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[#152A15]">
-                <th className="text-left px-6 py-3 text-xs font-medium text-[#6B8A6B] uppercase tracking-wider">
-                  Product
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-[#6B8A6B] uppercase tracking-wider">
-                  Variant
-                </th>
-                <th className="text-right px-6 py-3 text-xs font-medium text-[#6B8A6B] uppercase tracking-wider">
-                  Unit Price
-                </th>
-                <th className="text-right px-6 py-3 text-xs font-medium text-[#6B8A6B] uppercase tracking-wider">
-                  Qty
-                </th>
-                <th className="text-right px-6 py-3 text-xs font-medium text-[#6B8A6B] uppercase tracking-wider">
-                  Subtotal
-                </th>
+              <tr className="border-b border-[#f5f5f7]">
+                <th className="text-left px-6 py-3 text-xs font-medium text-[#6e6e73] uppercase tracking-wider">Product</th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-[#6e6e73] uppercase tracking-wider">Variant</th>
+                <th className="text-right px-6 py-3 text-xs font-medium text-[#6e6e73] uppercase tracking-wider">Unit Price</th>
+                <th className="text-right px-6 py-3 text-xs font-medium text-[#6e6e73] uppercase tracking-wider">Qty</th>
+                <th className="text-right px-6 py-3 text-xs font-medium text-[#6e6e73] uppercase tracking-wider">Subtotal</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#152A15]">
+            <tbody className="divide-y divide-[#f5f5f7]">
               {order.items.map((item) => (
-                <tr key={item.id} className="hover:bg-[#1A2219]/40 transition-colors">
+                <tr key={item.id} className="hover:bg-[#f5f5f7]/60 transition-colors">
                   <td className="px-6 py-4">
-                    <span className="text-sm font-medium text-[#F0F5F0]">
-                      {item.productName}
-                    </span>
+                    <span className="text-sm font-medium text-[#1d1d1f]">{item.productName}</span>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-sm text-[#B8C8B8]">{item.variantLabel}</span>
+                    <span className="text-sm text-[#6e6e73]">{item.variantLabel}</span>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <span className="font-mono text-sm text-[#D4A017]">
+                    <span className="font-mono text-sm text-[#1d1d1f]">
                       {formatPrice(item.unitPrice, order.currency)}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <span className="text-sm text-[#B8C8B8]">{item.quantity}</span>
+                    <span className="text-sm text-[#6e6e73]">{item.quantity}</span>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <span className="font-mono text-sm font-semibold text-[#D4A017]">
+                    <span className="font-mono text-sm font-semibold text-[#1d1d1f]">
                       {formatPrice(item.unitPrice * item.quantity, order.currency)}
                     </span>
                   </td>
@@ -102,55 +106,62 @@ export function OrderDetail({ order }: OrderDetailProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Delivery address */}
         {order.address && (
-          <div className="bg-[#111714] border border-[#1F3D1F] rounded-2xl p-6">
+          <div className="bg-white border border-[#e8e8ed] rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
             <div className="flex items-center gap-2 mb-4">
               <MapPin className="w-4 h-4 text-[#22A829]" />
-              <h3 className="text-sm font-semibold text-[#F0F5F0]">Delivery Address</h3>
+              <h3 className="text-sm font-semibold text-[#1d1d1f]">Delivery Address</h3>
             </div>
-            <div className="space-y-1 text-sm text-[#B8C8B8]">
-              <p className="font-medium text-[#F0F5F0]">{order.address.fullName}</p>
+            <div className="space-y-1 text-sm text-[#515154]">
+              <p className="font-medium text-[#1d1d1f]">{order.address.fullName}</p>
               <p>{order.address.line1}</p>
               {order.address.line2 && <p>{order.address.line2}</p>}
-              <p>
-                {order.address.city}, {order.address.postalCode}
-              </p>
+              <p>{order.address.city}, {order.address.postalCode}</p>
               <p>{order.address.country}</p>
             </div>
           </div>
         )}
 
+        {/* Contact info */}
+        {order.user && (
+          <div className="bg-white border border-[#e8e8ed] rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
+            <div className="flex items-center gap-2 mb-4">
+              <User className="w-4 h-4 text-[#22A829]" />
+              <h3 className="text-sm font-semibold text-[#1d1d1f]">Contact Information</h3>
+            </div>
+            <div className="space-y-1 text-sm text-[#515154]">
+              {order.user.name && <p className="font-medium text-[#1d1d1f]">{order.user.name}</p>}
+              {order.user.email && <p>{order.user.email}</p>}
+              {order.user.phone && <p>{order.user.phone}</p>}
+            </div>
+          </div>
+        )}
+
         {/* Payment summary */}
-        <div className="bg-[#111714] border border-[#1F3D1F] rounded-2xl p-6">
+        <div className="bg-white border border-[#e8e8ed] rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
           <div className="flex items-center gap-2 mb-4">
             <CreditCard className="w-4 h-4 text-[#22A829]" />
-            <h3 className="text-sm font-semibold text-[#F0F5F0]">Payment Summary</h3>
+            <h3 className="text-sm font-semibold text-[#1d1d1f]">Payment Summary</h3>
           </div>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-[#B8C8B8]">Subtotal</span>
-              <span className="font-mono text-[#F0F5F0]">
-                {formatPrice(order.subtotalAmount, order.currency)}
-              </span>
+              <span className="text-[#6e6e73]">Subtotal</span>
+              <span className="font-mono text-[#1d1d1f]">{formatPrice(order.subtotalAmount, order.currency)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-[#B8C8B8]">Shipping</span>
-              <span className="font-mono text-[#F0F5F0]">
-                {order.shippingAmount === 0
-                  ? 'Free'
-                  : formatPrice(order.shippingAmount, order.currency)}
+              <span className="text-[#6e6e73]">Shipping</span>
+              <span className="font-mono text-[#1d1d1f]">
+                {order.shippingAmount === 0 ? 'Free' : formatPrice(order.shippingAmount, order.currency)}
               </span>
             </div>
             {order.taxAmount > 0 && (
               <div className="flex justify-between text-sm">
-                <span className="text-[#B8C8B8]">Tax</span>
-                <span className="font-mono text-[#F0F5F0]">
-                  {formatPrice(order.taxAmount, order.currency)}
-                </span>
+                <span className="text-[#6e6e73]">Tax</span>
+                <span className="font-mono text-[#1d1d1f]">{formatPrice(order.taxAmount, order.currency)}</span>
               </div>
             )}
-            <div className="border-t border-[#1F3D1F] pt-2 mt-2 flex justify-between">
-              <span className="font-semibold text-[#F0F5F0]">Total</span>
-              <span className="font-mono font-bold text-lg text-[#D4A017]">
+            <div className="border-t border-[#e8e8ed] pt-2 mt-2 flex justify-between">
+              <span className="font-semibold text-[#1d1d1f]">Total</span>
+              <span className="font-mono font-bold text-lg text-[#22A829]">
                 {formatPrice(order.totalAmount, order.currency)}
               </span>
             </div>

@@ -8,17 +8,17 @@ interface SendEmailOptions {
 }
 
 export async function sendEmail({ to, subject, react }: SendEmailOptions) {
+  // Resend requires a verified domain. Until your domain is verified,
+  // use onboarding@resend.dev (only sends to the Resend account owner's email).
+  const from = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
   try {
-    const { error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL!,
-      to,
-      subject,
-      react,
-    })
+    const { data, error } = await resend.emails.send({ from, to, subject, react })
     if (error) {
-      console.error('Email send error:', error)
+      console.error('Email send error:', JSON.stringify(error))
+    } else {
+      console.log('Email sent:', data?.id, '→', to)
     }
   } catch (e) {
-    console.error('sendEmail error:', e)
+    console.error('sendEmail exception:', e)
   }
 }
