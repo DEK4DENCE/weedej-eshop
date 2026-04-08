@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { writeFile, mkdir } from "fs/promises"
-import { join } from "path"
 
 export async function POST(
   req: NextRequest,
@@ -19,31 +17,37 @@ export async function POST(
 
   const formData = await req.formData()
   const file = formData.get("file") as File | null
-
   if (!file) return NextResponse.json({ error: "No file provided" }, { status: 400 })
 
   const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"]
   if (!allowedTypes.includes(file.type)) {
     return NextResponse.json({ error: "Invalid file type. Use JPG, PNG, WebP or GIF." }, { status: 400 })
   }
-
-  const maxSize = 5 * 1024 * 1024 // 5 MB
-  if (file.size > maxSize) {
+  if (file.size > 5 * 1024 * 1024) {
     return NextResponse.json({ error: "File too large. Max 5 MB." }, { status: 400 })
   }
 
   const ext = file.name.split(".").pop() ?? "jpg"
-  const fileName = `${id}-${Date.now()}.${ext}`
-  const uploadDir = join(process.cwd(), "public", "images", "products")
+  const fileName = `products/${id}-${Date.now()}.${ext}`
+  let url: string
 
-  await mkdir(uploadDir, { recursive: true })
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    // Production: use Vercel Blob
+    const { put } = await import("@vercel/blob")
+    const blob = await put(fileName, file, { access: "public" })
+    url = blob.url
+  } else {
+    // Development: save to local public folder
+    const { writeFile, mkdir } = await import("fs/promises")
+    const { join } = await import("path")
+    const uploadDir = join(process.cwd(), "public", "images", "products")
+    await mkdir(uploadDir, { recursive: true })
+    const buffer = Buffer.from(await file.arrayBuffer())
+    const localName = `${id}-${Date.now()}.${ext}`
+    await writeFile(join(uploadDir, localName), buffer)
+    url = `/images/products/${localName}`
+  }
 
-  const buffer = Buffer.from(await file.arrayBuffer())
-  await writeFile(join(uploadDir, fileName), buffer)
-
-  const url = `/images/products/${fileName}`
-
-  // Append to imageUrls
   await db.product.update({
     where: { id },
     data: { imageUrls: { push: url } },
@@ -71,11 +75,17 @@ export async function DELETE(
   const newUrls = product.imageUrls.filter((u) => u !== url)
   await db.product.update({ where: { id }, data: { imageUrls: newUrls } })
 
-  // Delete file from disk if it's a local file
-  if (url.startsWith("/images/products/")) {
+  // Delete from Vercel Blob if it's a blob URL
+  if (url.includes("vercel-storage.com") || url.includes("blob.vercel.app")) {
+    try {
+      const { del } = await import("@vercel/blob")
+      await del(url)
+    } catch { /* ignore */ }
+  } else if (url.startsWith("/images/products/")) {
+    // Local dev: delete from disk
     const { unlink } = await import("fs/promises")
-    const filePath = join(process.cwd(), "public", url)
-    unlink(filePath).catch(() => {}) // ignore if already gone
+    const { join } = await import("path")
+    unlink(join(process.cwd(), "public", url)).catch(() => {})
   }
 
   return NextResponse.json({ ok: true })
