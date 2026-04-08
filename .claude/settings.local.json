@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ruflo start:*)",
+      "Bash(npm install:*)",
+      "Bash(ruflo init:*)",
+      "Bash(ruflo --help)",
+      "Bash(ruflo mcp:*)",
+      "mcp__claude-flow__swarm_init",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --app --src-dir --import-alias \"@/*\" --no-git --no-eslint --yes)",
+      "Skill(update-config)",
+      "Skill(update-config:*)"
+    ],
+    "additionalDirectories": [
+      "c:\\ADAM THE DEVELOPER\\Github repositories\\Weedejna Cannabis eshop\\docs\\superpowers"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "claude-flow"
+  ],
+  "enableAllProjectMcpServers": true
+}
