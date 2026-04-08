@@ -15,10 +15,15 @@ function formatDate(date: Date) {
 }
 
 export default async function AdminBlogPage() {
-  const posts = await db.blogPost.findMany({
-    orderBy: { createdAt: "desc" },
-    include: { author: { select: { name: true, email: true } } },
-  })
+  let posts: any[] = []
+  try {
+    posts = await db.blogPost.findMany({
+      orderBy: { createdAt: "desc" },
+      include: { author: { select: { name: true, email: true } } },
+    })
+  } catch {
+    // table not yet migrated in production — show empty state
+  }
 
   return (
     <div className="space-y-6">

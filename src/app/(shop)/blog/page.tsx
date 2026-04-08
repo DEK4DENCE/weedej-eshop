@@ -12,11 +12,16 @@ function formatDate(date: Date) {
 }
 
 export default async function BlogPage() {
-  const posts = await db.blogPost.findMany({
-    where: { published: true },
-    orderBy: { publishedAt: "desc" },
-    include: { author: { select: { name: true } } },
-  })
+  let posts: any[] = []
+  try {
+    posts = await db.blogPost.findMany({
+      where: { published: true },
+      orderBy: { publishedAt: "desc" },
+      include: { author: { select: { name: true } } },
+    })
+  } catch {
+    // table not yet migrated in production — show empty state
+  }
 
   return (
     <div className="container mx-auto px-4 py-12 max-w-5xl">
