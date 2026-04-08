@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import { ContactForm } from '@/components/contact/ContactForm'
 import { MapPin, Phone, Mail, Clock } from 'lucide-react'
 
-export const metadata: Metadata = { title: 'Kontakt — Weedejna' }
+export const metadata: Metadata = { title: 'Kontakt — Weedej' }
 
 export default function ContactPage() {
   const hours = [
@@ -42,7 +42,7 @@ export default function ContactPage() {
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-[#E8F5E9] flex items-center justify-center"><Mail className="w-5 h-5 text-[#2E7D32]" /></div>
-                <div><p className="text-xs text-[#6B7280] uppercase tracking-wider">E-mail</p><a href="mailto:info@weedejna.cz" className="font-semibold text-[#2E7D32] hover:text-[#1B5E20]">info@weedejna.cz</a></div>
+                <div><p className="text-xs text-[#6B7280] uppercase tracking-wider">E-mail</p><a href="mailto:info@weedej.cz" className="font-semibold text-[#2E7D32] hover:text-[#1B5E20]">info@weedej.cz</a></div>
               </div>
             </div>
 

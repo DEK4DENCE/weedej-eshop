@@ -23,13 +23,13 @@ export function PasswordReset({ name, resetUrl }: PasswordResetProps) {
       <Body style={body}>
         <Container style={container}>
           {/* Header */}
-          <Text style={logo}>Weedejna</Text>
+          <Text style={logo}>Weedej</Text>
 
           {/* Content */}
           <Text style={heading}>Reset Your Password</Text>
           <Text style={paragraph}>Hi {name},</Text>
           <Text style={paragraph}>
-            We received a request to reset the password for your Weedejna account. If you made
+            We received a request to reset the password for your Weedej account. If you made
             this request, click the link below:
           </Text>
 
@@ -48,13 +48,13 @@ export function PasswordReset({ name, resetUrl }: PasswordResetProps) {
 
           <Text style={paragraph}>
             For any concerns, contact{' '}
-            <Link href="mailto:support@weedejna.com" style={link}>
-              support@weedejna.com
+            <Link href="mailto:support@weedej.com" style={link}>
+              support@weedej.com
             </Link>
             .
           </Text>
 
-          <Text style={paragraph}>The Weedejna Team</Text>
+          <Text style={paragraph}>The Weedej Team</Text>
 
           <Hr style={divider} />
 

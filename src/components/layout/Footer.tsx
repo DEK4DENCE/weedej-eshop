@@ -7,7 +7,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <h3 className="text-xl font-bold text-[#2E7D32] mb-4 font-playfair">
-              Weedejna
+              Weedej
             </h3>
             <p className="text-sm text-[#6e6e73]">
               Premium cannabis products delivered to your door.
@@ -39,7 +39,7 @@ export function Footer() {
           </div>
         </div>
         <div className="mt-8 pt-8 border-t border-[#DEE2E6] text-center text-xs text-[#aeaeb2]">
-          © 2026 Weedejna. All rights reserved.
+          © 2026 Weedej. All rights reserved.
         </div>
       </div>
     </footer>

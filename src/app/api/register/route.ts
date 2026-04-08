@@ -44,13 +44,13 @@ export async function POST(req: NextRequest) {
 
     await sendEmail({
       to: email,
-      subject: 'Verify your Weedejna account',
+      subject: 'Verify your Weedej account',
       react: EmailVerification({ name: firstName, verifyUrl }),
     })
 
     await sendEmail({
       to: email,
-      subject: 'Welcome to Weedejna — Your First Order Awaits',
+      subject: 'Welcome to Weedej — Your First Order Awaits',
       react: WelcomeEmail({ name: firstName }),
     })
 

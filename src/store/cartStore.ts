@@ -90,7 +90,7 @@ export const useCartStore = create<CartState>()(
       },
     }),
     {
-      name: 'weedejna_cart',
+      name: 'weedej_cart',
     },
   ),
 )

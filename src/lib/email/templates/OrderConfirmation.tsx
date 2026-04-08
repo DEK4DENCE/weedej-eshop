@@ -37,7 +37,7 @@ interface OrderConfirmationProps {
   }
 }
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://weedejna.com'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://weedej.com'
 
 function formatPrice(cents: number) {
   return `€${(cents / 100).toFixed(2)}`
@@ -56,10 +56,10 @@ export function OrderConfirmation({
   return (
     <Html lang="en">
       <Head />
-      <Preview>Your Weedejna order #{orderNumber} is confirmed — thank you!</Preview>
+      <Preview>Your Weedej order #{orderNumber} is confirmed — thank you!</Preview>
       <Body style={body}>
         <Container style={container}>
-          <Text style={logo}>Weedejna</Text>
+          <Text style={logo}>Weedej</Text>
 
           <Text style={heading}>Order Confirmed</Text>
           <Text style={paragraph}>Hi {name},</Text>
@@ -133,20 +133,20 @@ export function OrderConfirmation({
 
           <Text style={paragraph}>
             Questions? Contact us at{' '}
-            <Link href="mailto:support@weedejna.com" style={link}>
-              support@weedejna.com
+            <Link href="mailto:support@weedej.com" style={link}>
+              support@weedej.com
             </Link>
           </Text>
 
           <Text style={paragraph}>
             Thanks,
             <br />
-            The Weedejna Team
+            The Weedej Team
           </Text>
 
           <Hr style={divider} />
           <Text style={footer}>
-            This email was sent because you placed an order at Weedejna.
+            This email was sent because you placed an order at Weedej.
           </Text>
         </Container>
       </Body>

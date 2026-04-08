@@ -23,13 +23,13 @@ export function EmailVerification({ name, verifyUrl }: EmailVerificationProps) {
       <Body style={body}>
         <Container style={container}>
           {/* Header */}
-          <Text style={logo}>Weedejna</Text>
+          <Text style={logo}>Weedej</Text>
 
           {/* Content */}
           <Text style={heading}>Verify Your Email Address</Text>
           <Text style={paragraph}>Hi {name},</Text>
           <Text style={paragraph}>
-            Thanks for registering at Weedejna. Before you start shopping, we need to confirm
+            Thanks for registering at Weedej. Before you start shopping, we need to confirm
             your email address.
           </Text>
           <Text style={paragraph}>Click the button below to verify your account:</Text>
@@ -40,7 +40,7 @@ export function EmailVerification({ name, verifyUrl }: EmailVerificationProps) {
 
           <Text style={paragraph}>
             This link will expire in <strong>24 hours</strong>. If you did not create a
-            Weedejna account, you can safely ignore this email.
+            Weedej account, you can safely ignore this email.
           </Text>
 
           <Hr style={divider} />
@@ -55,7 +55,7 @@ export function EmailVerification({ name, verifyUrl }: EmailVerificationProps) {
           <Hr style={divider} />
 
           <Text style={footer}>
-            The Weedejna Team &bull; support@weedejna.com
+            The Weedej Team &bull; support@weedej.com
           </Text>
         </Container>
       </Body>

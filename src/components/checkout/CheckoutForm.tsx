@@ -222,7 +222,7 @@ export function CheckoutForm({ user, addresses }: Props) {
             <Card>
               <CardHeader><CardTitle className="flex items-center gap-2"><Store className="h-5 w-5 text-green-400" />Pickup Location</CardTitle></CardHeader>
               <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p className="font-medium text-foreground">Weedejna Store</p>
+                <p className="font-medium text-foreground">Weedej Store</p>
                 <p>Václavské náměstí 1, 110 00 Praha 1</p>
                 <p>Mon–Sat: 10:00–20:00 | Sun: 12:00–18:00</p>
                 <p className="text-green-400 text-xs mt-2">✓ Free pickup — no shipping fee</p>

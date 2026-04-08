@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Package, ShoppingCart, Users, DollarSign } from "lucide-react"
 import { formatPrice } from "@/lib/utils/formatPrice"
 
-export const metadata = { title: "Admin Dashboard — Weedejna" }
+export const metadata = { title: "Admin Dashboard — Weedej" }
 
 export default async function AdminDashboard() {
   const [productCount, orderCount, userCount, revenueData] = await Promise.all([

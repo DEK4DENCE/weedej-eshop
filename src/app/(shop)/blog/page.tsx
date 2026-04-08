@@ -5,7 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { CalendarDays } from "lucide-react"
 
-export const metadata = { title: "Blog — Weedejna" }
+export const metadata = { title: "Blog — Weedej" }
 
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat("cs-CZ", { day: "numeric", month: "long", year: "numeric" }).format(date)

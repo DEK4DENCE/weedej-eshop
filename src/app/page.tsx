@@ -32,69 +32,37 @@ export default async function HomePage() {
       <Header />
       <main className="flex-1 bg-[#F8F9FA]">
 
-        {/* Hero — two-column with light green gradient */}
+        {/* Hero — centered with light green gradient */}
         <section className="relative overflow-hidden bg-gradient-to-br from-[#E8F5E9] via-[#F0FAF0] to-white">
-          <div className="container mx-auto px-4 py-16 md:py-20">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-
-              {/* Left: text */}
-              <FadeIn delay={0}>
-                <div className="flex flex-col gap-6">
-                  <span className="inline-flex items-center gap-1.5 w-fit px-3 py-1 rounded-full bg-[#2E7D32]/10 text-[#2E7D32] border border-[#2E7D32]/20 text-sm font-medium">
-                    <span className="text-base">🌿</span> Premium Cannabis Products
-                  </span>
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-[#1d1d1f] font-playfair">
-                    Modern wellness<br />
-                    for <span className="text-[#2E7D32]">every day</span>
-                  </h1>
-                  <p className="text-lg text-[#6e6e73] max-w-md">
-                    Discover our curated selection of premium cannabis flowers, extracts, and edibles. Lab-tested, nature-inspired.
-                  </p>
-                  <div className="flex gap-3 flex-wrap">
-                    <Link
-                      href="/products"
-                      className="inline-flex items-center gap-2 bg-[#2E7D32] hover:bg-[#1a9020] text-white font-semibold px-7 py-3 rounded-xl text-sm transition-all duration-200 hover:shadow-[0_4px_20px_rgba(34,168,41,0.35)]"
-                    >
-                      Shop Now <ArrowRight className="h-4 w-4" />
-                    </Link>
-                    <Link
-                      href="/contact"
-                      className="inline-flex items-center gap-2 bg-transparent border-2 border-[#2E7D32] text-[#2E7D32] hover:bg-[#2E7D32]/5 font-semibold px-7 py-3 rounded-xl text-sm transition-all duration-200"
-                    >
-                      About us
-                    </Link>
-                  </div>
-                </div>
-              </FadeIn>
-
-              {/* Right: product category mosaic */}
-              <FadeIn delay={0.2}>
-                <div className="grid grid-cols-2 gap-3 h-80 md:h-96">
-                  {/* Large top card */}
-                  <Link href="/products?category=flowers" className="col-span-2 relative rounded-2xl overflow-hidden bg-[#2E7D32] flex items-center justify-center group hover:opacity-90 transition-opacity">
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#2E7D32] to-[#1B5E20]" />
-                    <div className="relative text-center text-white p-6">
-                      <div className="text-5xl mb-2">🌿</div>
-                      <p className="text-sm font-semibold uppercase tracking-widest opacity-80">Flowers</p>
-                    </div>
+          <div className="container mx-auto px-4 py-20 md:py-28">
+            <FadeIn delay={0}>
+              <div className="flex flex-col items-center text-center gap-6 max-w-2xl mx-auto">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#2E7D32]/10 text-[#2E7D32] border border-[#2E7D32]/20 text-sm font-medium">
+                  <span className="text-base">🌿</span> Premium Cannabis Products
+                </span>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-[#1d1d1f] font-playfair">
+                  Modern wellness<br />
+                  for <span className="text-[#2E7D32]">every day</span>
+                </h1>
+                <p className="text-lg text-[#6e6e73] max-w-xl">
+                  Discover our curated selection of premium cannabis flowers, extracts, and edibles. Lab-tested, nature-inspired.
+                </p>
+                <div className="flex gap-3 flex-wrap justify-center">
+                  <Link
+                    href="/products"
+                    className="inline-flex items-center gap-2 bg-[#2E7D32] hover:bg-[#1a9020] text-white font-semibold px-7 py-3 rounded-xl text-sm transition-all duration-200 hover:shadow-[0_4px_20px_rgba(34,168,41,0.35)]"
+                  >
+                    Shop Now <ArrowRight className="h-4 w-4" />
                   </Link>
-                  {/* Bottom left */}
-                  <Link href="/products?category=extracts" className="relative rounded-2xl overflow-hidden bg-[#C8E6C9] flex items-center justify-center group hover:opacity-90 transition-opacity">
-                    <div className="text-center p-4">
-                      <div className="text-4xl mb-1">🌱</div>
-                      <p className="text-xs font-semibold text-[#2E7D32] uppercase tracking-wider">Extracts</p>
-                    </div>
-                  </Link>
-                  {/* Bottom right */}
-                  <Link href="/products?category=edibles" className="relative rounded-2xl overflow-hidden bg-[#E8F5E9] flex items-center justify-center group hover:opacity-90 transition-opacity">
-                    <div className="text-center p-4">
-                      <div className="text-4xl mb-1">🍬</div>
-                      <p className="text-xs font-semibold text-[#2E7D32] uppercase tracking-wider">Edibles</p>
-                    </div>
+                  <Link
+                    href="/contact"
+                    className="inline-flex items-center gap-2 bg-transparent border-2 border-[#2E7D32] text-[#2E7D32] hover:bg-[#2E7D32]/5 font-semibold px-7 py-3 rounded-xl text-sm transition-all duration-200"
+                  >
+                    About us
                   </Link>
                 </div>
-              </FadeIn>
-            </div>
+              </div>
+            </FadeIn>
           </div>
         </section>
 

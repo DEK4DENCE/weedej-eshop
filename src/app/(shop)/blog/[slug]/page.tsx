@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props) {
   const { slug } = await params
   const post = await db.blogPost.findUnique({ where: { slug, published: true } })
   if (!post) return { title: "Not found" }
-  return { title: `${post.title} — Weedejna Blog`, description: post.excerpt }
+  return { title: `${post.title} — Weedej Blog`, description: post.excerpt }
 }
 
 export default async function BlogPostPage({ params }: Props) {

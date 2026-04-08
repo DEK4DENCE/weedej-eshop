@@ -9,7 +9,7 @@ interface Props {
   params: Promise<{ orderId: string }>
 }
 
-export const metadata = { title: "Order Detail — Weedejna" }
+export const metadata = { title: "Order Detail — Weedej" }
 
 export default async function OrderDetailPage({ params }: Props) {
   const { orderId } = await params

@@ -7,7 +7,7 @@ import { OrderConfirmation } from "@/lib/email/templates/OrderConfirmation"
 import { NewOrderNotification } from "@/lib/email/templates/NewOrderNotification"
 
 export const dynamic = "force-dynamic"
-export const metadata = { title: "Order Confirmed — Weedejna" }
+export const metadata = { title: "Order Confirmed — Weedej" }
 
 async function ensureOrderCreated(sessionId: string) {
   try {

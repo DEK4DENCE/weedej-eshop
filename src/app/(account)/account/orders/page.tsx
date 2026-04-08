@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { OrderCard } from "@/components/orders/OrderCard"
 
-export const metadata = { title: "Orders — Weedejna" }
+export const metadata = { title: "Orders — Weedej" }
 
 export default async function OrdersPage() {
   const session = await auth()

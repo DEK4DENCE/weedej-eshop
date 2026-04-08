@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { Shield } from "lucide-react"
 
-const STORAGE_KEY = "weedejna_age_verified"
+const STORAGE_KEY = "weedej_age_verified"
 
 export function AgeGate() {
   const [show, setShow] = useState(false)
@@ -53,7 +53,7 @@ export function AgeGate() {
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-8">
           <Shield className="h-6 w-6 text-[#2E7D32]" />
-          <span className="text-xl font-bold text-[#2E7D32] tracking-tight">Weedejna</span>
+          <span className="text-xl font-bold text-[#2E7D32] tracking-tight">Weedej</span>
         </div>
 
         <h1 className="text-2xl font-bold text-[#1d1d1f] mb-3 font-playfair">

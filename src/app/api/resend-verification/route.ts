@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
 
     await sendEmail({
       to: email,
-      subject: 'Verify your Weedejna account',
+      subject: 'Verify your Weedej account',
       react: EmailVerification({ name: firstName, verifyUrl }),
     })
 

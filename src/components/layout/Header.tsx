@@ -23,7 +23,7 @@ export function Header() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
           <span className="text-2xl font-bold text-[#2E7D32] font-playfair">
-            Weedejna
+            Weedej
           </span>
         </Link>
 

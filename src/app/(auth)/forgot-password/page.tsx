@@ -1,7 +1,7 @@
 import { ForgotPasswordForm } from '@/components/auth/ForgotPasswordForm'
 
 export const metadata = {
-  title: 'Reset Your Password — Weedejna',
+  title: 'Reset Your Password — Weedej',
   description: 'Enter your email and we\'ll send you a reset link.',
 }
 

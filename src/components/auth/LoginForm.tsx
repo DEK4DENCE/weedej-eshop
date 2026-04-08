@@ -48,7 +48,7 @@ export function LoginForm() {
     <div className="bg-white border border-[#DEE2E6] rounded-2xl p-8 w-full max-w-md">
       <div className="mb-8 text-center">
         <h1 className="text-2xl font-bold text-[#1d1d1f] mb-1">Welcome Back</h1>
-        <p className="text-[#6e6e73] text-sm">Sign in to your Weedejna account</p>
+        <p className="text-[#6e6e73] text-sm">Sign in to your Weedej account</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>

@@ -48,7 +48,7 @@ export function NewOrderNotification({
       <Preview>New order #{orderNumber.slice(-8).toUpperCase()} from {customerName}</Preview>
       <Body style={body}>
         <Container style={container}>
-          <Text style={logo}>Weedejna — New Order</Text>
+          <Text style={logo}>Weedej — New Order</Text>
           <Text style={heading}>New Order Received</Text>
 
           <Section style={infoBox}>
@@ -101,7 +101,7 @@ export function NewOrderNotification({
           </Row>
 
           <Hr style={divider} />
-          <Text style={footer}>Weedejna Admin Notification</Text>
+          <Text style={footer}>Weedej Admin Notification</Text>
         </Container>
       </Body>
     </Html>

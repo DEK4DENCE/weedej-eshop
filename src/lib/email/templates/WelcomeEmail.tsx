@@ -14,7 +14,7 @@ interface WelcomeEmailProps {
   name: string
 }
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://weedejna.com'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://weedej.com'
 
 export function WelcomeEmail({ name }: WelcomeEmailProps) {
   return (
@@ -24,17 +24,17 @@ export function WelcomeEmail({ name }: WelcomeEmailProps) {
       <Body style={body}>
         <Container style={container}>
           {/* Header */}
-          <Text style={logo}>Weedejna</Text>
+          <Text style={logo}>Weedej</Text>
 
           {/* Content */}
-          <Text style={heading}>Welcome to Weedejna</Text>
+          <Text style={heading}>Welcome to Weedej</Text>
           <Text style={paragraph}>Hi {name},</Text>
           <Text style={paragraph}>
-            Welcome to Weedejna. Your account is now active and you&apos;re ready to start
+            Welcome to Weedej. Your account is now active and you&apos;re ready to start
             exploring our curated cannabis catalogue.
           </Text>
 
-          <Text style={subheading}>Here&apos;s what you get as a Weedejna member:</Text>
+          <Text style={subheading}>Here&apos;s what you get as a Weedej member:</Text>
 
           <Text style={listItem}>
             <strong style={{ color: '#F0F5F0' }}>Full catalogue access</strong> — Browse hundreds
@@ -59,8 +59,8 @@ export function WelcomeEmail({ name }: WelcomeEmailProps) {
 
           <Text style={paragraph}>
             If you have any questions, our support team is here at{' '}
-            <Link href="mailto:support@weedejna.com" style={link}>
-              support@weedejna.com
+            <Link href="mailto:support@weedej.com" style={link}>
+              support@weedej.com
             </Link>{' '}
             or via live chat on the website.
           </Text>
@@ -68,16 +68,16 @@ export function WelcomeEmail({ name }: WelcomeEmailProps) {
           <Text style={paragraph}>
             Thanks for joining us.
             <br />
-            The Weedejna Team
+            The Weedej Team
           </Text>
 
           <Hr style={divider} />
 
           <Text style={footer}>
-            You are receiving this email because you created a Weedejna account. If you did not
+            You are receiving this email because you created a Weedej account. If you did not
             create this account, please contact us immediately at{' '}
-            <Link href="mailto:support@weedejna.com" style={footerLink}>
-              support@weedejna.com
+            <Link href="mailto:support@weedej.com" style={footerLink}>
+              support@weedej.com
             </Link>
             .
           </Text>

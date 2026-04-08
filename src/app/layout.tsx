@@ -11,16 +11,16 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Weedejna — Premium Cannabis E-Shop',
-    template: '%s | Weedejna',
+    default: 'Weedej — Premium Cannabis E-Shop',
+    template: '%s | Weedej',
   },
   description:
-    'Discover premium cannabis products at Weedejna. Quality flowers, edibles, concentrates and accessories. Age-verified, discreet delivery.',
+    'Discover premium cannabis products at Weedej. Quality flowers, edibles, concentrates and accessories. Age-verified, discreet delivery.',
   keywords: ['cannabis', 'CBD', 'premium', 'online shop', 'flowers', 'edibles'],
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    siteName: 'Weedejna',
+    siteName: 'Weedej',
   },
 }
 
