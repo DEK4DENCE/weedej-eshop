@@ -32,7 +32,7 @@ export function OrderCard({ order }: OrderCardProps) {
   const thumbnailItems = order.items.slice(0, 3)
 
   return (
-    <div className="bg-white border border-[#e8e8ed] rounded-2xl p-6 hover:border-[#22A829]/50 transition-colors duration-200 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
+    <div className="bg-white border border-[#DEE2E6] rounded-2xl p-6 hover:border-[#2E7D32]/50 transition-colors duration-200 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
       <div className="flex items-start justify-between gap-4">
         {/* Left: order info */}
         <div className="flex-1 min-w-0">
@@ -52,14 +52,14 @@ export function OrderCard({ order }: OrderCardProps) {
             {thumbnailItems.map((item) => (
               <div
                 key={item.id}
-                className="w-12 h-12 rounded-lg bg-[#f5f5f7] border border-[#e8e8ed] flex items-center justify-center overflow-hidden flex-shrink-0"
+                className="w-12 h-12 rounded-lg bg-[#F8F9FA] border border-[#DEE2E6] flex items-center justify-center overflow-hidden flex-shrink-0"
                 title={item.productName}
               >
                 <Package className="w-5 h-5 text-[#6e6e73]" />
               </div>
             ))}
             {order.items.length > 3 && (
-              <div className="w-12 h-12 rounded-lg bg-[#f5f5f7] border border-[#e8e8ed] flex items-center justify-center flex-shrink-0">
+              <div className="w-12 h-12 rounded-lg bg-[#F8F9FA] border border-[#DEE2E6] flex items-center justify-center flex-shrink-0">
                 <span className="text-xs font-medium text-[#6e6e73]">
                   +{order.items.length - 3}
                 </span>
@@ -79,7 +79,7 @@ export function OrderCard({ order }: OrderCardProps) {
           </span>
           <Link
             href={`/account/orders/${order.id}`}
-            className="inline-flex items-center gap-1.5 bg-transparent border border-[#22A829] text-[#22A829] hover:bg-[#22A829]/10 rounded-xl px-4 py-2 text-sm font-semibold transition-colors duration-200"
+            className="inline-flex items-center gap-1.5 bg-transparent border border-[#2E7D32] text-[#2E7D32] hover:bg-[#2E7D32]/10 rounded-xl px-4 py-2 text-sm font-semibold transition-colors duration-200"
           >
             View Order
           </Link>

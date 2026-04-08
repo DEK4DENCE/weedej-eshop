@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weedejna — Homepage Preview (5 palet)</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Segoe UI', -apple-system, sans-serif; background:#1a1a1a; }
+
+/* Selector bar */
+.selector { position:fixed; top:0; left:0; right:0; z-index:9999; background:#111; padding:12px 24px; display:flex; align-items:center; gap:12px; box-shadow:0 2px 12px rgba(0,0,0,0.5); }
+.selector span { color:#aaa; font-size:0.8rem; font-weight:600; letter-spacing:1px; text-transform:uppercase; margin-right:8px; }
+.pal-btn { padding:7px 18px; border-radius:99px; border:2px solid transparent; font-size:0.8rem; font-weight:700; cursor:pointer; transition:all 0.2s; }
+.pal-btn.active { border-color:white; }
+.pal-btn:nth-child(2) { background:#1B5E20; color:#fff; }
+.pal-btn:nth-child(3) { background:#558B2F; color:#fff; }
+.pal-btn:nth-child(4) { background:#00695C; color:#fff; }
+.pal-btn:nth-child(5) { background:#2E7D32; color:#fff; }
+.pal-btn:nth-child(6) { background:#33691E; color:#AED581; }
+
+/* Pages */
+.page { display:none; margin-top:56px; }
+.page.active { display:block; }
+
+/* ===== SHARED HOMEPAGE STRUCTURE ===== */
+nav { display:flex; align-items:center; justify-content:space-between; padding:0 48px; height:64px; position:sticky; top:56px; z-index:100; }
+.nav-logo { font-size:1.4rem; font-weight:800; letter-spacing:-0.5px; }
+.nav-links { display:flex; gap:28px; font-size:0.9rem; font-weight:500; }
+.nav-actions { display:flex; align-items:center; gap:16px; }
+.nav-icon { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1rem; cursor:pointer; }
+.btn { display:inline-flex; align-items:center; gap:8px; padding:12px 28px; border-radius:99px; font-size:0.9rem; font-weight:700; cursor:pointer; border:none; transition:all 0.2s; text-decoration:none; }
+.btn-outline { background:transparent; border:2px solid currentColor; }
+
+/* Hero */
+.hero { padding:80px 48px 64px; display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center; min-height:500px; }
+.hero-badge { display:inline-flex; align-items:center; gap:8px; padding:6px 16px; border-radius:99px; font-size:0.78rem; font-weight:700; letter-spacing:0.5px; margin-bottom:24px; }
+.hero h1 { font-size:3.5rem; font-weight:900; line-height:1.05; letter-spacing:-1.5px; margin-bottom:20px; }
+.hero p { font-size:1rem; line-height:1.7; margin-bottom:32px; opacity:0.65; max-width:420px; }
+.hero-btns { display:flex; gap:12px; flex-wrap:wrap; }
+.hero-visual { border-radius:24px; overflow:hidden; height:360px; display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:8px; }
+.hero-img { border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:2rem; }
+
+/* Features strip */
+.features { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; }
+.feature { padding:32px 40px; display:flex; align-items:center; gap:16px; }
+.feature-icon { width:48px; height:48px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0; }
+.feature h3 { font-size:0.95rem; font-weight:700; margin-bottom:4px; }
+.feature p { font-size:0.82rem; opacity:0.6; line-height:1.5; }
+
+/* Products */
+.products-section { padding:64px 48px; }
+.section-header { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:36px; }
+.section-tag { font-size:0.75rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; opacity:0.5; }
+.section-title { font-size:2rem; font-weight:800; letter-spacing:-0.5px; }
+.product-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
+.product-card { border-radius:20px; overflow:hidden; border:1px solid; transition:all 0.2s; }
+.product-img { height:200px; display:flex; align-items:center; justify-content:center; font-size:3rem; }
+.product-body { padding:16px; }
+.product-cat { font-size:0.68rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; opacity:0.45; margin-bottom:6px; }
+.product-name { font-size:0.95rem; font-weight:700; margin-bottom:4px; }
+.product-meta { font-size:0.75rem; opacity:0.5; margin-bottom:12px; }
+.product-footer { display:flex; align-items:center; justify-content:space-between; }
+.product-price { font-size:1.05rem; font-weight:800; }
+.add-btn { width:32px; height:32px; border-radius:50%; border:none; display:flex; align-items:center; justify-content:center; font-size:1.2rem; font-weight:300; cursor:pointer; }
+
+/* CTA */
+.cta { margin:0 48px 64px; border-radius:28px; padding:60px 64px; display:flex; align-items:center; justify-content:space-between; gap:40px; }
+.cta h2 { font-size:2.2rem; font-weight:800; letter-spacing:-0.5px; margin-bottom:12px; }
+.cta p { font-size:0.95rem; opacity:0.65; max-width:420px; line-height:1.6; }
+.cta-btns { display:flex; gap:12px; flex-shrink:0; }
+
+/* Footer */
+footer { padding:40px 48px; display:flex; align-items:center; justify-content:space-between; border-top:1px solid; }
+.footer-logo { font-size:1.1rem; font-weight:800; }
+.footer-text { font-size:0.8rem; opacity:0.4; }
+.footer-links { display:flex; gap:24px; font-size:0.82rem; opacity:0.5; }
+</style>
+</head>
+<body>
+
+<!-- SELECTOR -->
+<div class="selector">
+  <span>Paleta:</span>
+  <button class="pal-btn active" onclick="show('a',this)">A — Forest Premium</button>
+  <button class="pal-btn" onclick="show('b',this)">B — Sage & Stone</button>
+  <button class="pal-btn" onclick="show('c',this)">C — Emerald Clean</button>
+  <button class="pal-btn" onclick="show('d',this)">D — Mint Modern</button>
+  <button class="pal-btn" onclick="show('e',this)">E — Cannabis Natural</button>
+</div>
+
+<!-- ======================== PALETA A — Forest Premium ======================== -->
+<div class="page active" id="page-a" style="background:#FAFAFA; color:#1A1A1A;">
+
+  <nav style="background:#1B5E20; color:#fff; box-shadow:0 2px 20px rgba(27,94,32,0.3);">
+    <div class="nav-logo" style="color:#fff;">Weedejna</div>
+    <div class="nav-links" style="color:rgba(255,255,255,0.8);">
+      <a href="#" style="color:rgba(255,255,255,0.8);text-decoration:none;">Vše</a>
+      <a href="#" style="color:rgba(255,255,255,0.8);text-decoration:none;">Flowers</a>
+      <a href="#" style="color:rgba(255,255,255,0.8);text-decoration:none;">Extracts</a>
+      <a href="#" style="color:rgba(255,255,255,0.8);text-decoration:none;">Edibles</a>
+      <a href="#" style="color:rgba(255,255,255,0.8);text-decoration:none;">Blog</a>
+      <a href="#" style="color:rgba(255,255,255,0.8);text-decoration:none;">Kontakt</a>
+    </div>
+    <div class="nav-actions">
+      <div class="nav-icon" style="background:rgba(255,255,255,0.15); color:#fff;">🛒</div>
+      <div class="nav-icon" style="background:rgba(255,255,255,0.15); color:#fff;">👤</div>
+    </div>
+  </nav>
+
+  <div class="hero" style="background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 50%,#1B5E20 100%); color:#fff;">
+    <div>
+      <div class="hero-badge" style="background:rgba(76,175,80,0.25); color:#A5D6A7; border:1px solid rgba(165,214,167,0.3);">🌿 Prémiové CBD produkty</div>
+      <h1>Příroda<br/>ve své<br/><span style="color:#A5D6A7;">nejčistší</span><br/>formě</h1>
+      <p>Objevte naši kurátorsky vybranou kolekci prémiových konopných produktů. Laboratoří testováno, přírodou inspirováno.</p>
+      <div class="hero-btns">
+        <a class="btn" style="background:#4CAF50; color:#fff;">Nakupovat →</a>
+        <a class="btn btn-outline" style="color:#A5D6A7; border-color:#A5D6A7;">Více o nás</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-img" style="background:rgba(76,175,80,0.2); grid-column:1/3; border-radius:20px 20px 0 0; font-size:4rem;">🌿</div>
+      <div class="hero-img" style="background:rgba(165,214,167,0.15);">🌱</div>
+      <div class="hero-img" style="background:rgba(76,175,80,0.15);">💊</div>
+    </div>
+  </div>
+
+  <div class="features" style="background:#fff; border-top:1px solid #E8F5E9; border-bottom:1px solid #E8F5E9;">
+    <div class="feature" style="border-right:1px solid #E8F5E9;">
+      <div class="feature-icon" style="background:#E8F5E9; color:#1B5E20;">⭐</div>
+      <div><h3 style="color:#1A1A1A;">Prémiová kvalita</h3><p>Laboratoří testované, ručně vybrané produkty</p></div>
+    </div>
+    <div class="feature" style="border-right:1px solid #E8F5E9;">
+      <div class="feature-icon" style="background:#E8F5E9; color:#1B5E20;">🛡️</div>
+      <div><h3 style="color:#1A1A1A;">Bezpečné & legální</h3><p>Plně v souladu s EU předpisy</p></div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon" style="background:#E8F5E9; color:#1B5E20;">🚚</div>
+      <div><h3 style="color:#1A1A1A;">Rychlé doručení</h3><p>Diskrétní zásilky po celé ČR</p></div>
+    </div>
+  </div>
+
+  <div class="products-section" style="background:#FAFAFA;">
+    <div class="section-header">
+      <div><div class="section-tag" style="color:#1B5E20;">Naše produkty</div><div class="section-title">Bestsellery</div></div>
+      <a class="btn btn-outline" style="color:#1B5E20; border-color:#1B5E20; font-size:0.82rem; padding:9px 20px;">Zobrazit vše →</a>
+    </div>
+    <div class="product-grid">
+      <div class="product-card" style="background:#fff; border-color:#E8F5E9;">
+        <div class="product-img" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9);">🌿</div>
+        <div class="product-body">
+          <div class="product-cat">Flowers</div>
+          <div class="product-name" style="color:#1A1A1A;">Girl Scout Cookies</div>
+          <div class="product-meta">THC: 25% · CBD: 0.1%</div>
+          <div class="product-footer">
+            <div class="product-price" style="color:#1B5E20;">15,99 €</div>
+            <button class="add-btn" style="background:#1B5E20; color:#fff;">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card" style="background:#fff; border-color:#E8F5E9;">
+        <div class="product-img" style="background:linear-gradient(135deg,#F1F8E9,#DCEDC8);">🧴</div>
+        <div class="product-body">
+          <div class="product-cat">Extracts</div>
+          <div class="product-name" style="color:#1A1A1A;">CBD Oil 10%</div>
+          <div class="product-meta">THC: 0.2% · CBD: 10%</div>
+          <div class="product-footer">
+            <div class="product-price" style="color:#1B5E20;">39,99 €</div>
+            <button class="add-btn" style="background:#1B5E20; color:#fff;">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card" style="background:#fff; border-color:#E8F5E9;">
+        <div class="product-img" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9);">🍬</div>
+        <div class="product-body">
+          <div class="product-cat">Edibles</div>
+          <div class="product-name" style="color:#1A1A1A;">CBD Gummies</div>
+          <div class="product-meta">THC: 0% · CBD: 25%</div>
+          <div class="product-footer">
+            <div class="product-price" style="color:#1B5E20;">19,99 €</div>
+            <button class="add-btn" style="background:#1B5E20; color:#fff;">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card" style="background:#fff; border-color:#E8F5E9;">
+        <div class="product-img" style="background:linear-gradient(135deg,#F9FBE7,#F0F4C3);">🧪</div>
+        <div class="product-body">
+          <div class="product-cat">Extracts</div>
+          <div class="product-name" style="color:#1A1A1A;">CBD Isolate 99%</div>
+          <div class="product-meta">THC: 0% · CBD: 99%</div>
+          <div class="product-footer">
+            <div class="product-price" style="color:#1B5E20;">24,99 €</div>
+            <button class="add-btn" style="background:#1B5E20; color:#fff;">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta" style="background:linear-gradient(135deg,#1B5E20,#2E7D32); color:#fff;">
+    <div>
+      <h2>Připraveni začít?</h2>
+      <p>Prohlédněte si náš plný katalog prémiových produktů a najděte to pravé pro sebe.</p>
+    </div>
+    <div class="cta-btns">
+      <a class="btn" style="background:#4CAF50; color:#fff;">Zobrazit produkty →</a>
+      <a class="btn btn-outline" style="color:#A5D6A7; border-color:#A5D6A7;">Kontakt</a>
+    </div>
+  </div>
+
+  <footer style="background:#fff; border-color:#E8F5E9; color:#1A1A1A;">
+    <div class="footer-logo" style="color:#1B5E20;">Weedejna</div>
+    <div class="footer-links"><a href="#" style="color:#666;text-decoration:none;">Produkty</a><a href="#" style="color:#666;text-decoration:none;">Blog</a><a href="#" style="color:#666;text-decoration:none;">Kontakt</a><a href="#" style="color:#666;text-decoration:none;">Ochrana soukromí</a></div>
+    <div class="footer-text">© 2026 Weedejna. Všechna práva vyhrazena.</div>
+  </footer>
+</div>
+
+<!-- ======================== PALETA B — Sage & Stone ======================== -->
+<div class="page" id="page-b" style="background:#F5F5F5; color:#2E2E2E;">
+
+  <nav style="background:#fff; color:#2E2E2E; border-bottom:3px solid #558B2F; box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+    <div class="nav-logo" style="color:#558B2F;">Weedejna</div>
+    <div class="nav-links" style="color:#2E2E2E;">
+      <a href="#" style="color:#2E2E2E;text-decoration:none;">Vše</a>
+      <a href="#" style="color:#2E2E2E;text-decoration:none;">Flowers</a>
+      <a href="#" style="color:#2E2E2E;text-decoration:none;">Extracts</a>
+      <a href="#" style="color:#2E2E2E;text-decoration:none;">Edibles</a>
+      <a href="#" style="color:#2E2E2E;text-decoration:none;">Blog</a>
+      <a href="#" style="color:#558B2F;text-decoration:none;font-weight:700;">Kontakt</a>
+    </div>
+    <div class="nav-actions">
+      <div class="nav-icon" style="background:#F0F4E8; color:#558B2F;">🛒</div>
+      <div class="nav-icon" style="background:#F0F4E8; color:#558B2F;">👤</div>
+    </div>
+  </nav>
+
+  <div class="hero" style="background:linear-gradient(135deg,#DCEDC8 0%,#F5F5F5 60%); color:#2E2E2E; padding-top:60px;">
+    <div>
+      <div class="hero-badge" style="background:#DCEDC8; color:#33691E; border:1px solid #AED581;">🌿 Prémiové CBD produkty</div>
+      <h1 style="color:#2E2E2E;">Přírodní<br/>harmonie<br/>pro <span style="color:#558B2F;">váš</span><br/>život</h1>
+      <p style="color:#555;">Objevte naši kurátorsky vybranou kolekci prémiových konopných produktů. Laboratoří testováno, přírodou inspirováno.</p>
+      <div class="hero-btns">
+        <a class="btn" style="background:#558B2F; color:#fff;">Nakupovat →</a>
+        <a class="btn btn-outline" style="color:#558B2F; border-color:#558B2F;">Více o nás</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-img" style="background:linear-gradient(135deg,#558B2F,#8BC34A); grid-column:1/3; border-radius:20px 20px 0 0; font-size:4rem; color:#fff;">🌿</div>
+      <div class="hero-img" style="background:#DCEDC8;">🌱</div>
+      <div class="hero-img" style="background:#F0F4E8;">💊</div>
+    </div>
+  </div>
+
+  <div class="features" style="background:#fff; border-top:1px solid #E8F0DB; border-bottom:1px solid #E8F0DB;">
+    <div class="feature" style="border-right:1px solid #E8F0DB;">
+      <div class="feature-icon" style="background:#F0F4E8; color:#558B2F;">⭐</div>
+      <div><h3 style="color:#2E2E2E;">Prémiová kvalita</h3><p style="color:#666;">Laboratoří testované, ručně vybrané produkty</p></div>
+    </div>
+    <div class="feature" style="border-right:1px solid #E8F0DB;">
+      <div class="feature-icon" style="background:#F0F4E8; color:#558B2F;">🛡️</div>
+      <div><h3 style="color:#2E2E2E;">Bezpečné & legální</h3><p style="color:#666;">Plně v souladu s EU předpisy</p></div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon" style="background:#F0F4E8; color:#558B2F;">🚚</div>
+      <div><h3 style="color:#2E2E2E;">Rychlé doručení</h3><p style="color:#666;">Diskrétní zásilky po celé ČR</p></div>
+    </div>
+  </div>
+
+  <div class="products-section">
+    <div class="section-header">
+      <div><div class="section-tag" style="color:#558B2F;">Naše produkty</div><div class="section-title" style="color:#2E2E2E;">Bestsellery</div></div>
+      <a class="btn btn-outline" style="color:#558B2F; border-color:#558B2F; font-size:0.82rem; padding:9px 20px;">Zobrazit vše →</a>
+    </div>
+    <div class="product-grid">
+      <div class="product-card" style="background:#fff; border-color:#E0EDD0;">
+        <div class="product-img" style="background:linear-gradient(135deg,#DCEDC8,#AED581);">🌿</div>
+        <div class="product-body">
+          <div class="product-cat" style="color:#558B2F;">Flowers</div>
+          <div class="product-name" style="color:#2E2E2E;">Girl Scout Cookies</div>
+          <div class="product-meta" style="color:#888;">THC: 25% · CBD: 0.1%</div>
+          <div class="product-footer">
+            <div class="product-price" style="color:#558B2F;">15,99 €</div>
+            <button class="add-btn" style="background:#558B2F; color:#fff;">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card" style="background:#fff; border-color:#E0EDD0;">
+        <div class="product-img" style="background:linear-gradient(135deg,#F1F8E9,#DCEDC8);">🧴</div>
+        <div class="product-body">
+          <div class="product-cat" style="color:#558B2F;">Extracts</div>
+          <div class="product-name" style="color:#2E2E2E;">CBD Oil 10%</div>
+          <div class="product-meta" style="color:#888;">THC: 0.2% · CBD: 10%</div>
+          <div class="product-footer">
+            <div class="product-price" style="color:#558B2F;">39,99 €</div>
+            <button class="add-btn" style="background:#558B2F; color:#fff;">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card" style="background:#fff; border-color:#E0EDD0;">
+        <div class="product-img" style="background:linear-gradient(135deg,#DCEDC8,#AED581);">🍬</div>
+        <div class="product-body">
+          <div class="product-cat" style="color:#558B2F;">Edibles</div>
+          <div class="product-name" style="color:#2E2E2E;">CBD Gummies</div>
+          <div class="product-meta" style="color:#888;">THC: 0% · CBD: 25%</div>
+          <div class="product-footer">
+            <div class="product-price" style="color:#558B2F;">19,99 €</div>
+            <button class="add-btn" style="background:#558B2F; color:#fff;">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card" style="background:#fff; border-color:#E0EDD0;">
+        <div class="product-img" style="background:linear-gradient(135deg,#F9FBE7,#F0F4C3);">🧪</div>
+        <div class="product-body">
+          <div class="product-cat" style="color:#558B2F;">Extracts</div>
+          <div class="product-name" style="color:#2E2E2E;">CBD Isolate 99%</div>
+          <div class="product-meta" style="color:#888;">THC: 0% · CBD: 99%</div>
+          <div class="product-footer">
+            <div class="product-price" style="color:#558B2F;">24,99 €</div>
+            <button class="add-btn" style="background:#558B2F; color:#fff;">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta" style="background:linear-gradient(135deg,#558B2F,#8BC34A); color:#fff;">
+    <div>
+      <h2>Připraveni začít?</h2>
+      <p style="color:rgba(255,255,255,0.8);">Prohlédněte si náš plný katalog prémiových produktů.</p>
+    </div>
+    <div class="cta-btns">
+      <a class="btn" style="background:#fff; color:#558B2F;">Zobrazit produkty →</a>
+      <a class="btn btn-outline" style="color:#fff; border-color:rgba(255,255,255,0.5);">Kontakt</a>
+    </div>
+  </div>
+
+  <footer style="background:#fff; border-color:#E0EDD0; color:#2E2E2E;">
+    <div class="footer-logo" style="color:#558B2F;">Weedejna</div>
+    <div class="footer-links"><a href="#" style="color:#888;text-decoration:none;">Produkty</a><a href="#" style="color:#888;text-decoration:none;">Blog</a><a href="#" style="color:#888;text-decoration:none;">Kontakt</a><a href="#" style="color:#888;text-decoration:none;">Ochrana soukromí</a></div>
+    <div class="footer-text" style="color:#aaa;">© 2026 Weedejna. Všechna práva vyhrazena.</div>
+  </footer>
+</div>
+
+<!-- ======================== PALETA C — Emerald Clean ======================== -->
+<div class="page" id="page-c" style="background:#fff; color:#1d1d1f;">
+
+  <nav style="background:#fff; color:#1d1d1f; border-bottom:1px solid #f0f0f0; box-shadow:0 1px 20px rgba(0,0,0,0.05);">
+    <div class="nav-logo" style="color:#00695C; font-size:1.5rem; letter-spacing:-1px;">Weedejna</div>
+    <div class="nav-links">
+      <a href="#" style="color:#1d1d1f;text-decoration:none;">Vše</a>
+      <a href="#" style="color:#1d1d1f;text-decoration:none;">Flowers</a>
+      <a href="#" style="color:#1d1d1f;text-decoration:none;">Extracts</a>
+      <a href="#" style="color:#1d1d1f;text-decoration:none;">Edibles</a>
+      <a href="#" style="color:#1d1d1f;text-decoration:none;">Blog</a>
+      <a href="#" style="color:#1d1d1f;text-decoration:none;">Kontakt</a>
+    </div>
+    <div class="nav-actions">
+      <div class="nav-icon" style="background:#E0F2F1; color:#00695C;">🛒</div>
+      <div class="nav-icon" style="background:#E0F2F1; color:#00695C;">👤</div>
+    </div>
+  </nav>
+
+  <div class="hero" style="background:#fff; color:#1d1d1f; padding-top:80px; padding-bottom:80px;">
+    <div>
+      <div class="hero-badge" style="background:rgba(0,105,92,0.08); color:#00695C; border:1px solid rgba(0,105,92,0.2);">🌿 Prémiové CBD produkty</div>
+      <h1 style="color:#1d1d1f; font-size:3.8rem;">Čistota<br/>v každé<br/><span style="color:#00695C;">kapce</span></h1>
+      <p>Objevte naši kurátorsky vybranou kolekci prémiových konopných produktů. Laboratoří testováno, přírodou inspirováno.</p>
+      <div class="hero-btns">
+        <a class="btn" style="background:#00695C; color:#fff;">Nakupovat →</a>
+        <a class="btn btn-outline" style="color:#00695C; border-color:#00695C;">Více o nás</a>
+      </div>
+    </div>
+    <div class="hero-visual" style="border:1px solid #E0F2F1;">
+      <div class="hero-img" style="background:linear-gradient(135deg,#00695C,#26A69A); grid-column:1/3; border-radius:20px 20px 0 0; font-size:4rem; color:#fff;">🌊</div>
+      <div class="hero-img" style="background:#E0F2F1;">🌿</div>
+      <div class="hero-img" style="background:#B2DFDB;">💧</div>
+    </div>
+  </div>
+
+  <div class="features" style="background:#F5FFFE; border-top:1px solid #E0F2F1; border-bottom:1px solid #E0F2F1;">
+    <div class="feature" style="border-right:1px solid #E0F2F1;">
+      <div class="feature-icon" style="background:#E0F2F1; color:#00695C;">⭐</div>
+      <div><h3>Prémiová kvalita</h3><p>Laboratoří testované, ručně vybrané produkty</p></div>
+    </div>
+    <div class="feature" style="border-right:1px solid #E0F2F1;">
+      <div class="feature-icon" style="background:#E0F2F1; color:#00695C;">🛡️</div>
+      <div><h3>Bezpečné & legální</h3><p>Plně v souladu s EU předpisy</p></div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon" style="background:#E0F2F1; color:#00695C;">🚚</div>
+      <div><h3>Rychlé doručení</h3><p>Diskrétní zásilky po celé ČR</p></div>
+    </div>
+  </div>
+
+  <div class="products-section" style="background:#fff;">
+    <div class="section-header">
+      <div><div class="section-tag" style="color:#00695C;">Naše produkty</div><div class="section-title">Bestsellery</div></div>
+      <a class="btn btn-outline" style="color:#00695C; border-color:#00695C; font-size:0.82rem; padding:9px 20px;">Zobrazit vše →</a>
+    </div>
+    <div class="product-grid">
+      <div class="product-card" style="background:#fff; border-color:#E0F2F1; box-shadow:0 2px 12px rgba(0,105,92,0.06);">
+        <div class="product-img" style="background:linear-gradient(135deg,#E0F2F1,#B2DFDB);">🌿</div>
+        <div class="product-body">
+          <div class="product-cat" style="color:#26A69A;">Flowers</div>
+          <div class="product-name">Girl Scout Cookies</div>
+          <div class="product-meta">THC: 25% · CBD: 0.1%</div>
+          <div class="product-footer">
+            <div class="product-price" style="color:#00695C;">15,99 €</div>
+            <button class="add-btn" style="background:#00695C; color:#fff;">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card" style="background:#fff; border-color:#E0F2F1; box-shadow:0 2px 12px rgba(0,105,92,0.06);">
+        <div class="product-img" style="background:linear-gradient(135deg,#F5FFFE,#E0F2F1);">🧴</div>
+        <div class="product-body">
+          <div class="product-cat" style="color:#26A69A;">Extracts</div>
+          <div class="product-name">CBD Oil 10%</div>
+          <div class="product-meta">THC: 0.2% · CBD: 10%</div>
+          <div class="product-footer">
+            <div class="product-price" style="color:#00695C;">39,99 €</div>
+            <button class="add-btn" style="background:#00695C; color:#fff;">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card" style="background:#fff; border-color:#E0F2F1; box-shadow:0 2px 12px rgba(0,105,92,0.06);">
+        <div class="product-img" style="background:linear-gradient(135deg,#E0F2F1,#80CBC4);">🍬</div>
+        <div class="product-body">
+          <div class="product-cat" style="color:#26A69A;">Edibles</div>
+          <div class="product-name">CBD Gummies</div>
+          <div class="product-meta">THC: 0% · CBD: 25%</div>
+          <div class="product-footer">
+            <div class="product-price" style="color:#00695C;">19,99 €</div>
+            <button class="add-btn" style="background:#00695C; color:#fff;">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card" style="background:#fff; border-color:#E0F2F1; box-shadow:0 2px 12px rgba(0,105,92,0.06);">
+        <div class="product-img" style="background:linear-gradient(135deg,#F5FFFE,#E0F2F1);">🧪</div>
+        <div class="product-body">
+          <div class="product-cat" style="color:#26A69A;">Extracts</div>
+          <div class="product-name">CBD Isolate 99%</div>
+          <div class="product-meta">THC: 0% · CBD: 99%</div>
+          <div class="product-footer">
+            <div class="product-price" style="color:#00695C;">24,99 €</div>
+            <button class="add-btn" style="background:#00695C; color:#fff;">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta" style="background:linear-gradient(135deg,#004D40,#00695C); color:#fff;">
+    <div>
+      <h2>Připraveni začít?</h2>
+      <p style="color:rgba(255,255,255,0.7);">Prohlédněte si náš plný katalog prémiových produktů.</p>
+    </div>
+    <div class="cta-btns">
+      <a class="btn" style="background:#26A69A; color:#fff;">Zobrazit produkty →</a>
+      <a class="btn btn-outline" style="color:#80CBC4; border-color:#80CBC4;">Kontakt</a>
+    </div>
+  </div>
+
+  <footer style="background:#F5FFFE; border-color:#E0F2F1;">
+    <div class="footer-logo" style="color:#00695C;">Weedejna</div>
+    <div class="footer-links"><a href="#" style="color:#888;text-decoration:none;">Produkty</a><a href="#" style="color:#888;text-decoration:none;">Blog</a><a href="#" style="color:#888;text-decoration:none;">Kontakt</a><a href="#" style="color:#888;text-decoration:none;">Ochrana soukromí</a></div>
+    <div class="footer-text">© 2026 Weedejna. Všechna práva vyhrazena.</div>
+  </footer>
+</div>
+
+<!-- ======================== PALETA D — Mint Modern ======================== -->
+<div class="page" id="page-d" style="background:#F8F9FA; color:#212121;">
+
+  <nav style="background:#F8F9FA; color:#212121; border-bottom:1px solid #DEE2E6; backdrop-filter:blur(10px);">
+    <div class="nav-logo" style="color:#2E7D32; font-weight:900;">Weedejna</div>
+    <div class="nav-links">
+      <a href="#" style="color:#212121;text-decoration:none;">Vše</a>
+      <a href="#" style="color:#212121;text-decoration:none;">Flowers</a>
+      <a href="#" style="color:#212121;text-decoration:none;">Extracts</a>
+      <a href="#" style="color:#212121;text-decoration:none;">Edibles</a>
+      <a href="#" style="color:#212121;text-decoration:none;">Blog</a>
+      <a href="#" style="color:#212121;text-decoration:none;">Kontakt</a>
+    </div>
+    <div class="nav-actions">
+      <div class="nav-icon" style="background:#E8F5E9; color:#2E7D32;">🛒</div>
+      <div class="nav-icon" style="background:#E8F5E9; color:#2E7D32;">👤</div>
+    </div>
+  </nav>
+
+  <div class="hero" style="background:linear-gradient(160deg,#F8F9FA 40%,#C8E6C9 100%); color:#212121; padding-top:80px;">
+    <div>
+      <div class="hero-badge" style="background:#E8F5E9; color:#2E7D32; border:1px solid #C8E6C9;">🌿 Prémiové CBD produkty</div>
+      <h1 style="font-size:3.6rem; color:#212121;">Moderní<br/>wellness<br/>pro <span style="color:#2E7D32;">každý</span><br/>den</h1>
+      <p style="color:#555;">Objevte naši kurátorsky vybranou kolekci prémiových konopných produktů. Laboratoří testováno, přírodou inspirováno.</p>
+      <div class="hero-btns">
+        <a class="btn" style="background:#2E7D32; color:#fff; box-shadow:0 4px 20px rgba(46,125,50,0.3);">Nakupovat →</a>
+        <a class="btn btn-outline" style="color:#2E7D32; border-color:#2E7D32;">Více o nás</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-img" style="background:linear-gradient(135deg,#2E7D32,#66BB6A); grid-column:1/3; border-radius:20px 20px 0 0; font-size:4rem; color:#fff;">🌿</div>
+      <div class="hero-img" style="background:#C8E6C9; border-radius:0 0 0 16px;">🌱</div>
+      <div class="hero-img" style="background:#E8F5E9; border-radius:0 0 16px 0;">💊</div>
+    </div>
+  </div>
+
+  <div class="features" style="background:#fff; border-top:1px solid #DEE2E6; border-bottom:1px solid #DEE2E6;">
+    <div class="feature" style="border-right:1px solid #DEE2E6;">
+      <div class="feature-icon" style="background:#E8F5E9; color:#2E7D32;">⭐</div>
+      <div><h3 style="color:#212121;">Prémiová kvalita</h3><p style="color:#666;">Laboratoří testované, ručně vybrané produkty</p></div>
+    </div>
+    <div class="feature" style="border-right:1px solid #DEE2E6;">
+      <div class="feature-icon" style="background:#E8F5E9; color:#2E7D32;">🛡️</div>
+      <div><h3 style="color:#212121;">Bezpečné & legální</h3><p style="color:#666;">Plně v souladu s EU předpisy</p></div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon" style="background:#E8F5E9; color:#2E7D32;">🚚</div>
+      <div><h3 style="color:#212121;">Rychlé doručení</h3><p style="color:#666;">Diskrétní zásilky po celé ČR</p></div>
+    </div>
+  </div>
+
+  <div class="products-section" style="background:#F8F9FA;">
+    <div class="section-header">
+      <div><div class="section-tag" style="color:#2E7D32;">Naše produkty</div><div class="section-title" style="color:#212121;">Bestsellery</div></div>
+      <a class="btn btn-outline" style="color:#2E7D32; border-color:#2E7D32; font-size:0.82rem; padding:9px 20px;">Zobrazit vše →</a>
+    </div>
+    <div class="product-grid">
+      <div class="product-card" style="background:#fff; border-color:#DEE2E6; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+        <div class="product-img" style="background:linear-gradient(135deg,#C8E6C9,#A5D6A7);">🌿</div>
+        <div class="product-body">
+          <div class="product-cat" style="color:#66BB6A;">Flowers</div>
+          <div class="product-name" style="color:#212121;">Girl Scout Cookies</div>
+          <div class="product-meta" style="color:#888;">THC: 25% · CBD: 0.1%</div>
+          <div class="product-footer">
+            <div class="product-price" style="color:#2E7D32;">15,99 €</div>
+            <button class="add-btn" style="background:#2E7D32; color:#fff;">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card" style="background:#fff; border-color:#DEE2E6; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+        <div class="product-img" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9);">🧴</div>
+        <div class="product-body">
+          <div class="product-cat" style="color:#66BB6A;">Extracts</div>
+          <div class="product-name" style="color:#212121;">CBD Oil 10%</div>
+          <div class="product-meta" style="color:#888;">THC: 0.2% · CBD: 10%</div>
+          <div class="product-footer">
+            <div class="product-price" style="color:#2E7D32;">39,99 €</div>
+            <button class="add-btn" style="background:#2E7D32; color:#fff;">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card" style="background:#fff; border-color:#DEE2E6; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+        <div class="product-img" style="background:linear-gradient(135deg,#DCEDC8,#C8E6C9);">🍬</div>
+        <div class="product-body">
+          <div class="product-cat" style="color:#66BB6A;">Edibles</div>
+          <div class="product-name" style="color:#212121;">CBD Gummies</div>
+          <div class="product-meta" style="color:#888;">THC: 0% · CBD: 25%</div>
+          <div class="product-footer">
+            <div class="product-price" style="color:#2E7D32;">19,99 €</div>
+            <button class="add-btn" style="background:#2E7D32; color:#fff;">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card" style="background:#fff; border-color:#DEE2E6; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+        <div class="product-img" style="background:linear-gradient(135deg,#F8F9FA,#E8F5E9);">🧪</div>
+        <div class="product-body">
+          <div class="product-cat" style="color:#66BB6A;">Extracts</div>
+          <div class="product-name" style="color:#212121;">CBD Isolate 99%</div>
+          <div class="product-meta" style="color:#888;">THC: 0% · CBD: 99%</div>
+          <div class="product-footer">
+            <div class="product-price" style="color:#2E7D32;">24,99 €</div>
+            <button class="add-btn" style="background:#2E7D32; color:#fff;">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta" style="background:#2E7D32; color:#fff;">
+    <div>
+      <h2>Připraveni začít?</h2>
+      <p style="color:rgba(255,255,255,0.75);">Prohlédněte si náš plný katalog prémiových produktů.</p>
+    </div>
+    <div class="cta-btns">
+      <a class="btn" style="background:#fff; color:#2E7D32;">Zobrazit produkty →</a>
+      <a class="btn btn-outline" style="color:#A5D6A7; border-color:rgba(165,214,167,0.5);">Kontakt</a>
+    </div>
+  </div>
+
+  <footer style="background:#fff; border-color:#DEE2E6;">
+    <div class="footer-logo" style="color:#2E7D32;">Weedejna</div>
+    <div class="footer-links"><a href="#" style="color:#888;text-decoration:none;">Produkty</a><a href="#" style="color:#888;text-decoration:none;">Blog</a><a href="#" style="color:#888;text-decoration:none;">Kontakt</a><a href="#" style="color:#888;text-decoration:none;">Ochrana soukromí</a></div>
+    <div class="footer-text" style="color:#aaa;">© 2026 Weedejna. Všechna práva vyhrazena.</div>
+  </footer>
+</div>
+
+<!-- ======================== PALETA E — Cannabis Natural ======================== -->
+<div class="page" id="page-e" style="background:#FEFEFE; color:#263238;">
+
+  <nav style="background:#33691E; color:#fff;">
+    <div class="nav-logo" style="color:#AED581; font-size:1.4rem; font-weight:900; letter-spacing:-0.5px;">Weedejna</div>
+    <div class="nav-links">
+      <a href="#" style="color:rgba(255,255,255,0.75);text-decoration:none;">Vše</a>
+      <a href="#" style="color:rgba(255,255,255,0.75);text-decoration:none;">Flowers</a>
+      <a href="#" style="color:rgba(255,255,255,0.75);text-decoration:none;">Extracts</a>
+      <a href="#" style="color:rgba(255,255,255,0.75);text-decoration:none;">Edibles</a>
+      <a href="#" style="color:rgba(255,255,255,0.75);text-decoration:none;">Blog</a>
+      <a href="#" style="color:#AED581;text-decoration:none;font-weight:700;">Kontakt</a>
+    </div>
+    <div class="nav-actions">
+      <div class="nav-icon" style="background:rgba(174,213,129,0.2); color:#AED581;">🛒</div>
+      <div class="nav-icon" style="background:rgba(174,213,129,0.2); color:#AED581;">👤</div>
+    </div>
+  </nav>
+
+  <div class="hero" style="background:#FEFEFE; color:#263238; padding-top:72px;">
+    <div>
+      <div class="hero-badge" style="background:#F0F4C3; color:#33691E; border:1px solid #AED581;">🌿 Prémiové CBD produkty</div>
+      <h1 style="color:#263238; font-size:3.4rem;">Ze srdce<br/>přírody<br/>přímo k <span style="color:#33691E;">vám</span></h1>
+      <p style="color:#546E7A;">Objevte naši kurátorsky vybranou kolekci prémiových konopných produktů. Laboratoří testováno, přírodou inspirováno.</p>
+      <div class="hero-btns">
+        <a class="btn" style="background:#33691E; color:#AED581; border:2px solid #33691E;">Nakupovat →</a>
+        <a class="btn btn-outline" style="color:#33691E; border-color:#33691E;">Více o nás</a>
+      </div>
+    </div>
+    <div class="hero-visual" style="border:2px solid #F0F4C3;">
+      <div class="hero-img" style="background:linear-gradient(135deg,#33691E,#558B2F); grid-column:1/3; border-radius:20px 20px 0 0; font-size:4rem; color:#AED581;">🍃</div>
+      <div class="hero-img" style="background:#F0F4C3;">🌾</div>
+      <div class="hero-img" style="background:#DCEDC8;">🌱</div>
+    </div>
+  </div>
+
+  <div class="features" style="background:#F0F4C3; border-top:1px solid #DCEDC8; border-bottom:1px solid #DCEDC8;">
+    <div class="feature" style="border-right:1px solid #DCEDC8;">
+      <div class="feature-icon" style="background:#DCEDC8; color:#33691E;">⭐</div>
+      <div><h3 style="color:#263238;">Prémiová kvalita</h3><p style="color:#546E7A;">Laboratoří testované, ručně vybrané produkty</p></div>
+    </div>
+    <div class="feature" style="border-right:1px solid #DCEDC8;">
+      <div class="feature-icon" style="background:#DCEDC8; color:#33691E;">🛡️</div>
+      <div><h3 style="color:#263238;">Bezpečné & legální</h3><p style="color:#546E7A;">Plně v souladu s EU předpisy</p></div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon" style="background:#DCEDC8; color:#33691E;">🚚</div>
+      <div><h3 style="color:#263238;">Rychlé doručení</h3><p style="color:#546E7A;">Diskrétní zásilky po celé ČR</p></div>
+    </div>
+  </div>
+
+  <div class="products-section" style="background:#FEFEFE;">
+    <div class="section-header">
+      <div><div class="section-tag" style="color:#33691E;">Naše produkty</div><div class="section-title" style="color:#263238;">Bestsellery</div></div>
+      <a class="btn btn-outline" style="color:#33691E; border-color:#33691E; font-size:0.82rem; padding:9px 20px;">Zobrazit vše →</a>
+    </div>
+    <div class="product-grid">
+      <div class="product-card" style="background:#FAFFF5; border-color:#DCEDC8;">
+        <div class="product-img" style="background:linear-gradient(135deg,#DCEDC8,#AED581);">🌿</div>
+        <div class="product-body">
+          <div class="product-cat" style="color:#558B2F;">Flowers</div>
+          <div class="product-name" style="color:#263238;">Girl Scout Cookies</div>
+          <div class="product-meta" style="color:#78909C;">THC: 25% · CBD: 0.1%</div>
+          <div class="product-footer">
+            <div class="product-price" style="color:#33691E;">15,99 €</div>
+            <button class="add-btn" style="background:#33691E; color:#AED581;">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card" style="background:#FAFFF5; border-color:#DCEDC8;">
+        <div class="product-img" style="background:linear-gradient(135deg,#F0F4C3,#DCEDC8);">🧴</div>
+        <div class="product-body">
+          <div class="product-cat" style="color:#558B2F;">Extracts</div>
+          <div class="product-name" style="color:#263238;">CBD Oil 10%</div>
+          <div class="product-meta" style="color:#78909C;">THC: 0.2% · CBD: 10%</div>
+          <div class="product-footer">
+            <div class="product-price" style="color:#33691E;">39,99 €</div>
+            <button class="add-btn" style="background:#33691E; color:#AED581;">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card" style="background:#FAFFF5; border-color:#DCEDC8;">
+        <div class="product-img" style="background:linear-gradient(135deg,#DCEDC8,#F0F4C3);">🍬</div>
+        <div class="product-body">
+          <div class="product-cat" style="color:#558B2F;">Edibles</div>
+          <div class="product-name" style="color:#263238;">CBD Gummies</div>
+          <div class="product-meta" style="color:#78909C;">THC: 0% · CBD: 25%</div>
+          <div class="product-footer">
+            <div class="product-price" style="color:#33691E;">19,99 €</div>
+            <button class="add-btn" style="background:#33691E; color:#AED581;">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card" style="background:#FAFFF5; border-color:#DCEDC8;">
+        <div class="product-img" style="background:linear-gradient(135deg,#F9FBE7,#F0F4C3);">🧪</div>
+        <div class="product-body">
+          <div class="product-cat" style="color:#558B2F;">Extracts</div>
+          <div class="product-name" style="color:#263238;">CBD Isolate 99%</div>
+          <div class="product-meta" style="color:#78909C;">THC: 0% · CBD: 99%</div>
+          <div class="product-footer">
+            <div class="product-price" style="color:#33691E;">24,99 €</div>
+            <button class="add-btn" style="background:#33691E; color:#AED581;">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta" style="background:linear-gradient(135deg,#1B5E20,#33691E); color:#fff; border:2px solid #AED581;">
+    <div>
+      <h2 style="color:#AED581;">Připraveni začít?</h2>
+      <p style="color:rgba(255,255,255,0.7);">Prohlédněte si náš plný katalog prémiových produktů.</p>
+    </div>
+    <div class="cta-btns">
+      <a class="btn" style="background:#AED581; color:#1B5E20;">Zobrazit produkty →</a>
+      <a class="btn btn-outline" style="color:#AED581; border-color:#AED581;">Kontakt</a>
+    </div>
+  </div>
+
+  <footer style="background:#33691E; border-color:#33691E;">
+    <div class="footer-logo" style="color:#AED581;">Weedejna</div>
+    <div class="footer-links"><a href="#" style="color:rgba(255,255,255,0.5);text-decoration:none;">Produkty</a><a href="#" style="color:rgba(255,255,255,0.5);text-decoration:none;">Blog</a><a href="#" style="color:rgba(255,255,255,0.5);text-decoration:none;">Kontakt</a><a href="#" style="color:rgba(255,255,255,0.5);text-decoration:none;">Ochrana soukromí</a></div>
+    <div class="footer-text" style="color:rgba(255,255,255,0.35);">© 2026 Weedejna. Všechna práva vyhrazena.</div>
+  </footer>
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.pal-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>

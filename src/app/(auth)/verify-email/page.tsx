@@ -48,7 +48,7 @@ export default function VerifyEmailPage() {
     <div className="bg-[#111714] border border-[#1F3D1F] rounded-2xl p-8 w-full max-w-md text-center">
       {state === 'loading' && (
         <>
-          <div className="w-12 h-12 border-2 border-[#22A829] border-t-transparent rounded-full animate-spin mx-auto mb-6" />
+          <div className="w-12 h-12 border-2 border-[#2E7D32] border-t-transparent rounded-full animate-spin mx-auto mb-6" />
           <h1 className="text-xl font-semibold text-[#F0F5F0] mb-2">Verifying your email…</h1>
           <p className="text-[#6B8F6B] text-sm">This should only take a moment.</p>
         </>
@@ -57,7 +57,7 @@ export default function VerifyEmailPage() {
       {state === 'success' && (
         <>
           <div className="w-12 h-12 bg-[#1A2E1A] rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg className="w-6 h-6 text-[#22A829]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-6 h-6 text-[#2E7D32]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
@@ -67,7 +67,7 @@ export default function VerifyEmailPage() {
           </p>
           <Link
             href="/login"
-            className="inline-block bg-[#22A829] hover:bg-[#38C424] text-black font-semibold rounded-xl px-6 py-3 transition-colors"
+            className="inline-block bg-[#2E7D32] hover:bg-[#38C424] text-black font-semibold rounded-xl px-6 py-3 transition-colors"
           >
             Sign In Now
           </Link>
@@ -86,7 +86,7 @@ export default function VerifyEmailPage() {
           <div className="flex flex-col gap-3">
             <Link
               href="/login"
-              className="inline-block bg-[#22A829] hover:bg-[#38C424] text-black font-semibold rounded-xl px-6 py-3 transition-colors text-center"
+              className="inline-block bg-[#2E7D32] hover:bg-[#38C424] text-black font-semibold rounded-xl px-6 py-3 transition-colors text-center"
             >
               Back to Sign In
             </Link>

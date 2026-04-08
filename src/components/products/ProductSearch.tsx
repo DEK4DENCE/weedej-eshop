@@ -53,7 +53,7 @@ export function ProductSearch({ placeholder = 'Search products…', className = 
         value={value}
         onChange={handleChange}
         placeholder={placeholder}
-        className="w-full bg-[#fafafa] border border-[#d2d2d7] rounded-xl pl-9 pr-9 py-2.5 text-sm text-[#1d1d1f] placeholder:text-[#aeaeb2] focus:outline-none focus:border-[#22A829] focus:ring-2 focus:ring-[#22A829]/20 transition-all duration-200"
+        className="w-full bg-[#fafafa] border border-[#DEE2E6] rounded-xl pl-9 pr-9 py-2.5 text-sm text-[#1d1d1f] placeholder:text-[#aeaeb2] focus:outline-none focus:border-[#2E7D32] focus:ring-2 focus:ring-[#2E7D32]/20 transition-all duration-200"
       />
       {value && (
         <button

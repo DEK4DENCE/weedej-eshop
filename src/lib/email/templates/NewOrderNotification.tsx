@@ -108,11 +108,11 @@ export function NewOrderNotification({
   )
 }
 
-const body = { backgroundColor: '#f5f5f7', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }
-const container = { backgroundColor: '#ffffff', border: '1px solid #d2d2d7', borderRadius: '12px', margin: '40px auto', padding: '40px', maxWidth: '520px' }
-const logo = { color: '#22A829', fontSize: '18px', fontWeight: '700', marginBottom: '8px' }
+const body = { backgroundColor: '#F8F9FA', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }
+const container = { backgroundColor: '#ffffff', border: '1px solid #DEE2E6', borderRadius: '12px', margin: '40px auto', padding: '40px', maxWidth: '520px' }
+const logo = { color: '#2E7D32', fontSize: '18px', fontWeight: '700', marginBottom: '8px' }
 const heading = { color: '#1d1d1f', fontSize: '20px', fontWeight: '700', marginBottom: '20px' }
-const infoBox = { backgroundColor: '#f5f5f7', borderRadius: '8px', padding: '16px', marginBottom: '16px' }
+const infoBox = { backgroundColor: '#F8F9FA', borderRadius: '8px', padding: '16px', marginBottom: '16px' }
 const infoLabel = { color: '#6e6e73', fontSize: '11px', textTransform: 'uppercase' as const, letterSpacing: '0.05em', margin: '0 0 2px 0' }
 const infoValue = { color: '#1d1d1f', fontSize: '14px', fontWeight: '500', margin: '0 0 10px 0', whiteSpace: 'pre-line' as const }
 const sectionTitle = { color: '#1d1d1f', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }
@@ -121,10 +121,10 @@ const itemName = { color: '#1d1d1f', fontSize: '14px', fontWeight: '500', margin
 const itemVariant = { color: '#6e6e73', fontSize: '13px', margin: '0' }
 const priceCol = { textAlign: 'right' as const, verticalAlign: 'top' as const }
 const itemPrice = { color: '#1d1d1f', fontSize: '14px', margin: '0' }
-const divider = { borderColor: '#d2d2d7', marginTop: '16px', marginBottom: '16px' }
+const divider = { borderColor: '#DEE2E6', marginTop: '16px', marginBottom: '16px' }
 const totalRow = { marginBottom: '4px' }
 const totalLabel = { color: '#6e6e73', fontSize: '13px', margin: '0' }
 const totalVal = { color: '#1d1d1f', fontSize: '13px', textAlign: 'right' as const, margin: '0' }
 const grandLabel = { color: '#1d1d1f', fontSize: '15px', fontWeight: '700', margin: '0' }
-const grandVal = { color: '#22A829', fontSize: '15px', fontWeight: '700', textAlign: 'right' as const, margin: '0' }
+const grandVal = { color: '#2E7D32', fontSize: '15px', fontWeight: '700', textAlign: 'right' as const, margin: '0' }
 const footer = { color: '#aeaeb2', fontSize: '11px' }

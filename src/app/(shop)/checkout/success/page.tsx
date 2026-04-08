@@ -128,7 +128,7 @@ export default async function CheckoutSuccessPage({
 
   return (
     <div className="container mx-auto px-4 py-24 text-center max-w-lg">
-      <CheckCircle2 className="h-16 w-16 text-[#22A829] mx-auto mb-6" />
+      <CheckCircle2 className="h-16 w-16 text-[#2E7D32] mx-auto mb-6" />
       <h1 className="text-3xl font-bold mb-4 font-playfair text-[#1d1d1f]">Order Confirmed!</h1>
       <p className="text-[#6e6e73] mb-8">
         Thank you for your order. You will receive a confirmation email shortly.
@@ -141,13 +141,13 @@ export default async function CheckoutSuccessPage({
       <div className="flex gap-4 justify-center">
         <Link
           href="/account/orders"
-          className="inline-flex items-center justify-center bg-[#22A829] hover:bg-[#1a9020] text-white font-semibold px-6 py-3 rounded-xl text-sm transition-colors"
+          className="inline-flex items-center justify-center bg-[#2E7D32] hover:bg-[#1a9020] text-white font-semibold px-6 py-3 rounded-xl text-sm transition-colors"
         >
           View Orders
         </Link>
         <Link
           href="/products"
-          className="inline-flex items-center justify-center border border-[#22A829] text-[#22A829] hover:bg-[#22A829]/10 font-semibold px-6 py-3 rounded-xl text-sm transition-colors"
+          className="inline-flex items-center justify-center border border-[#2E7D32] text-[#2E7D32] hover:bg-[#2E7D32]/10 font-semibold px-6 py-3 rounded-xl text-sm transition-colors"
         >
           Continue Shopping
         </Link>

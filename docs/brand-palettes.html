@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<title>Weedejna — Barevné palety</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f0f0f0; padding: 40px 20px; }
+  h1 { text-align: center; font-size: 2rem; margin-bottom: 8px; color: #111; }
+  .subtitle { text-align: center; color: #666; margin-bottom: 48px; font-size: 0.95rem; }
+
+  .palette-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 28px; max-width: 1200px; margin: 0 auto; }
+
+  .palette-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.10); }
+  .palette-header { padding: 20px 24px 14px; }
+  .palette-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; opacity: 0.5; margin-bottom: 4px; }
+  .palette-name { font-size: 1.3rem; font-weight: 700; }
+
+  .swatches { display: flex; height: 90px; }
+  .swatch { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 7px; }
+  .swatch span { font-size: 0.6rem; font-weight: 600; letter-spacing: 0.5px; opacity: 0.75; }
+
+  .details { padding: 18px 24px 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .detail-item { }
+  .detail-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: #999; margin-bottom: 4px; }
+  .detail-value { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 600; color: #222; }
+  .dot { width: 20px; height: 20px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.08); flex-shrink: 0; }
+
+  .preview { margin: 0 24px 22px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(0,0,0,0.07); }
+  .preview-header { padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; }
+  .preview-logo { font-weight: 800; font-size: 1rem; letter-spacing: -0.5px; }
+  .preview-nav { display: flex; gap: 12px; font-size: 0.72rem; opacity: 0.6; }
+  .preview-hero { padding: 22px 16px; }
+  .preview-tag { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 0.65rem; font-weight: 600; margin-bottom: 8px; }
+  .preview-title { font-size: 1.4rem; font-weight: 800; line-height: 1.2; margin-bottom: 6px; }
+  .preview-sub { font-size: 0.75rem; opacity: 0.55; margin-bottom: 14px; }
+  .preview-btn { display: inline-block; padding: 8px 20px; border-radius: 99px; font-size: 0.75rem; font-weight: 700; }
+  .preview-cards { display: flex; gap: 8px; padding: 0 16px 16px; }
+  .preview-card { flex: 1; border-radius: 8px; padding: 10px; border: 1px solid rgba(0,0,0,0.07); }
+  .preview-card-img { height: 36px; border-radius: 5px; margin-bottom: 6px; }
+  .preview-card-name { font-size: 0.65rem; font-weight: 700; margin-bottom: 2px; }
+  .preview-card-price { font-size: 0.7rem; font-weight: 800; }
+</style>
+</head>
+<body>
+
+<h1>Weedejna — Návrh barevných palet</h1>
+<p class="subtitle">Vyberte paletu, která nejlépe vystihuje charakter značky Weedejna</p>
+
+<div class="palette-grid">
+
+  <!-- A: Forest Premium -->
+  <div class="palette-card">
+    <div class="palette-header">
+      <div class="palette-label">Paleta A</div>
+      <div class="palette-name">Forest Premium</div>
+    </div>
+    <div class="swatches">
+      <div class="swatch" style="background:#1B5E20;"><span style="color:#fff">#1B5E20</span></div>
+      <div class="swatch" style="background:#4CAF50;"><span style="color:#fff">#4CAF50</span></div>
+      <div class="swatch" style="background:#A5D6A7;"><span style="color:#2E2E2E">#A5D6A7</span></div>
+      <div class="swatch" style="background:#FAFAFA; border-top:1px solid #e0e0e0;"><span style="color:#555">#FAFAFA</span></div>
+      <div class="swatch" style="background:#E0E0E0;"><span style="color:#555">#E0E0E0</span></div>
+      <div class="swatch" style="background:#1A1A1A;"><span style="color:#fff">#1A1A1A</span></div>
+    </div>
+    <div class="details">
+      <div class="detail-item"><div class="detail-label">Primární</div><div class="detail-value"><div class="dot" style="background:#1B5E20"></div>#1B5E20</div></div>
+      <div class="detail-item"><div class="detail-label">Akcent</div><div class="detail-value"><div class="dot" style="background:#4CAF50"></div>#4CAF50</div></div>
+      <div class="detail-item"><div class="detail-label">Pozadí</div><div class="detail-value"><div class="dot" style="background:#FAFAFA; border:1px solid #ddd"></div>#FAFAFA</div></div>
+      <div class="detail-item"><div class="detail-label">Text</div><div class="detail-value"><div class="dot" style="background:#1A1A1A"></div>#1A1A1A</div></div>
+    </div>
+    <div class="preview" style="background:#FAFAFA;">
+      <div class="preview-header" style="background:#1B5E20;">
+        <div class="preview-logo" style="color:#fff">Weedejna</div>
+        <div class="preview-nav" style="color:#fff">Vše &nbsp; Flowers &nbsp; Extracts</div>
+      </div>
+      <div class="preview-hero" style="background:#FAFAFA;">
+        <div class="preview-tag" style="background:#4CAF50;color:#fff">Prémiové konopí</div>
+        <div class="preview-title" style="color:#1A1A1A">Weedejna</div>
+        <div class="preview-sub" style="color:#1A1A1A">Kvalitní CBD produkty z přírody</div>
+        <div class="preview-btn" style="background:#1B5E20;color:#fff">Nakupovat →</div>
+      </div>
+      <div class="preview-cards">
+        <div class="preview-card" style="background:#fff;">
+          <div class="preview-card-img" style="background:#A5D6A7;"></div>
+          <div class="preview-card-name" style="color:#1A1A1A">Girl Scout Cookies</div>
+          <div class="preview-card-price" style="color:#1B5E20">15,99 €</div>
+        </div>
+        <div class="preview-card" style="background:#fff;">
+          <div class="preview-card-img" style="background:#C8E6C9;"></div>
+          <div class="preview-card-name" style="color:#1A1A1A">CBD Oil 10%</div>
+          <div class="preview-card-price" style="color:#1B5E20">39,99 €</div>
+        </div>
+        <div class="preview-card" style="background:#fff;">
+          <div class="preview-card-img" style="background:#A5D6A7;"></div>
+          <div class="preview-card-name" style="color:#1A1A1A">OG Kush</div>
+          <div class="preview-card-price" style="color:#1B5E20">14,99 €</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B: Sage & Stone -->
+  <div class="palette-card">
+    <div class="palette-header">
+      <div class="palette-label">Paleta B</div>
+      <div class="palette-name">Sage & Stone</div>
+    </div>
+    <div class="swatches">
+      <div class="swatch" style="background:#558B2F;"><span style="color:#fff">#558B2F</span></div>
+      <div class="swatch" style="background:#8BC34A;"><span style="color:#fff">#8BC34A</span></div>
+      <div class="swatch" style="background:#DCEDC8;"><span style="color:#555">#DCEDC8</span></div>
+      <div class="swatch" style="background:#F5F5F5; border-top:1px solid #e0e0e0;"><span style="color:#555">#F5F5F5</span></div>
+      <div class="swatch" style="background:#BDBDBD;"><span style="color:#555">#BDBDBD</span></div>
+      <div class="swatch" style="background:#2E2E2E;"><span style="color:#fff">#2E2E2E</span></div>
+    </div>
+    <div class="details">
+      <div class="detail-item"><div class="detail-label">Primární</div><div class="detail-value"><div class="dot" style="background:#558B2F"></div>#558B2F</div></div>
+      <div class="detail-item"><div class="detail-label">Akcent</div><div class="detail-value"><div class="dot" style="background:#8BC34A"></div>#8BC34A</div></div>
+      <div class="detail-item"><div class="detail-label">Pozadí</div><div class="detail-value"><div class="dot" style="background:#F5F5F5; border:1px solid #ddd"></div>#F5F5F5</div></div>
+      <div class="detail-item"><div class="detail-label">Text</div><div class="detail-value"><div class="dot" style="background:#2E2E2E"></div>#2E2E2E</div></div>
+    </div>
+    <div class="preview" style="background:#F5F5F5;">
+      <div class="preview-header" style="background:#fff; border-bottom:2px solid #558B2F;">
+        <div class="preview-logo" style="color:#558B2F">Weedejna</div>
+        <div class="preview-nav" style="color:#2E2E2E">Vše &nbsp; Flowers &nbsp; Extracts</div>
+      </div>
+      <div class="preview-hero" style="background:linear-gradient(135deg,#DCEDC8,#F5F5F5); padding:22px 16px;">
+        <div class="preview-tag" style="background:#8BC34A;color:#fff">Prémiové konopí</div>
+        <div class="preview-title" style="color:#2E2E2E">Weedejna</div>
+        <div class="preview-sub" style="color:#2E2E2E">Kvalitní CBD produkty z přírody</div>
+        <div class="preview-btn" style="background:#558B2F;color:#fff">Nakupovat →</div>
+      </div>
+      <div class="preview-cards">
+        <div class="preview-card" style="background:#fff;">
+          <div class="preview-card-img" style="background:#DCEDC8;"></div>
+          <div class="preview-card-name" style="color:#2E2E2E">Girl Scout Cookies</div>
+          <div class="preview-card-price" style="color:#558B2F">15,99 €</div>
+        </div>
+        <div class="preview-card" style="background:#fff;">
+          <div class="preview-card-img" style="background:#DCEDC8;"></div>
+          <div class="preview-card-name" style="color:#2E2E2E">CBD Oil 10%</div>
+          <div class="preview-card-price" style="color:#558B2F">39,99 €</div>
+        </div>
+        <div class="preview-card" style="background:#fff;">
+          <div class="preview-card-img" style="background:#DCEDC8;"></div>
+          <div class="preview-card-name" style="color:#2E2E2E">OG Kush</div>
+          <div class="preview-card-price" style="color:#558B2F">14,99 €</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C: Emerald Clean -->
+  <div class="palette-card">
+    <div class="palette-header">
+      <div class="palette-label">Paleta C</div>
+      <div class="palette-name">Emerald Clean</div>
+    </div>
+    <div class="swatches">
+      <div class="swatch" style="background:#00695C;"><span style="color:#fff">#00695C</span></div>
+      <div class="swatch" style="background:#26A69A;"><span style="color:#fff">#26A69A</span></div>
+      <div class="swatch" style="background:#80CBC4;"><span style="color:#fff">#80CBC4</span></div>
+      <div class="swatch" style="background:#FFFFFF; border-top:1px solid #e0e0e0;"><span style="color:#555">#FFFFFF</span></div>
+      <div class="swatch" style="background:#EEEEEE;"><span style="color:#555">#EEEEEE</span></div>
+      <div class="swatch" style="background:#1d1d1f;"><span style="color:#fff">#1d1d1f</span></div>
+    </div>
+    <div class="details">
+      <div class="detail-item"><div class="detail-label">Primární</div><div class="detail-value"><div class="dot" style="background:#00695C"></div>#00695C</div></div>
+      <div class="detail-item"><div class="detail-label">Akcent</div><div class="detail-value"><div class="dot" style="background:#26A69A"></div>#26A69A</div></div>
+      <div class="detail-item"><div class="detail-label">Pozadí</div><div class="detail-value"><div class="dot" style="background:#FFFFFF; border:1px solid #ddd"></div>#FFFFFF</div></div>
+      <div class="detail-item"><div class="detail-label">Text</div><div class="detail-value"><div class="dot" style="background:#1d1d1f"></div>#1d1d1f</div></div>
+    </div>
+    <div class="preview" style="background:#fff;">
+      <div class="preview-header" style="background:#fff; border-bottom:1px solid #eee;">
+        <div class="preview-logo" style="color:#00695C">Weedejna</div>
+        <div class="preview-nav" style="color:#1d1d1f">Vše &nbsp; Flowers &nbsp; Extracts</div>
+      </div>
+      <div class="preview-hero" style="background:#fff; padding:22px 16px;">
+        <div class="preview-tag" style="background:rgba(38,166,154,0.12);color:#00695C;border:1px solid #26A69A">Prémiové konopí</div>
+        <div class="preview-title" style="color:#1d1d1f">Weedejna</div>
+        <div class="preview-sub">Kvalitní CBD produkty z přírody</div>
+        <div class="preview-btn" style="background:#00695C;color:#fff">Nakupovat →</div>
+      </div>
+      <div class="preview-cards">
+        <div class="preview-card" style="background:#F5FFFE;">
+          <div class="preview-card-img" style="background:#80CBC4;"></div>
+          <div class="preview-card-name" style="color:#1d1d1f">Girl Scout Cookies</div>
+          <div class="preview-card-price" style="color:#00695C">15,99 €</div>
+        </div>
+        <div class="preview-card" style="background:#F5FFFE;">
+          <div class="preview-card-img" style="background:#B2DFDB;"></div>
+          <div class="preview-card-name" style="color:#1d1d1f">CBD Oil 10%</div>
+          <div class="preview-card-price" style="color:#00695C">39,99 €</div>
+        </div>
+        <div class="preview-card" style="background:#F5FFFE;">
+          <div class="preview-card-img" style="background:#80CBC4;"></div>
+          <div class="preview-card-name" style="color:#1d1d1f">OG Kush</div>
+          <div class="preview-card-price" style="color:#00695C">14,99 €</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- D: Mint Modern -->
+  <div class="palette-card">
+    <div class="palette-header">
+      <div class="palette-label">Paleta D</div>
+      <div class="palette-name">Mint Modern</div>
+    </div>
+    <div class="swatches">
+      <div class="swatch" style="background:#2E7D32;"><span style="color:#fff">#2E7D32</span></div>
+      <div class="swatch" style="background:#66BB6A;"><span style="color:#fff">#66BB6A</span></div>
+      <div class="swatch" style="background:#C8E6C9;"><span style="color:#555">#C8E6C9</span></div>
+      <div class="swatch" style="background:#F8F9FA; border-top:1px solid #e0e0e0;"><span style="color:#555">#F8F9FA</span></div>
+      <div class="swatch" style="background:#DEE2E6;"><span style="color:#555">#DEE2E6</span></div>
+      <div class="swatch" style="background:#212121;"><span style="color:#fff">#212121</span></div>
+    </div>
+    <div class="details">
+      <div class="detail-item"><div class="detail-label">Primární</div><div class="detail-value"><div class="dot" style="background:#2E7D32"></div>#2E7D32</div></div>
+      <div class="detail-item"><div class="detail-label">Akcent</div><div class="detail-value"><div class="dot" style="background:#66BB6A"></div>#66BB6A</div></div>
+      <div class="detail-item"><div class="detail-label">Pozadí</div><div class="detail-value"><div class="dot" style="background:#F8F9FA; border:1px solid #ddd"></div>#F8F9FA</div></div>
+      <div class="detail-item"><div class="detail-label">Text</div><div class="detail-value"><div class="dot" style="background:#212121"></div>#212121</div></div>
+    </div>
+    <div class="preview" style="background:#F8F9FA;">
+      <div class="preview-header" style="background:#F8F9FA; border-bottom:1px solid #DEE2E6;">
+        <div class="preview-logo" style="color:#2E7D32; font-size:1.05rem">Weedejna</div>
+        <div class="preview-nav" style="color:#212121">Vše &nbsp; Flowers &nbsp; Extracts</div>
+      </div>
+      <div class="preview-hero" style="background:linear-gradient(135deg,#F8F9FA 60%,#C8E6C9 100%); padding:22px 16px;">
+        <div class="preview-tag" style="background:#66BB6A;color:#fff">Prémiové konopí</div>
+        <div class="preview-title" style="color:#212121">Weedejna</div>
+        <div class="preview-sub">Kvalitní CBD produkty z přírody</div>
+        <div class="preview-btn" style="background:#2E7D32;color:#fff">Nakupovat →</div>
+      </div>
+      <div class="preview-cards">
+        <div class="preview-card" style="background:#fff;">
+          <div class="preview-card-img" style="background:#C8E6C9;"></div>
+          <div class="preview-card-name" style="color:#212121">Girl Scout Cookies</div>
+          <div class="preview-card-price" style="color:#2E7D32">15,99 €</div>
+        </div>
+        <div class="preview-card" style="background:#fff;">
+          <div class="preview-card-img" style="background:#DCEDC8;"></div>
+          <div class="preview-card-name" style="color:#212121">CBD Oil 10%</div>
+          <div class="preview-card-price" style="color:#2E7D32">39,99 €</div>
+        </div>
+        <div class="preview-card" style="background:#fff;">
+          <div class="preview-card-img" style="background:#C8E6C9;"></div>
+          <div class="preview-card-name" style="color:#212121">OG Kush</div>
+          <div class="preview-card-price" style="color:#2E7D32">14,99 €</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- E: Cannabis Natural -->
+  <div class="palette-card">
+    <div class="palette-header">
+      <div class="palette-label">Paleta E</div>
+      <div class="palette-name">Cannabis Natural</div>
+    </div>
+    <div class="swatches">
+      <div class="swatch" style="background:#33691E;"><span style="color:#fff">#33691E</span></div>
+      <div class="swatch" style="background:#AED581;"><span style="color:#33691E">#AED581</span></div>
+      <div class="swatch" style="background:#F0F4C3;"><span style="color:#555">#F0F4C3</span></div>
+      <div class="swatch" style="background:#FEFEFE; border-top:1px solid #e0e0e0;"><span style="color:#555">#FEFEFE</span></div>
+      <div class="swatch" style="background:#ECEFF1;"><span style="color:#555">#ECEFF1</span></div>
+      <div class="swatch" style="background:#263238;"><span style="color:#fff">#263238</span></div>
+    </div>
+    <div class="details">
+      <div class="detail-item"><div class="detail-label">Primární</div><div class="detail-value"><div class="dot" style="background:#33691E"></div>#33691E</div></div>
+      <div class="detail-item"><div class="detail-label">Akcent</div><div class="detail-value"><div class="dot" style="background:#AED581"></div>#AED581</div></div>
+      <div class="detail-item"><div class="detail-label">Pozadí</div><div class="detail-value"><div class="dot" style="background:#FEFEFE; border:1px solid #ddd"></div>#FEFEFE</div></div>
+      <div class="detail-item"><div class="detail-label">Text</div><div class="detail-value"><div class="dot" style="background:#263238"></div>#263238</div></div>
+    </div>
+    <div class="preview" style="background:#FEFEFE;">
+      <div class="preview-header" style="background:#33691E;">
+        <div class="preview-logo" style="color:#AED581">Weedejna</div>
+        <div class="preview-nav" style="color:#F0F4C3">Vše &nbsp; Flowers &nbsp; Extracts</div>
+      </div>
+      <div class="preview-hero" style="background:#FEFEFE; padding:22px 16px;">
+        <div class="preview-tag" style="background:#F0F4C3;color:#33691E;border:1px solid #AED581">Prémiové konopí</div>
+        <div class="preview-title" style="color:#263238">Weedejna</div>
+        <div class="preview-sub">Kvalitní CBD produkty z přírody</div>
+        <div class="preview-btn" style="background:#33691E;color:#AED581">Nakupovat →</div>
+      </div>
+      <div class="preview-cards">
+        <div class="preview-card" style="background:#FAFFF5; border-color:#F0F4C3;">
+          <div class="preview-card-img" style="background:#DCEDC8;"></div>
+          <div class="preview-card-name" style="color:#263238">Girl Scout Cookies</div>
+          <div class="preview-card-price" style="color:#33691E">15,99 €</div>
+        </div>
+        <div class="preview-card" style="background:#FAFFF5; border-color:#F0F4C3;">
+          <div class="preview-card-img" style="background:#F0F4C3;"></div>
+          <div class="preview-card-name" style="color:#263238">CBD Oil 10%</div>
+          <div class="preview-card-price" style="color:#33691E">39,99 €</div>
+        </div>
+        <div class="preview-card" style="background:#FAFFF5; border-color:#F0F4C3;">
+          <div class="preview-card-img" style="background:#DCEDC8;"></div>
+          <div class="preview-card-name" style="color:#263238">OG Kush</div>
+          <div class="preview-card-price" style="color:#33691E">14,99 €</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="text-align:center; margin-top:48px; color:#888; font-size:0.85rem;">
+  Weedejna Brand Palettes — vyberte paletu A–E
+</div>
+
+</body>
+</html>

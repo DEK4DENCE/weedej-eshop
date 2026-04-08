@@ -23,7 +23,7 @@ export default function CartSummary({ totalPrice, itemCount, onCheckout, compact
   }
 
   return (
-    <div className={`bg-[#f5f5f7] border border-[#e8e8ed] rounded-2xl p-5 ${compact ? '' : 'sticky top-24'}`}>
+    <div className={`bg-[#F8F9FA] border border-[#DEE2E6] rounded-2xl p-5 ${compact ? '' : 'sticky top-24'}`}>
       <h2 className="text-sm font-semibold text-[#1d1d1f] mb-3">Order Summary</h2>
 
       <div className="flex items-center justify-between py-1.5">
@@ -31,7 +31,7 @@ export default function CartSummary({ totalPrice, itemCount, onCheckout, compact
         <span className="text-sm font-medium text-[#1d1d1f]">€{totalPrice.toFixed(2)}</span>
       </div>
 
-      <div className="flex items-start justify-between py-1.5 border-t border-[#e8e8ed]">
+      <div className="flex items-start justify-between py-1.5 border-t border-[#DEE2E6]">
         <div className="flex-1">
           <span className="text-sm text-[#6e6e73]">Shipping</span>
           {!shippingFree && (
@@ -42,13 +42,13 @@ export default function CartSummary({ totalPrice, itemCount, onCheckout, compact
           )}
         </div>
         {shippingFree ? (
-          <span className="text-sm font-medium text-[#22A829]">Free</span>
+          <span className="text-sm font-medium text-[#2E7D32]">Free</span>
         ) : (
           <span className="text-sm font-medium text-[#1d1d1f]">€{shipping.toFixed(2)}</span>
         )}
       </div>
 
-      <div className="flex items-center justify-between py-2.5 border-t border-[#e8e8ed] mt-1">
+      <div className="flex items-center justify-between py-2.5 border-t border-[#DEE2E6] mt-1">
         <span className="text-base font-bold text-[#1d1d1f]">Total</span>
         <span className="text-lg font-bold text-[#b8860b] font-mono">€{total.toFixed(2)}</span>
       </div>
@@ -56,7 +56,7 @@ export default function CartSummary({ totalPrice, itemCount, onCheckout, compact
       <button
         onClick={handleCheckout}
         disabled={itemCount === 0}
-        className="w-full mt-3 bg-[#22A829] hover:bg-[#1a9020] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-all duration-200 hover:shadow-[0_4px_20px_rgba(34,168,41,0.35)] text-sm"
+        className="w-full mt-3 bg-[#2E7D32] hover:bg-[#1a9020] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-all duration-200 hover:shadow-[0_4px_20px_rgba(34,168,41,0.35)] text-sm"
       >
         Proceed to Checkout
       </button>

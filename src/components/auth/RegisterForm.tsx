@@ -20,7 +20,7 @@ function PasswordStrength({ password }: { password: string }) {
   ]
   const strength = checks.filter(Boolean).length
   const labels = ['Too short', 'Weak', 'Fair', 'Good', 'Strong']
-  const colors = ['bg-[#d2d2d7]', 'bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-[#22A829]']
+  const colors = ['bg-[#DEE2E6]', 'bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-[#2E7D32]']
 
   if (!password) return null
 
@@ -30,7 +30,7 @@ function PasswordStrength({ password }: { password: string }) {
         {[0, 1, 2, 3].map((i) => (
           <div
             key={i}
-            className={`h-1 flex-1 rounded-full transition-colors ${i < strength ? colors[strength] : 'bg-[#d2d2d7]'}`}
+            className={`h-1 flex-1 rounded-full transition-colors ${i < strength ? colors[strength] : 'bg-[#DEE2E6]'}`}
           />
         ))}
       </div>
@@ -78,7 +78,7 @@ export function RegisterForm() {
   }
 
   return (
-    <div className="bg-white border border-[#d2d2d7] rounded-2xl p-8 w-full max-w-md">
+    <div className="bg-white border border-[#DEE2E6] rounded-2xl p-8 w-full max-w-md">
       <div className="mb-8 text-center">
         <h1 className="text-2xl font-bold text-[#1d1d1f] mb-1">Create Your Account</h1>
         <p className="text-[#6e6e73] text-sm">Join thousands of satisfied customers</p>
@@ -100,7 +100,7 @@ export function RegisterForm() {
             type="text"
             placeholder="Adam Smith"
             autoComplete="name"
-            className="bg-[#f5f5f7] border border-[#d2d2d7] focus:border-[#22A829] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#1d1d1f] placeholder:text-[#aeaeb2] rounded-xl h-11"
+            className="bg-[#F8F9FA] border border-[#DEE2E6] focus:border-[#2E7D32] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#1d1d1f] placeholder:text-[#aeaeb2] rounded-xl h-11"
             {...register('name')}
           />
           {errors.name && (
@@ -117,7 +117,7 @@ export function RegisterForm() {
             type="email"
             placeholder="you@example.com"
             autoComplete="email"
-            className="bg-[#f5f5f7] border border-[#d2d2d7] focus:border-[#22A829] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#1d1d1f] placeholder:text-[#aeaeb2] rounded-xl h-11"
+            className="bg-[#F8F9FA] border border-[#DEE2E6] focus:border-[#2E7D32] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#1d1d1f] placeholder:text-[#aeaeb2] rounded-xl h-11"
             {...register('email')}
           />
           {errors.email && (
@@ -133,7 +133,7 @@ export function RegisterForm() {
             id="dateOfBirth"
             type="date"
             autoComplete="bday"
-            className="bg-[#f5f5f7] border border-[#d2d2d7] focus:border-[#22A829] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#1d1d1f] rounded-xl h-11"
+            className="bg-[#F8F9FA] border border-[#DEE2E6] focus:border-[#2E7D32] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#1d1d1f] rounded-xl h-11"
             {...register('dateOfBirth')}
           />
           {errors.dateOfBirth && (
@@ -151,7 +151,7 @@ export function RegisterForm() {
               type={showPassword ? 'text' : 'password'}
               placeholder="Create a secure password"
               autoComplete="new-password"
-              className="bg-[#f5f5f7] border border-[#d2d2d7] focus:border-[#22A829] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#1d1d1f] placeholder:text-[#aeaeb2] rounded-xl h-11 pr-11"
+              className="bg-[#F8F9FA] border border-[#DEE2E6] focus:border-[#2E7D32] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#1d1d1f] placeholder:text-[#aeaeb2] rounded-xl h-11 pr-11"
               {...register('password')}
             />
             <button
@@ -179,7 +179,7 @@ export function RegisterForm() {
               type={showConfirm ? 'text' : 'password'}
               placeholder="Repeat your password"
               autoComplete="new-password"
-              className="bg-[#f5f5f7] border border-[#d2d2d7] focus:border-[#22A829] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#1d1d1f] placeholder:text-[#aeaeb2] rounded-xl h-11 pr-11"
+              className="bg-[#F8F9FA] border border-[#DEE2E6] focus:border-[#2E7D32] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#1d1d1f] placeholder:text-[#aeaeb2] rounded-xl h-11 pr-11"
               {...register('confirmPassword')}
             />
             <button
@@ -199,7 +199,7 @@ export function RegisterForm() {
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-[#22A829] hover:bg-[#1a9020] text-white font-semibold rounded-xl h-11 transition-colors disabled:opacity-60"
+          className="w-full bg-[#2E7D32] hover:bg-[#1a9020] text-white font-semibold rounded-xl h-11 transition-colors disabled:opacity-60"
         >
           {isSubmitting ? 'Creating account…' : 'Create Account'}
         </Button>
@@ -207,7 +207,7 @@ export function RegisterForm() {
 
       <p className="mt-6 text-center text-sm text-[#6e6e73]">
         Already have an account?{' '}
-        <Link href="/login" className="text-[#22A829] hover:text-[#1a9020] font-medium transition-colors">
+        <Link href="/login" className="text-[#2E7D32] hover:text-[#1a9020] font-medium transition-colors">
           Sign in
         </Link>
       </p>

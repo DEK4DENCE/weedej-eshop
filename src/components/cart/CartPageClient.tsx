@@ -26,7 +26,7 @@ export function CartPageClient() {
         <p className="text-[#6B8A6B]">Add some products to get started</p>
         <Link
           href="/products"
-          className="bg-[#22A829] hover:bg-[#38C424] text-black font-semibold px-6 py-3 rounded-xl text-sm transition-colors"
+          className="bg-[#2E7D32] hover:bg-[#38C424] text-black font-semibold px-6 py-3 rounded-xl text-sm transition-colors"
         >
           Browse Products
         </Link>

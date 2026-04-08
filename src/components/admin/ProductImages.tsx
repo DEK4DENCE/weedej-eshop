@@ -110,7 +110,7 @@ export function ProductImages({ productId, initialImages, initialAdjustments }: 
               <div
                 key={url}
                 className={`relative group rounded-xl overflow-hidden border aspect-square ${
-                  i === 0 ? "border-[#22A829]" : "border-[#d2d2d7]"
+                  i === 0 ? "border-[#2E7D32]" : "border-[#DEE2E6]"
                 }`}
               >
                 {/* Image with stored adjustments */}
@@ -133,7 +133,7 @@ export function ProductImages({ productId, initialImages, initialAdjustments }: 
                 </div>
 
                 {i === 0 && (
-                  <div className="absolute top-1.5 left-1.5 z-10 bg-[#22A829] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1">
+                  <div className="absolute top-1.5 left-1.5 z-10 bg-[#2E7D32] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1">
                     <Star size={8} fill="white" /> Main
                   </div>
                 )}
@@ -153,7 +153,7 @@ export function ProductImages({ productId, initialImages, initialAdjustments }: 
                       type="button"
                       onClick={() => handleSetFirst(url)}
                       title="Set as main image"
-                      className="p-1.5 bg-[#22A829] text-white rounded-lg hover:bg-[#1a9020] transition-colors"
+                      className="p-1.5 bg-[#2E7D32] text-white rounded-lg hover:bg-[#1a9020] transition-colors"
                     >
                       <Star size={13} />
                     </button>
@@ -172,7 +172,7 @@ export function ProductImages({ productId, initialImages, initialAdjustments }: 
           })}
         </div>
       ) : (
-        <div className="flex items-center justify-center h-24 rounded-xl border border-dashed border-[#d2d2d7] bg-[#fafafa] text-[#aeaeb2] text-sm gap-2">
+        <div className="flex items-center justify-center h-24 rounded-xl border border-dashed border-[#DEE2E6] bg-[#fafafa] text-[#aeaeb2] text-sm gap-2">
           <ImagePlus size={18} />
           No images yet
         </div>
@@ -190,7 +190,7 @@ export function ProductImages({ productId, initialImages, initialAdjustments }: 
           type="button"
           onClick={() => fileRef.current?.click()}
           disabled={uploading}
-          className="flex items-center gap-2 text-sm border border-[#d2d2d7] hover:border-[#22A829] text-[#6e6e73] hover:text-[#1d1d1f] bg-white hover:bg-[#f5f5f7] px-4 py-2 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 text-sm border border-[#DEE2E6] hover:border-[#2E7D32] text-[#6e6e73] hover:text-[#1d1d1f] bg-white hover:bg-[#F8F9FA] px-4 py-2 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {uploading ? <><Loader2 size={15} className="animate-spin" />Uploading...</> : <><Upload size={15} />Upload Image</>}
         </button>

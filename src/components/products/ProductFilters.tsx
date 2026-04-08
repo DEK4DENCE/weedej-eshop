@@ -83,13 +83,13 @@ export function ProductFilters() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-[#1d1d1f] font-semibold">
-          <SlidersHorizontal size={16} className="text-[#22A829]" />
+          <SlidersHorizontal size={16} className="text-[#2E7D32]" />
           Filters
         </div>
         {hasActiveFilters && (
           <button
             onClick={resetFilters}
-            className="flex items-center gap-1 text-xs text-[#6e6e73] hover:text-[#22A829] transition-colors"
+            className="flex items-center gap-1 text-xs text-[#6e6e73] hover:text-[#2E7D32] transition-colors"
           >
             <RotateCcw size={12} />
             Reset
@@ -108,7 +108,7 @@ export function ProductFilters() {
                   type="checkbox"
                   checked={selectedCategories.includes(cat.slug)}
                   onChange={() => toggleCategory(cat.slug)}
-                  className="w-4 h-4 rounded border border-[#d2d2d7] accent-[#22A829] cursor-pointer"
+                  className="w-4 h-4 rounded border border-[#DEE2E6] accent-[#2E7D32] cursor-pointer"
                 />
                 <span className="text-sm text-[#6e6e73] group-hover:text-[#1d1d1f] transition-colors">
                   {cat.name}
@@ -129,7 +129,7 @@ export function ProductFilters() {
             onChange={(e) => setMinPrice(e.target.value)}
             placeholder="Min"
             min={0}
-            className="w-full bg-[#fafafa] border border-[#d2d2d7] rounded-xl px-3 py-2 text-sm text-[#1d1d1f] placeholder:text-[#aeaeb2] focus:outline-none focus:border-[#22A829] focus:ring-1 focus:ring-[#22A829]/30"
+            className="w-full bg-[#fafafa] border border-[#DEE2E6] rounded-xl px-3 py-2 text-sm text-[#1d1d1f] placeholder:text-[#aeaeb2] focus:outline-none focus:border-[#2E7D32] focus:ring-1 focus:ring-[#2E7D32]/30"
           />
           <span className="text-[#aeaeb2] text-sm flex-shrink-0">—</span>
           <input
@@ -138,7 +138,7 @@ export function ProductFilters() {
             onChange={(e) => setMaxPrice(e.target.value)}
             placeholder="Max"
             min={0}
-            className="w-full bg-[#fafafa] border border-[#d2d2d7] rounded-xl px-3 py-2 text-sm text-[#1d1d1f] placeholder:text-[#aeaeb2] focus:outline-none focus:border-[#22A829] focus:ring-1 focus:ring-[#22A829]/30"
+            className="w-full bg-[#fafafa] border border-[#DEE2E6] rounded-xl px-3 py-2 text-sm text-[#1d1d1f] placeholder:text-[#aeaeb2] focus:outline-none focus:border-[#2E7D32] focus:ring-1 focus:ring-[#2E7D32]/30"
           />
         </div>
       </div>
@@ -149,7 +149,7 @@ export function ProductFilters() {
           type="checkbox"
           checked={inStock}
           onChange={(e) => setInStock(e.target.checked)}
-          className="w-4 h-4 rounded border border-[#d2d2d7] accent-[#22A829] cursor-pointer"
+          className="w-4 h-4 rounded border border-[#DEE2E6] accent-[#2E7D32] cursor-pointer"
         />
         <span className="text-sm text-[#6e6e73] group-hover:text-[#1d1d1f] transition-colors">
           In Stock Only
@@ -167,8 +167,8 @@ export function ProductFilters() {
               className={[
                 'px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200',
                 selectedStrains.includes(value)
-                  ? 'bg-[#22A829]/10 border-[#22A829] text-[#22A829]'
-                  : 'bg-[#fafafa] border-[#d2d2d7] text-[#6e6e73] hover:border-[#22A829]/50 hover:text-[#1d1d1f]',
+                  ? 'bg-[#2E7D32]/10 border-[#2E7D32] text-[#2E7D32]'
+                  : 'bg-[#fafafa] border-[#DEE2E6] text-[#6e6e73] hover:border-[#2E7D32]/50 hover:text-[#1d1d1f]',
               ].join(' ')}
             >
               {label}
@@ -180,7 +180,7 @@ export function ProductFilters() {
       {/* Apply */}
       <button
         onClick={applyFilters}
-        className="w-full bg-[#22A829] hover:bg-[#1a9020] text-white font-semibold py-2.5 rounded-xl text-sm transition-all duration-200 hover:shadow-[0_4px_16px_rgba(34,168,41,0.3)]"
+        className="w-full bg-[#2E7D32] hover:bg-[#1a9020] text-white font-semibold py-2.5 rounded-xl text-sm transition-all duration-200 hover:shadow-[0_4px_16px_rgba(34,168,41,0.3)]"
       >
         Apply Filters
       </button>

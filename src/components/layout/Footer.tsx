@@ -2,11 +2,11 @@ import Link from "next/link"
 
 export function Footer() {
   return (
-    <footer className="border-t border-[#d2d2d7] bg-white mt-16">
+    <footer className="border-t border-[#DEE2E6] bg-white mt-16">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-xl font-bold text-[#22A829] mb-4 font-playfair">
+            <h3 className="text-xl font-bold text-[#2E7D32] mb-4 font-playfair">
               Weedejna
             </h3>
             <p className="text-sm text-[#6e6e73]">
@@ -38,7 +38,7 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        <div className="mt-8 pt-8 border-t border-[#d2d2d7] text-center text-xs text-[#aeaeb2]">
+        <div className="mt-8 pt-8 border-t border-[#DEE2E6] text-center text-xs text-[#aeaeb2]">
           © 2026 Weedejna. All rights reserved.
         </div>
       </div>

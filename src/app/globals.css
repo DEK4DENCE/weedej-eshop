@@ -53,17 +53,17 @@
   --font-body: Inter, system-ui, sans-serif;
   --font-mono-brand: "Space Grotesk", monospace;
 
-  /* Brand green scale */
-  --color-green-50: #EDFAED;
-  --color-green-100: #C8F0C8;
-  --color-green-200: #96E296;
-  --color-green-300: #5FD15F;
-  --color-green-400: #38C424;
-  --color-green-500: #22A829;
-  --color-green-600: #198A1F;
-  --color-green-700: #116616;
-  --color-green-800: #0A420E;
-  --color-green-900: #052208;
+  /* Brand green scale — Mint Modern palette */
+  --color-green-50: #E8F5E9;
+  --color-green-100: #C8E6C9;
+  --color-green-200: #A5D6A7;
+  --color-green-300: #81C784;
+  --color-green-400: #66BB6A;
+  --color-green-500: #4CAF50;
+  --color-green-600: #2E7D32;
+  --color-green-700: #1B5E20;
+  --color-green-800: #145214;
+  --color-green-900: #0D3B0D;
 
   /* Brand gold scale */
   --color-gold-50: #FFF9E6;
@@ -77,11 +77,11 @@
   --color-gold-800: #5C4510;
   --color-gold-900: #2E220A;
 
-  /* Box shadows */
-  --shadow-green-sm: 0 2px 8px rgba(34, 168, 41, 0.2);
-  --shadow-green-md: 0 4px 20px rgba(34, 168, 41, 0.3);
-  --shadow-green-lg: 0 8px 32px rgba(34, 168, 41, 0.4);
-  --shadow-green-glow: 0 0 30px rgba(34, 168, 41, 0.5);
+  /* Box shadows — Mint Modern */
+  --shadow-green-sm: 0 2px 8px rgba(46, 125, 50, 0.15);
+  --shadow-green-md: 0 4px 20px rgba(46, 125, 50, 0.25);
+  --shadow-green-lg: 0 8px 32px rgba(46, 125, 50, 0.35);
+  --shadow-green-glow: 0 0 30px rgba(46, 125, 50, 0.4);
   --shadow-gold-glow: 0 0 24px rgba(212, 160, 23, 0.4);
   --shadow-card: 0 2px 16px rgba(0, 0, 0, 0.08);
   --shadow-card-hover: 0 4px 24px rgba(0, 0, 0, 0.14);
@@ -96,41 +96,41 @@
   --animate-toast-progress: toast-progress 4s linear forwards;
 }
 
-/* Weedejna brand CSS variables */
+/* Weedejna brand CSS variables — Mint Modern */
 :root {
-  --background: #ebebeb;
-  --foreground: #1d1d1f;
-  --card: #fafafa;
-  --card-foreground: #1d1d1f;
-  --popover: #fafafa;
-  --popover-foreground: #1d1d1f;
-  --primary: #22A829;
+  --background: #F8F9FA;
+  --foreground: #212121;
+  --card: #ffffff;
+  --card-foreground: #212121;
+  --popover: #ffffff;
+  --popover-foreground: #212121;
+  --primary: #2E7D32;
   --primary-foreground: #ffffff;
-  --secondary: #e8e8e8;
-  --secondary-foreground: #1d1d1f;
-  --muted: #e8e8e8;
-  --muted-foreground: #6e6e73;
-  --accent: #b8860b;
+  --secondary: #E8F5E9;
+  --secondary-foreground: #212121;
+  --muted: #F8F9FA;
+  --muted-foreground: #6B7280;
+  --accent: #66BB6A;
   --accent-foreground: #ffffff;
-  --destructive: #ff3b30;
+  --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: #d2d2d7;
-  --input: #d2d2d7;
-  --ring: #22A829;
+  --border: #DEE2E6;
+  --input: #DEE2E6;
+  --ring: #2E7D32;
   --radius: 0.75rem;
 
-  /* Sidebar (admin — keep dark) */
+  /* Sidebar (admin) */
   --sidebar: #ffffff;
-  --sidebar-foreground: #1d1d1f;
-  --sidebar-primary: #22A829;
+  --sidebar-foreground: #212121;
+  --sidebar-primary: #2E7D32;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f5f5f7;
-  --sidebar-accent-foreground: #1d1d1f;
-  --sidebar-border: #d2d2d7;
-  --sidebar-ring: #22A829;
+  --sidebar-accent: #E8F5E9;
+  --sidebar-accent-foreground: #212121;
+  --sidebar-border: #DEE2E6;
+  --sidebar-ring: #2E7D32;
 
   /* Chart colors */
-  --chart-1: #22A829;
+  --chart-1: #2E7D32;
   --chart-2: #D4A017;
   --chart-3: #38C424;
   --chart-4: #F5B800;
@@ -142,13 +142,13 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-[#f5f5f7] text-[#1d1d1f] antialiased;
+    @apply bg-[#F8F9FA] text-[#212121] antialiased;
     font-family: Inter, system-ui, sans-serif;
   }
 
   ::selection {
-    background-color: rgba(34, 168, 41, 0.15);
-    color: #1d1d1f;
+    background-color: rgba(46, 125, 50, 0.15);
+    color: #212121;
   }
 
   ::-webkit-scrollbar {
@@ -156,16 +156,16 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: #f5f5f7;
+    background: #F8F9FA;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #d2d2d7;
+    background: #DEE2E6;
     border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #22A829;
+    background: #2E7D32;
   }
 }
 
@@ -186,8 +186,8 @@
 }
 
 @keyframes pulse-green {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(34, 168, 41, 0.4); }
-  50% { box-shadow: 0 0 0 8px rgba(34, 168, 41, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.35); }
+  50% { box-shadow: 0 0 0 8px rgba(46, 125, 50, 0); }
 }
 
 @keyframes toast-progress {

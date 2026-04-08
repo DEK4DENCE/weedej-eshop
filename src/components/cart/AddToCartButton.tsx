@@ -46,7 +46,7 @@ export default function AddToCartButton({
   }
 
   const baseClass =
-    'relative bg-[#22A829] hover:bg-[#38C424] disabled:opacity-50 disabled:cursor-not-allowed text-black rounded-full w-9 h-9 flex items-center justify-center transition-all duration-200 overflow-hidden'
+    'relative bg-[#2E7D32] hover:bg-[#38C424] disabled:opacity-50 disabled:cursor-not-allowed text-black rounded-full w-9 h-9 flex items-center justify-center transition-all duration-200 overflow-hidden'
 
   return (
     <button

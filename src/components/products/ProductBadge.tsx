@@ -26,7 +26,7 @@ export function ProductBadge({ stock, className = '' }: ProductBadgeProps) {
 
   return (
     <span
-      className={`inline-flex items-center text-xs font-medium px-3 py-1 rounded-full bg-[#0D2000] border border-[#1A6B1D] text-[#22A829] font-mono ${className}`}
+      className={`inline-flex items-center text-xs font-medium px-3 py-1 rounded-full bg-[#0D2000] border border-[#1A6B1D] text-[#2E7D32] font-mono ${className}`}
     >
       In Stock
     </span>

@@ -45,7 +45,7 @@ export function LoginForm() {
   }
 
   return (
-    <div className="bg-white border border-[#d2d2d7] rounded-2xl p-8 w-full max-w-md">
+    <div className="bg-white border border-[#DEE2E6] rounded-2xl p-8 w-full max-w-md">
       <div className="mb-8 text-center">
         <h1 className="text-2xl font-bold text-[#1d1d1f] mb-1">Welcome Back</h1>
         <p className="text-[#6e6e73] text-sm">Sign in to your Weedejna account</p>
@@ -67,7 +67,7 @@ export function LoginForm() {
             type="email"
             placeholder="you@example.com"
             autoComplete="email"
-            className="bg-[#f5f5f7] border border-[#d2d2d7] focus:border-[#22A829] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#1d1d1f] placeholder:text-[#aeaeb2] rounded-xl h-11"
+            className="bg-[#F8F9FA] border border-[#DEE2E6] focus:border-[#2E7D32] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#1d1d1f] placeholder:text-[#aeaeb2] rounded-xl h-11"
             {...register('email')}
           />
           {errors.email && (
@@ -85,7 +85,7 @@ export function LoginForm() {
               type={showPassword ? 'text' : 'password'}
               placeholder="Enter your password"
               autoComplete="current-password"
-              className="bg-[#f5f5f7] border border-[#d2d2d7] focus:border-[#22A829] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#1d1d1f] placeholder:text-[#aeaeb2] rounded-xl h-11 pr-11"
+              className="bg-[#F8F9FA] border border-[#DEE2E6] focus:border-[#2E7D32] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#1d1d1f] placeholder:text-[#aeaeb2] rounded-xl h-11 pr-11"
               {...register('password')}
             />
             <button
@@ -105,7 +105,7 @@ export function LoginForm() {
         <div className="flex items-center justify-end">
           <Link
             href="/forgot-password"
-            className="text-[#22A829] hover:text-[#1a9020] text-sm transition-colors"
+            className="text-[#2E7D32] hover:text-[#1a9020] text-sm transition-colors"
           >
             Forgot your password?
           </Link>
@@ -114,7 +114,7 @@ export function LoginForm() {
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-[#22A829] hover:bg-[#1a9020] text-white font-semibold rounded-xl h-11 transition-colors disabled:opacity-60"
+          className="w-full bg-[#2E7D32] hover:bg-[#1a9020] text-white font-semibold rounded-xl h-11 transition-colors disabled:opacity-60"
         >
           {isSubmitting ? 'Signing in…' : 'Sign In'}
         </Button>
@@ -122,7 +122,7 @@ export function LoginForm() {
 
       <p className="mt-6 text-center text-sm text-[#6e6e73]">
         Don&apos;t have an account?{' '}
-        <Link href="/register" className="text-[#22A829] hover:text-[#1a9020] font-medium transition-colors">
+        <Link href="/register" className="text-[#2E7D32] hover:text-[#1a9020] font-medium transition-colors">
           Create one
         </Link>
       </p>

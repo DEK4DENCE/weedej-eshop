@@ -27,9 +27,9 @@ export default function CartItem({ item, itemId, onUpdateQty, onRemove }: CartIt
   const variantId = item.variantId
 
   return (
-    <div className="flex items-start gap-3 py-4 border-b border-[#e8e8ed] last:border-0">
+    <div className="flex items-start gap-3 py-4 border-b border-[#DEE2E6] last:border-0">
       {/* Thumbnail */}
-      <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-[#f5f5f7]">
+      <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-[#F8F9FA]">
         <Image src={imageUrl} alt={productName} fill className="object-cover" sizes="64px" />
       </div>
 
@@ -44,7 +44,7 @@ export default function CartItem({ item, itemId, onUpdateQty, onRemove }: CartIt
             onClick={() => item.quantity > 1 && onUpdateQty(itemId, variantId, item.quantity - 1)}
             disabled={item.quantity <= 1}
             aria-label="Decrease quantity"
-            className="w-6 h-6 rounded-full border border-[#d2d2d7] flex items-center justify-center text-[#6e6e73] hover:border-[#22A829] hover:text-[#22A829] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-6 h-6 rounded-full border border-[#DEE2E6] flex items-center justify-center text-[#6e6e73] hover:border-[#2E7D32] hover:text-[#2E7D32] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Minus size={12} />
           </button>
@@ -52,7 +52,7 @@ export default function CartItem({ item, itemId, onUpdateQty, onRemove }: CartIt
           <button
             onClick={() => onUpdateQty(itemId, variantId, item.quantity + 1)}
             aria-label="Increase quantity"
-            className="w-6 h-6 rounded-full border border-[#d2d2d7] flex items-center justify-center text-[#6e6e73] hover:border-[#22A829] hover:text-[#22A829] transition-colors"
+            className="w-6 h-6 rounded-full border border-[#DEE2E6] flex items-center justify-center text-[#6e6e73] hover:border-[#2E7D32] hover:text-[#2E7D32] transition-colors"
           >
             <Plus size={12} />
           </button>

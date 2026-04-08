@@ -49,10 +49,10 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
     <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2, ease: 'easeOut' }}>
       <Link
         href={`/products/${product.slug}`}
-        className="group block bg-white rounded-2xl overflow-hidden border border-[#d2d2d7] hover:border-[#22A829] transition-all duration-300 shadow-[0_2px_16px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.14)]"
+        className="group block bg-white rounded-2xl overflow-hidden border border-[#DEE2E6] hover:border-[#2E7D32] transition-all duration-300 shadow-[0_2px_16px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.14)]"
       >
         {/* Image */}
-        <div className="relative overflow-hidden h-[260px] bg-[#f5f5f7]">
+        <div className="relative overflow-hidden h-[260px] bg-[#F8F9FA]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={mainImage}
@@ -71,7 +71,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
 
           {/* Category badge */}
           {product.category && (
-            <span className="absolute top-3 left-3 text-xs font-medium px-2.5 py-1 rounded-full bg-[#22A829]/10 border border-[#22A829]/30 text-[#22A829]">
+            <span className="absolute top-3 left-3 text-xs font-medium px-2.5 py-1 rounded-full bg-[#2E7D32]/10 border border-[#2E7D32]/30 text-[#2E7D32]">
               {product.category.name}
             </span>
           )}
@@ -98,7 +98,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
             </span>
           )}
 
-          <h3 className="text-base font-semibold text-[#1d1d1f] leading-snug line-clamp-2 group-hover:text-[#22A829] transition-colors">
+          <h3 className="text-base font-semibold text-[#1d1d1f] leading-snug line-clamp-2 group-hover:text-[#2E7D32] transition-colors">
             {product.name}
           </h3>
 
@@ -119,7 +119,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
               onClick={handleAddToCart}
               disabled={isOutOfStock || added}
               aria-label={`Add ${product.name} to cart`}
-              className="w-9 h-9 rounded-full bg-[#22A829] hover:bg-[#1a9020] flex items-center justify-center text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-green-sm"
+              className="w-9 h-9 rounded-full bg-[#2E7D32] hover:bg-[#1a9020] flex items-center justify-center text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-green-sm"
             >
               {added ? <Check size={18} strokeWidth={2.5} /> : <Plus size={18} strokeWidth={2.5} />}
             </button>

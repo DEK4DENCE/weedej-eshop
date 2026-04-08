@@ -75,17 +75,17 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed right-0 top-0 z-50 h-full w-[400px] max-w-[90vw] bg-white border-l border-[#d2d2d7] shadow-[-8px_0_32px_rgba(0,0,0,0.12)] flex flex-col"
+            className="fixed right-0 top-0 z-50 h-full w-[400px] max-w-[90vw] bg-white border-l border-[#DEE2E6] shadow-[-8px_0_32px_rgba(0,0,0,0.12)] flex flex-col"
             aria-label="Shopping cart"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[#d2d2d7] flex-shrink-0">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#DEE2E6] flex-shrink-0">
               <div className="flex items-center gap-2">
-                <ShoppingBag size={20} className="text-[#22A829]" />
+                <ShoppingBag size={20} className="text-[#2E7D32]" />
                 <h2 className="text-base font-semibold text-[#1d1d1f]">
                   Cart
                   {totalItems > 0 && (
-                    <span className="ml-2 inline-flex items-center justify-center bg-[#22A829] text-white text-xs font-bold rounded-full w-5 h-5">
+                    <span className="ml-2 inline-flex items-center justify-center bg-[#2E7D32] text-white text-xs font-bold rounded-full w-5 h-5">
                       {totalItems}
                     </span>
                   )}
@@ -104,17 +104,17 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
             <div className="flex-1 overflow-y-auto px-6">
               {isLoading ? (
                 <div className="flex items-center justify-center py-16">
-                  <div className="w-6 h-6 border-2 border-[#22A829] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-6 h-6 border-2 border-[#2E7D32] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : items.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 text-center gap-4">
-                  <ShoppingBag size={48} className="text-[#d2d2d7]" />
+                  <ShoppingBag size={48} className="text-[#DEE2E6]" />
                   <p className="text-[#1d1d1f] font-medium">Your cart is empty</p>
                   <p className="text-sm text-[#6e6e73]">Add some products to get started</p>
                   <Link
                     href="/products"
                     onClick={onClose}
-                    className="mt-2 bg-[#22A829] hover:bg-[#1a9020] text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition-colors"
+                    className="mt-2 bg-[#2E7D32] hover:bg-[#1a9020] text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition-colors"
                   >
                     Shop Now
                   </Link>
@@ -139,7 +139,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
 
             {/* Footer summary */}
             {items.length > 0 && (
-              <div className="px-6 pb-6 pt-4 border-t border-[#d2d2d7] flex-shrink-0">
+              <div className="px-6 pb-6 pt-4 border-t border-[#DEE2E6] flex-shrink-0">
                 <CartSummary
                   totalPrice={totalPrice}
                   itemCount={totalItems}

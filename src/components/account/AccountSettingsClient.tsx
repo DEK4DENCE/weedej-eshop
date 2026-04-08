@@ -145,7 +145,7 @@ export function AccountSettingsClient() {
   }
 
   const inputClass =
-    "bg-[#f5f5f7] border border-[#d2d2d7] focus:border-[#22A829] focus-visible:ring-0 text-[#1d1d1f] placeholder:text-[#aeaeb2] rounded-xl h-10"
+    "bg-[#F8F9FA] border border-[#DEE2E6] focus:border-[#2E7D32] focus-visible:ring-0 text-[#1d1d1f] placeholder:text-[#aeaeb2] rounded-xl h-10"
 
   return (
     <div className="space-y-6">
@@ -176,7 +176,7 @@ export function AccountSettingsClient() {
                 size="sm"
                 variant="outline"
                 onClick={() => setShowAddForm(true)}
-                className="border-[#d2d2d7] text-[#22A829] hover:bg-[#f0faf0] hover:text-[#1a9020]"
+                className="border-[#DEE2E6] text-[#2E7D32] hover:bg-[#f0faf0] hover:text-[#1a9020]"
               >
                 <Plus size={14} className="mr-1" />
                 Add Address
@@ -198,14 +198,14 @@ export function AccountSettingsClient() {
                 <div
                   key={addr.id}
                   className={`rounded-xl border p-4 flex items-start justify-between gap-3 ${
-                    addr.isDefault ? "border-[#22A829]/40 bg-[#f0faf0]" : "border-[#d2d2d7] bg-white"
+                    addr.isDefault ? "border-[#2E7D32]/40 bg-[#f0faf0]" : "border-[#DEE2E6] bg-white"
                   }`}
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-[#1d1d1f] text-sm font-medium">{addr.fullName}</span>
                       {addr.isDefault && (
-                        <span className="text-[10px] font-semibold uppercase tracking-wider bg-[#22A829]/10 text-[#22A829] px-2 py-0.5 rounded-full">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider bg-[#2E7D32]/10 text-[#2E7D32] px-2 py-0.5 rounded-full">
                           Default
                         </span>
                       )}
@@ -241,7 +241,7 @@ export function AccountSettingsClient() {
 
           {/* Add new address form */}
           {showAddForm && (
-            <div className="border border-[#d2d2d7] rounded-xl p-4 space-y-3 bg-[#f5f5f7]">
+            <div className="border border-[#DEE2E6] rounded-xl p-4 space-y-3 bg-[#F8F9FA]">
               <p className="text-sm font-medium text-[#1d1d1f]">New Address</p>
               <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-2 space-y-1.5">
@@ -294,7 +294,7 @@ export function AccountSettingsClient() {
                   <select
                     value={newAddr.country}
                     onChange={(e) => setNewAddr((p) => ({ ...p, country: e.target.value }))}
-                    className="w-full bg-[#f5f5f7] border border-[#d2d2d7] focus:border-[#22A829] text-[#1d1d1f] rounded-xl h-10 px-3 text-sm outline-none"
+                    className="w-full bg-[#F8F9FA] border border-[#DEE2E6] focus:border-[#2E7D32] text-[#1d1d1f] rounded-xl h-10 px-3 text-sm outline-none"
                   >
                     <option value="CZ">Czech Republic</option>
                     <option value="SK">Slovakia</option>
@@ -308,7 +308,7 @@ export function AccountSettingsClient() {
                 <Button
                   onClick={handleAddAddress}
                   disabled={addingAddr}
-                  className="bg-[#22A829] hover:bg-[#38C424] text-black font-semibold"
+                  className="bg-[#2E7D32] hover:bg-[#38C424] text-black font-semibold"
                   size="sm"
                 >
                   {addingAddr ? <><Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />Saving...</> : "Save Address"}

@@ -78,7 +78,7 @@ const container = {
 }
 
 const logo = {
-  color: '#22A829',
+  color: '#2E7D32',
   fontSize: '22px',
   fontWeight: '700',
   letterSpacing: '-0.5px',
@@ -100,7 +100,7 @@ const paragraph = {
 }
 
 const button = {
-  backgroundColor: '#22A829',
+  backgroundColor: '#2E7D32',
   borderRadius: '10px',
   color: '#000000',
   display: 'inline-block',
@@ -119,7 +119,7 @@ const divider = {
 }
 
 const link = {
-  color: '#22A829',
+  color: '#2E7D32',
   fontSize: '12px',
   wordBreak: 'break-all' as const,
 }

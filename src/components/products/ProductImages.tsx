@@ -49,7 +49,7 @@ export function ProductImages({ images, productName, adjustments }: ProductImage
   return (
     <div className="flex flex-col gap-4">
       {/* Main image */}
-      <div className="relative aspect-square rounded-2xl overflow-hidden bg-[#f5f5f7] border border-[#e8e8ed] group">
+      <div className="relative aspect-square rounded-2xl overflow-hidden bg-[#F8F9FA] border border-[#DEE2E6] group">
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={selectedIndex}
@@ -77,14 +77,14 @@ export function ProductImages({ images, productName, adjustments }: ProductImage
             <button
               onClick={prev}
               aria-label="Previous image"
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 border border-[#d2d2d7] text-[#6e6e73] hover:text-[#22A829] hover:border-[#22A829] flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 shadow-sm"
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 border border-[#DEE2E6] text-[#6e6e73] hover:text-[#2E7D32] hover:border-[#2E7D32] flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 shadow-sm"
             >
               <ChevronLeft size={16} />
             </button>
             <button
               onClick={next}
               aria-label="Next image"
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 border border-[#d2d2d7] text-[#6e6e73] hover:text-[#22A829] hover:border-[#22A829] flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 shadow-sm"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 border border-[#DEE2E6] text-[#6e6e73] hover:text-[#2E7D32] hover:border-[#2E7D32] flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 shadow-sm"
             >
               <ChevronRight size={16} />
             </button>
@@ -101,10 +101,10 @@ export function ProductImages({ images, productName, adjustments }: ProductImage
               onClick={() => selectImage(i)}
               aria-label={`View image ${i + 1}`}
               className={[
-                'relative w-16 h-16 rounded-xl overflow-hidden border-2 transition-all duration-200 flex-shrink-0 bg-[#f5f5f7]',
+                'relative w-16 h-16 rounded-xl overflow-hidden border-2 transition-all duration-200 flex-shrink-0 bg-[#F8F9FA]',
                 i === selectedIndex
-                  ? 'border-[#22A829]'
-                  : 'border-[#d2d2d7] hover:border-[#22A829]/50 opacity-70 hover:opacity-100',
+                  ? 'border-[#2E7D32]'
+                  : 'border-[#DEE2E6] hover:border-[#2E7D32]/50 opacity-70 hover:opacity-100',
               ].join(' ')}
             >
               <Image

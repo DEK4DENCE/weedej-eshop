@@ -14,7 +14,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
   return (
     <div className="space-y-6">
       {product.category && (
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border border-[#22A829]/30 text-[#22A829] bg-[#22A829]/10">
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border border-[#2E7D32]/30 text-[#2E7D32] bg-[#2E7D32]/10">
           {product.category.name}
         </span>
       )}
@@ -24,7 +24,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
       {(product.thcContent || product.cbdContent) && (
         <div className="flex gap-4 text-sm">
           {product.thcContent && (
-            <span className="text-[#22A829] font-medium">THC: {product.thcContent}%</span>
+            <span className="text-[#2E7D32] font-medium">THC: {product.thcContent}%</span>
           )}
           {product.cbdContent && (
             <span className="text-[#b8860b] font-medium">CBD: {product.cbdContent}%</span>
@@ -64,7 +64,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
           <p className="text-sm font-medium text-[#515154] mb-2">Effects</p>
           <div className="flex flex-wrap gap-2">
             {product.effects.map((effect) => (
-              <span key={effect} className="px-3 py-1 rounded-full text-xs font-medium bg-[#22A829]/10 border border-[#22A829]/20 text-[#22A829]">
+              <span key={effect} className="px-3 py-1 rounded-full text-xs font-medium bg-[#2E7D32]/10 border border-[#2E7D32]/20 text-[#2E7D32]">
                 {effect}
               </span>
             ))}
@@ -90,7 +90,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
           <p className="text-sm font-medium text-[#515154] mb-2">Terpenes</p>
           <div className="flex flex-wrap gap-2">
             {product.terpenes.map((t) => (
-              <span key={t} className="px-3 py-1 rounded-full text-xs font-medium bg-[#f5f5f7] border border-[#d2d2d7] text-[#515154]">
+              <span key={t} className="px-3 py-1 rounded-full text-xs font-medium bg-[#F8F9FA] border border-[#DEE2E6] text-[#515154]">
                 {t}
               </span>
             ))}

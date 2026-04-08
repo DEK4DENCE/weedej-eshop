@@ -119,11 +119,11 @@ export function CheckoutForm({ user, addresses }: Props) {
                   onClick={() => setDeliveryType(value)}
                   className={`flex flex-col items-start gap-1 p-4 rounded-xl border-2 text-left transition-colors ${
                     deliveryType === value
-                      ? "border-[#22A829] bg-[#f0faf0]"
-                      : "border-[#d2d2d7] hover:border-[#22A829]"
+                      ? "border-[#2E7D32] bg-[#f0faf0]"
+                      : "border-[#DEE2E6] hover:border-[#2E7D32]"
                   }`}
                 >
-                  <Icon className={`h-5 w-5 mb-1 ${deliveryType === value ? "text-[#22A829]" : "text-[#6e6e73]"}`} />
+                  <Icon className={`h-5 w-5 mb-1 ${deliveryType === value ? "text-[#2E7D32]" : "text-[#6e6e73]"}`} />
                   <span className="font-medium text-sm">{label}</span>
                   <span className="text-xs text-muted-foreground">{desc}</span>
                 </button>
@@ -145,8 +145,8 @@ export function CheckoutForm({ user, addresses }: Props) {
                         onClick={() => setSelectedAddressId(addr.id)}
                         className={`w-full flex items-start gap-3 p-3 rounded-xl border-2 text-left transition-colors ${
                           selectedAddressId === addr.id
-                            ? "border-[#22A829] bg-[#f0faf0]"
-                            : "border-[#d2d2d7] hover:border-[#22A829]"
+                            ? "border-[#2E7D32] bg-[#f0faf0]"
+                            : "border-[#DEE2E6] hover:border-[#2E7D32]"
                         }`}
                       >
                         <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-muted-foreground" />
@@ -163,8 +163,8 @@ export function CheckoutForm({ user, addresses }: Props) {
                       onClick={() => setSelectedAddressId("new")}
                       className={`w-full flex items-center gap-2 p-3 rounded-xl border-2 text-left text-sm transition-colors ${
                         selectedAddressId === "new"
-                          ? "border-[#22A829] bg-[#f0faf0]"
-                          : "border-[#d2d2d7] hover:border-[#22A829]"
+                          ? "border-[#2E7D32] bg-[#f0faf0]"
+                          : "border-[#DEE2E6] hover:border-[#2E7D32]"
                       }`}
                     >
                       <Plus className="h-4 w-4" />Enter a new address
@@ -200,7 +200,7 @@ export function CheckoutForm({ user, addresses }: Props) {
                         <select
                           value={newAddress.country}
                           onChange={(e) => setNewAddress((p) => ({ ...p, country: e.target.value }))}
-                          className="w-full h-10 px-3 rounded-md border border-[#d2d2d7] bg-[#f5f5f7] text-[#1d1d1f] text-sm outline-none focus:border-[#22A829]"
+                          className="w-full h-10 px-3 rounded-md border border-[#DEE2E6] bg-[#F8F9FA] text-[#1d1d1f] text-sm outline-none focus:border-[#2E7D32]"
                           required
                         >
                           <option value="CZ">Czech Republic</option>
@@ -284,7 +284,7 @@ export function CheckoutForm({ user, addresses }: Props) {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#22A829] hover:bg-[#1a9020] text-white font-bold"
+                className="w-full bg-[#2E7D32] hover:bg-[#1a9020] text-white font-bold"
                 size="lg"
               >
                 {loading

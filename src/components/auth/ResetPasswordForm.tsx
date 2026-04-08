@@ -60,7 +60,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         </p>
         <Link
           href="/forgot-password"
-          className="inline-block bg-[#22A829] hover:bg-[#38C424] text-black font-semibold rounded-xl px-6 py-3 transition-colors"
+          className="inline-block bg-[#2E7D32] hover:bg-[#38C424] text-black font-semibold rounded-xl px-6 py-3 transition-colors"
         >
           Request New Link
         </Link>
@@ -94,7 +94,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
               type={showPassword ? 'text' : 'password'}
               placeholder="Create a secure password"
               autoComplete="new-password"
-              className="bg-[#1A2219] border border-[#1F3D1F] focus:border-[#22A829] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#F0F5F0] placeholder:text-[#3D5C3D] rounded-xl h-11 pr-11"
+              className="bg-[#1A2219] border border-[#1F3D1F] focus:border-[#2E7D32] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#F0F5F0] placeholder:text-[#3D5C3D] rounded-xl h-11 pr-11"
               {...register('password')}
             />
             <button
@@ -121,7 +121,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
               type={showConfirm ? 'text' : 'password'}
               placeholder="Repeat your password"
               autoComplete="new-password"
-              className="bg-[#1A2219] border border-[#1F3D1F] focus:border-[#22A829] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#F0F5F0] placeholder:text-[#3D5C3D] rounded-xl h-11 pr-11"
+              className="bg-[#1A2219] border border-[#1F3D1F] focus:border-[#2E7D32] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#F0F5F0] placeholder:text-[#3D5C3D] rounded-xl h-11 pr-11"
               {...register('confirmPassword')}
             />
             <button
@@ -141,7 +141,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-[#22A829] hover:bg-[#38C424] text-black font-semibold rounded-xl h-11 transition-colors disabled:opacity-60"
+          className="w-full bg-[#2E7D32] hover:bg-[#38C424] text-black font-semibold rounded-xl h-11 transition-colors disabled:opacity-60"
         >
           {isSubmitting ? 'Updating…' : 'Update Password'}
         </Button>

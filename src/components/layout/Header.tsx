@@ -19,10 +19,10 @@ export function Header() {
   const router = useRouter()
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[#d2d2d7] bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+    <header className="sticky top-0 z-50 w-full border-b border-[#DEE2E6] bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
-          <span className="text-2xl font-bold text-[#22A829] font-playfair">
+          <span className="text-2xl font-bold text-[#2E7D32] font-playfair">
             Weedejna
           </span>
         </Link>
@@ -50,7 +50,7 @@ export function Header() {
           >
             <ShoppingBag className="h-5 w-5" />
             {totalItems > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#22A829] text-xs text-white font-bold">
+              <span className="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#2E7D32] text-xs text-white font-bold">
                 {totalItems}
               </span>
             )}
@@ -61,9 +61,9 @@ export function Header() {
               <DropdownMenuTrigger className="p-2 text-[#6e6e73] hover:text-[#1d1d1f] transition-colors" aria-label="User menu">
                 <User className="h-5 w-5" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-white border-[#d2d2d7]">
+              <DropdownMenuContent align="end" className="bg-white border-[#DEE2E6]">
                 <div className="px-2 py-1.5 text-sm font-medium text-[#6e6e73]">{session.user?.email}</div>
-                <DropdownMenuSeparator className="bg-[#d2d2d7]" />
+                <DropdownMenuSeparator className="bg-[#DEE2E6]" />
                 <DropdownMenuItem
                   className="text-[#6e6e73] hover:text-[#1d1d1f] cursor-pointer"
                   onClick={() => router.push("/account")}
@@ -84,7 +84,7 @@ export function Header() {
                     <Settings className="mr-2 h-4 w-4" />Admin
                   </DropdownMenuItem>
                 )}
-                <DropdownMenuSeparator className="bg-[#d2d2d7]" />
+                <DropdownMenuSeparator className="bg-[#DEE2E6]" />
                 <DropdownMenuItem
                   onClick={() => signOut({ callbackUrl: "/" })}
                   className="text-[#6e6e73] hover:text-[#1d1d1f] cursor-pointer"

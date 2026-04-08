@@ -49,11 +49,11 @@ export function AgeGate() {
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md">
-      <div className="bg-white border border-[#d2d2d7] rounded-2xl p-10 max-w-md w-full mx-4 text-center shadow-2xl">
+      <div className="bg-white border border-[#DEE2E6] rounded-2xl p-10 max-w-md w-full mx-4 text-center shadow-2xl">
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-8">
-          <Shield className="h-6 w-6 text-[#22A829]" />
-          <span className="text-xl font-bold text-[#22A829] tracking-tight">Weedejna</span>
+          <Shield className="h-6 w-6 text-[#2E7D32]" />
+          <span className="text-xl font-bold text-[#2E7D32] tracking-tight">Weedejna</span>
         </div>
 
         <h1 className="text-2xl font-bold text-[#1d1d1f] mb-3 font-playfair">
@@ -69,13 +69,13 @@ export function AgeGate() {
         <div className="flex gap-3 justify-center">
           <button
             onClick={handleConfirm}
-            className="flex-1 bg-[#22A829] hover:bg-[#1a9020] text-white font-bold py-3 px-6 rounded-xl text-sm transition-colors hover:shadow-[0_4px_20px_rgba(34,168,41,0.35)]"
+            className="flex-1 bg-[#2E7D32] hover:bg-[#1a9020] text-white font-bold py-3 px-6 rounded-xl text-sm transition-colors hover:shadow-[0_4px_20px_rgba(34,168,41,0.35)]"
           >
             Yes, I am 18+
           </button>
           <button
             onClick={handleDeny}
-            className="flex-1 bg-[#f5f5f7] hover:bg-[#ebebed] border border-[#d2d2d7] text-[#6e6e73] hover:text-[#1d1d1f] font-semibold py-3 px-6 rounded-xl text-sm transition-colors"
+            className="flex-1 bg-[#F8F9FA] hover:bg-[#ebebed] border border-[#DEE2E6] text-[#6e6e73] hover:text-[#1d1d1f] font-semibold py-3 px-6 rounded-xl text-sm transition-colors"
           >
             No, I am under 18
           </button>

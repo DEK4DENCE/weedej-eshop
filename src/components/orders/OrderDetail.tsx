@@ -42,7 +42,7 @@ export function OrderDetail({ order }: OrderDetailProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white border border-[#e8e8ed] rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
+      <div className="bg-white border border-[#DEE2E6] rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h2 className="text-xl font-semibold text-[#1d1d1f] mb-1">
@@ -57,16 +57,16 @@ export function OrderDetail({ order }: OrderDetailProps) {
       </div>
 
       {/* Items table */}
-      <div className="bg-white border border-[#e8e8ed] rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
-        <div className="px-6 py-4 border-b border-[#e8e8ed]">
+      <div className="bg-white border border-[#DEE2E6] rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
+        <div className="px-6 py-4 border-b border-[#DEE2E6]">
           <h3 className="text-sm font-semibold text-[#1d1d1f] flex items-center gap-2">
-            <Package className="w-4 h-4 text-[#22A829]" /> Items
+            <Package className="w-4 h-4 text-[#2E7D32]" /> Items
           </h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[#f5f5f7]">
+              <tr className="border-b border-[#F8F9FA]">
                 <th className="text-left px-6 py-3 text-xs font-medium text-[#6e6e73] uppercase tracking-wider">Product</th>
                 <th className="text-left px-6 py-3 text-xs font-medium text-[#6e6e73] uppercase tracking-wider">Variant</th>
                 <th className="text-right px-6 py-3 text-xs font-medium text-[#6e6e73] uppercase tracking-wider">Unit Price</th>
@@ -74,9 +74,9 @@ export function OrderDetail({ order }: OrderDetailProps) {
                 <th className="text-right px-6 py-3 text-xs font-medium text-[#6e6e73] uppercase tracking-wider">Subtotal</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#f5f5f7]">
+            <tbody className="divide-y divide-[#F8F9FA]">
               {order.items.map((item) => (
-                <tr key={item.id} className="hover:bg-[#f5f5f7]/60 transition-colors">
+                <tr key={item.id} className="hover:bg-[#F8F9FA]/60 transition-colors">
                   <td className="px-6 py-4">
                     <span className="text-sm font-medium text-[#1d1d1f]">{item.productName}</span>
                   </td>
@@ -106,9 +106,9 @@ export function OrderDetail({ order }: OrderDetailProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Delivery address */}
         {order.address && (
-          <div className="bg-white border border-[#e8e8ed] rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
+          <div className="bg-white border border-[#DEE2E6] rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
             <div className="flex items-center gap-2 mb-4">
-              <MapPin className="w-4 h-4 text-[#22A829]" />
+              <MapPin className="w-4 h-4 text-[#2E7D32]" />
               <h3 className="text-sm font-semibold text-[#1d1d1f]">Delivery Address</h3>
             </div>
             <div className="space-y-1 text-sm text-[#515154]">
@@ -123,9 +123,9 @@ export function OrderDetail({ order }: OrderDetailProps) {
 
         {/* Contact info */}
         {order.user && (
-          <div className="bg-white border border-[#e8e8ed] rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
+          <div className="bg-white border border-[#DEE2E6] rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
             <div className="flex items-center gap-2 mb-4">
-              <User className="w-4 h-4 text-[#22A829]" />
+              <User className="w-4 h-4 text-[#2E7D32]" />
               <h3 className="text-sm font-semibold text-[#1d1d1f]">Contact Information</h3>
             </div>
             <div className="space-y-1 text-sm text-[#515154]">
@@ -137,9 +137,9 @@ export function OrderDetail({ order }: OrderDetailProps) {
         )}
 
         {/* Payment summary */}
-        <div className="bg-white border border-[#e8e8ed] rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
+        <div className="bg-white border border-[#DEE2E6] rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
           <div className="flex items-center gap-2 mb-4">
-            <CreditCard className="w-4 h-4 text-[#22A829]" />
+            <CreditCard className="w-4 h-4 text-[#2E7D32]" />
             <h3 className="text-sm font-semibold text-[#1d1d1f]">Payment Summary</h3>
           </div>
           <div className="space-y-2">
@@ -159,9 +159,9 @@ export function OrderDetail({ order }: OrderDetailProps) {
                 <span className="font-mono text-[#1d1d1f]">{formatPrice(order.taxAmount, order.currency)}</span>
               </div>
             )}
-            <div className="border-t border-[#e8e8ed] pt-2 mt-2 flex justify-between">
+            <div className="border-t border-[#DEE2E6] pt-2 mt-2 flex justify-between">
               <span className="font-semibold text-[#1d1d1f]">Total</span>
-              <span className="font-mono font-bold text-lg text-[#22A829]">
+              <span className="font-mono font-bold text-lg text-[#2E7D32]">
                 {formatPrice(order.totalAmount, order.currency)}
               </span>
             </div>

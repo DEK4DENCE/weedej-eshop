@@ -44,7 +44,7 @@ export function ForgotPasswordForm() {
     return (
       <div className="bg-[#111714] border border-[#1F3D1F] rounded-2xl p-8 w-full max-w-md text-center">
         <div className="w-12 h-12 bg-[#1A2E1A] rounded-full flex items-center justify-center mx-auto mb-6">
-          <svg className="w-6 h-6 text-[#22A829]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-6 h-6 text-[#2E7D32]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
           </svg>
         </div>
@@ -54,7 +54,7 @@ export function ForgotPasswordForm() {
         </p>
         <Link
           href="/login"
-          className="text-[#22A829] hover:text-[#38C424] text-sm font-medium transition-colors"
+          className="text-[#2E7D32] hover:text-[#38C424] text-sm font-medium transition-colors"
         >
           Back to sign in
         </Link>
@@ -85,7 +85,7 @@ export function ForgotPasswordForm() {
             type="email"
             placeholder="you@example.com"
             autoComplete="email"
-            className="bg-[#1A2219] border border-[#1F3D1F] focus:border-[#22A829] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#F0F5F0] placeholder:text-[#3D5C3D] rounded-xl h-11"
+            className="bg-[#1A2219] border border-[#1F3D1F] focus:border-[#2E7D32] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#F0F5F0] placeholder:text-[#3D5C3D] rounded-xl h-11"
             {...register('email')}
           />
           {errors.email && (
@@ -96,14 +96,14 @@ export function ForgotPasswordForm() {
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-[#22A829] hover:bg-[#38C424] text-black font-semibold rounded-xl h-11 transition-colors disabled:opacity-60"
+          className="w-full bg-[#2E7D32] hover:bg-[#38C424] text-black font-semibold rounded-xl h-11 transition-colors disabled:opacity-60"
         >
           {isSubmitting ? 'Sending…' : 'Send Reset Link'}
         </Button>
       </form>
 
       <p className="mt-6 text-center">
-        <Link href="/login" className="text-[#22A829] hover:text-[#38C424] text-sm font-medium transition-colors">
+        <Link href="/login" className="text-[#2E7D32] hover:text-[#38C424] text-sm font-medium transition-colors">
           Back to sign in
         </Link>
       </p>
