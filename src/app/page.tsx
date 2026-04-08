@@ -4,6 +4,7 @@ import { Header } from "@/components/layout/Header"
 import { Footer } from "@/components/layout/Footer"
 import { CartSidebarWrapper } from "@/components/layout/CartSidebarWrapper"
 import { Toaster } from "@/components/ui/toaster"
+import { FadeIn } from "@/components/ui/FadeIn"
 
 export default function HomePage() {
   return (
@@ -13,23 +14,29 @@ export default function HomePage() {
         {/* Hero */}
         <section className="relative overflow-hidden bg-gradient-to-br from-[#F8F9FA] via-white to-[#F8F9FA] py-24 px-4">
           <div className="container mx-auto text-center max-w-3xl">
-            <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#2E7D32]/10 text-[#2E7D32] border border-[#2E7D32]/20 text-sm font-medium mb-6">
-              Premium Cannabis Products
-            </span>
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 font-playfair bg-gradient-to-r from-[#1d1d1f] via-[#3d3d3f] to-[#2E7D32] bg-clip-text text-transparent pb-3">
-              Weedejna
-            </h1>
-            <p className="text-xl text-[#6e6e73] mb-8 max-w-xl mx-auto">
-              Discover our curated selection of premium cannabis flowers, extracts, and edibles. Quality you can trust.
-            </p>
-            <div className="flex gap-4 justify-center flex-wrap">
-              <Link
-                href="/products"
-                className="inline-flex items-center gap-2 bg-[#2E7D32] hover:bg-[#1a9020] text-white font-semibold px-8 py-3 rounded-xl text-sm transition-all duration-200 hover:shadow-[0_4px_20px_rgba(34,168,41,0.35)]"
-              >
-                Shop Now <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
+            <FadeIn delay={0}>
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#2E7D32]/10 text-[#2E7D32] border border-[#2E7D32]/20 text-sm font-medium mb-6">
+                Premium Cannabis Products
+              </span>
+              <h1 className="text-5xl md:text-7xl font-bold mb-6 font-playfair bg-gradient-to-r from-[#1d1d1f] via-[#3d3d3f] to-[#2E7D32] bg-clip-text text-transparent pb-3">
+                Weedejna
+              </h1>
+            </FadeIn>
+            <FadeIn delay={0.15}>
+              <p className="text-xl text-[#6e6e73] mb-8 max-w-xl mx-auto">
+                Discover our curated selection of premium cannabis flowers, extracts, and edibles. Quality you can trust.
+              </p>
+            </FadeIn>
+            <FadeIn delay={0.3}>
+              <div className="flex gap-4 justify-center flex-wrap">
+                <Link
+                  href="/products"
+                  className="inline-flex items-center gap-2 bg-[#2E7D32] hover:bg-[#1a9020] text-white font-semibold px-8 py-3 rounded-xl text-sm transition-all duration-200 hover:shadow-[0_4px_20px_rgba(34,168,41,0.35)]"
+                >
+                  Shop Now <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </FadeIn>
           </div>
         </section>
 
