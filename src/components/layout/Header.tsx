@@ -19,7 +19,7 @@ export function Header() {
   const router = useRouter()
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[#DEE2E6] bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+    <header className="sticky top-0 z-50 w-full border-b border-[#DEE2E6] bg-[#EDEEF0]/95 backdrop-blur supports-[backdrop-filter]:bg-[#EDEEF0]/90">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
           <span className="text-2xl font-bold text-[#2E7D32] font-playfair">
