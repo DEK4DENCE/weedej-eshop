@@ -1,8 +1,8 @@
 import { ForgotPasswordForm } from '@/components/auth/ForgotPasswordForm'
 
 export const metadata = {
-  title: 'Reset Your Password — Weedej',
-  description: 'Enter your email and we\'ll send you a reset link.',
+  title: 'Obnovit heslo — Weedej',
+  description: 'Zadejte svůj e-mail a my vám pošleme odkaz pro reset hesla.',
 }
 
 export default function ForgotPasswordPage() {

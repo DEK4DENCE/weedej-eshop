@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import type { Metadata } from "next"
 import type { Product } from "@/types/product"
 
-export const metadata: Metadata = { title: "Products — Weedej" }
+export const metadata: Metadata = { title: "Produkty — Weedej" }
 
 interface Props {
   searchParams: Promise<{

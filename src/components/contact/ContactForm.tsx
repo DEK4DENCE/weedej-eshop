@@ -29,7 +29,7 @@ export function ContactForm() {
     <div className="p-6 rounded-xl bg-[#E8F5E9] border border-[#C8E6C9] text-[#2E7D32] text-center">
       <p className="text-2xl mb-2">✓</p>
       <p className="font-semibold">Zpráva odeslána!</p>
-      <p className="text-sm mt-1 text-[#4CAF50]">Ozve se vám co nejdříve.</p>
+      <p className="text-sm mt-1 text-[#4CAF50]">Ozveme se vám co nejdříve.</p>
     </div>
   )
 

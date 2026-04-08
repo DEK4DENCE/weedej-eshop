@@ -54,7 +54,7 @@ export function OrderConfirmation({
   shippingAddress,
 }: OrderConfirmationProps) {
   return (
-    <Html lang="en">
+    <Html lang="cs">
       <Head />
       <Preview>Vaše objednávka Weedej #{orderNumber} je potvrzena — děkujeme!</Preview>
       <Body style={body}>

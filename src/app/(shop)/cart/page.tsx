@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import { CartPageClient } from '@/components/cart/CartPageClient'
 
 export const metadata: Metadata = {
-  title: 'Your Cart — Weedej',
-  description: 'Review your cart and proceed to checkout.',
+  title: 'Košík — Weedej',
+  description: 'Zkontrolujte svůj košík a přejděte k pokladně.',
 }
 
 export default function CartPage() {

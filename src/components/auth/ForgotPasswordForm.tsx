@@ -50,7 +50,7 @@ export function ForgotPasswordForm() {
         </div>
         <h1 className="text-xl font-semibold text-[#F0F5F0] mb-2">Zkontrolujte svou e-mailovou schránku</h1>
         <p className="text-[#6B8F6B] text-sm mb-6">
-          Odkaz pro reset hesla je na cestě do vaší schránky.
+          Odkaz pro obnovení hesla je na cestě do vaší schránky.
         </p>
         <Link
           href="/login"
@@ -66,7 +66,7 @@ export function ForgotPasswordForm() {
     <div className="bg-[#111714] border border-[#1F3D1F] rounded-2xl p-8 w-full max-w-md">
       <div className="mb-8 text-center">
         <h1 className="text-2xl font-bold text-[#F0F5F0] mb-1">Obnovit heslo</h1>
-        <p className="text-[#6B8F6B] text-sm">Zadejte svůj e-mail a my vám pošleme odkaz pro reset hesla</p>
+        <p className="text-[#6B8F6B] text-sm">Zadejte svůj e-mail a my vám pošleme odkaz pro obnovení hesla</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
@@ -98,7 +98,7 @@ export function ForgotPasswordForm() {
           disabled={isSubmitting}
           className="w-full bg-[#2E7D32] hover:bg-[#38C424] text-black font-semibold rounded-xl h-11 transition-colors disabled:opacity-60"
         >
-          {isSubmitting ? 'Odesílání…' : 'Odeslat odkaz pro reset'}
+          {isSubmitting ? 'Odesílání…' : 'Odeslat odkaz pro obnovení'}
         </Button>
       </form>
 

@@ -52,7 +52,7 @@ export function Header() {
           <button
             onClick={toggleSidebar}
             className="relative p-2 text-[#6e6e73] hover:text-[#1d1d1f] transition-colors"
-            aria-label="Shopping cart"
+            aria-label="Nákupní košík"
           >
             <ShoppingBag className="h-5 w-5" />
             {totalItems > 0 && (

@@ -1,8 +1,8 @@
 import { ResetPasswordForm } from '@/components/auth/ResetPasswordForm'
 
 export const metadata = {
-  title: 'Choose a New Password — Weedej',
-  description: 'Set a new password for your Weedej account.',
+  title: 'Zvolte nové heslo — Weedej',
+  description: 'Nastavte nové heslo pro svůj účet Weedej.',
 }
 
 interface ResetPasswordPageProps {

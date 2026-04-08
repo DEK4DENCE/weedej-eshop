@@ -137,7 +137,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
             <button
               onClick={handleAddToCart}
               disabled={isOutOfStock || added}
-              aria-label={`Add ${product.name} to cart`}
+              aria-label={`Přidat ${product.name} do košíku`}
               className="w-9 h-9 rounded-full bg-[#2E7D32] hover:bg-[#1a9020] flex items-center justify-center text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-green-sm"
             >
               {added ? <Check size={18} strokeWidth={2.5} /> : <Plus size={18} strokeWidth={2.5} />}

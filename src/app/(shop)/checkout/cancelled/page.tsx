@@ -2,7 +2,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { XCircle } from "lucide-react"
 
-export const metadata = { title: "Payment Cancelled — Weedej" }
+export const metadata = { title: "Platba zrušena — Weedej" }
 
 export default function CheckoutCancelledPage() {
   return (

@@ -14,7 +14,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const product = await db.product.findUnique({ where: { slug, isActive: true } })
-  if (!product) return { title: "Product Not Found" }
+  if (!product) return { title: "Produkt nenalezen — Weedej" }
   return { title: `${product.name} — Weedej` }
 }
 

@@ -7,7 +7,7 @@ import { OrderConfirmation } from "@/lib/email/templates/OrderConfirmation"
 import { NewOrderNotification } from "@/lib/email/templates/NewOrderNotification"
 
 export const dynamic = "force-dynamic"
-export const metadata = { title: "Order Confirmed — Weedej" }
+export const metadata = { title: "Objednávka potvrzena — Weedej" }
 
 async function ensureOrderCreated(sessionId: string) {
   try {
@@ -81,10 +81,10 @@ async function ensureOrderCreated(sessionId: string) {
         if (addr) shippingAddress = { fullName: addr.fullName, line1: addr.line1, city: addr.city, postalCode: addr.postalCode, country: addr.country }
       }
       if (user?.email) {
-        const firstName = user.name?.split(" ")[0] ?? "there"
+        const firstName = user.name?.split(" ")[0] ?? "zákazníku"
         await sendEmail({
           to: user.email,
-          subject: `Order confirmed — #${order.id.slice(-8).toUpperCase()}`,
+          subject: `Objednávka potvrzena — #${order.id.slice(-8).toUpperCase()}`,
           react: OrderConfirmation({ name: firstName, orderNumber: order.id, items, subtotalAmount, shippingAmount, totalAmount, deliveryType, shippingAddress }),
         })
       }
@@ -95,8 +95,8 @@ async function ensureOrderCreated(sessionId: string) {
       if (adminEmail) {
         await sendEmail({
           to: adminEmail,
-          subject: `New Order #${order.id.slice(-8).toUpperCase()} — ${user?.name ?? user?.email ?? "Customer"}`,
-          react: NewOrderNotification({ orderNumber: order.id, customerName: user?.name ?? user?.email ?? "Unknown", customerEmail: user?.email ?? "", items, subtotalAmount, shippingAmount, totalAmount, deliveryType, shippingAddress }),
+          subject: `Nová objednávka #${order.id.slice(-8).toUpperCase()} — ${user?.name ?? user?.email ?? "Zákazník"}`,
+          react: NewOrderNotification({ orderNumber: order.id, customerName: user?.name ?? user?.email ?? "Neznámý zákazník", customerEmail: user?.email ?? "", items, subtotalAmount, shippingAmount, totalAmount, deliveryType, shippingAddress }),
         })
       }
     } catch (e) {
