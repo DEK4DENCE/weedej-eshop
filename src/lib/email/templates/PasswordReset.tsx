@@ -17,49 +17,49 @@ interface PasswordResetProps {
 
 export function PasswordReset({ name, resetUrl }: PasswordResetProps) {
   return (
-    <Html lang="en">
+    <Html lang="cs">
       <Head />
-      <Preview>A password reset was requested for your account.</Preview>
+      <Preview>Pro váš účet bylo požádáno o obnovení hesla.</Preview>
       <Body style={body}>
         <Container style={container}>
           {/* Header */}
           <Text style={logo}>Weedej</Text>
 
           {/* Content */}
-          <Text style={heading}>Reset Your Password</Text>
-          <Text style={paragraph}>Hi {name},</Text>
+          <Text style={heading}>Obnovení hesla</Text>
+          <Text style={paragraph}>Dobrý den, {name},</Text>
           <Text style={paragraph}>
-            We received a request to reset the password for your Weedej account. If you made
-            this request, click the link below:
+            Požádali jste o obnovení hesla k vašemu účtu Weedej. Pokud jste tuto žádost
+            podali, klikněte na odkaz níže:
           </Text>
 
           <Button style={button} href={resetUrl}>
-            Reset My Password
+            Obnovit heslo
           </Button>
 
           <Text style={warningBox}>
-            This link expires in <strong>1 hour</strong> and can only be used once.
+            Tento odkaz vyprší za <strong>1 hodinu</strong> a lze jej použít pouze jednou.
           </Text>
 
           <Text style={paragraph}>
-            If you did not request a password reset, your account is safe. You can ignore this
-            email — no changes have been made.
+            Pokud jste o obnovení hesla nepožádali, váš účet je v bezpečí. Tento e-mail
+            ignorujte — žádné změny nebyly provedeny.
           </Text>
 
           <Text style={paragraph}>
-            For any concerns, contact{' '}
+            V případě jakýchkoli obav nás kontaktujte na{' '}
             <Link href="mailto:support@weedej.com" style={link}>
               support@weedej.com
             </Link>
             .
           </Text>
 
-          <Text style={paragraph}>The Weedej Team</Text>
+          <Text style={paragraph}>Tým Weedej</Text>
 
           <Hr style={divider} />
 
           <Text style={footer}>
-            If the button above doesn&apos;t work, copy and paste this URL into your browser:
+            Pokud tlačítko výše nefunguje, zkopírujte a vložte tuto adresu URL do prohlížeče:
           </Text>
           <Link href={resetUrl} style={footerLink}>
             {resetUrl}

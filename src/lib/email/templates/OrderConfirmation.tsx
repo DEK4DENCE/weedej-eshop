@@ -40,7 +40,7 @@ interface OrderConfirmationProps {
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://weedej.com'
 
 function formatPrice(cents: number) {
-  return `€${(cents / 100).toFixed(2)}`
+  return `${Math.round(cents / 100).toLocaleString('cs-CZ')} Kč`
 }
 
 export function OrderConfirmation({
@@ -56,25 +56,25 @@ export function OrderConfirmation({
   return (
     <Html lang="en">
       <Head />
-      <Preview>Your Weedej order #{orderNumber} is confirmed — thank you!</Preview>
+      <Preview>Vaše objednávka Weedej #{orderNumber} je potvrzena — děkujeme!</Preview>
       <Body style={body}>
         <Container style={container}>
           <Text style={logo}>Weedej</Text>
 
-          <Text style={heading}>Order Confirmed</Text>
-          <Text style={paragraph}>Hi {name},</Text>
+          <Text style={heading}>Potvrzení objednávky</Text>
+          <Text style={paragraph}>Dobrý den, {name},</Text>
           <Text style={paragraph}>
-            Thank you for your order! We&apos;ve received your payment and are preparing your items.
-            You&apos;ll receive another email when your order ships.
+            Děkujeme za vaši objednávku! Přijali jsme vaši platbu a připravujeme vaše položky.
+            Jakmile bude objednávka odeslána, obdržíte další e-mail.
           </Text>
 
           <Section style={orderBox}>
-            <Text style={orderLabel}>Order number</Text>
+            <Text style={orderLabel}>Číslo objednávky</Text>
             <Text style={orderNumber2}>#{orderNumber.slice(-8).toUpperCase()}</Text>
           </Section>
 
           {/* Items */}
-          <Text style={sectionTitle}>Order Summary</Text>
+          <Text style={sectionTitle}>Přehled objednávky</Text>
           {items.map((item, i) => (
             <Row key={i} style={itemRow}>
               <Column style={itemInfo}>
@@ -90,30 +90,30 @@ export function OrderConfirmation({
           <Hr style={divider} />
 
           <Row style={totalRow}>
-            <Column><Text style={totalLabel}>Subtotal</Text></Column>
+            <Column><Text style={totalLabel}>Mezisoučet</Text></Column>
             <Column><Text style={totalValue}>{formatPrice(subtotalAmount)}</Text></Column>
           </Row>
           <Row style={totalRow}>
-            <Column><Text style={totalLabel}>Shipping</Text></Column>
-            <Column><Text style={totalValue}>{shippingAmount === 0 ? 'Free' : formatPrice(shippingAmount)}</Text></Column>
+            <Column><Text style={totalLabel}>Doprava</Text></Column>
+            <Column><Text style={totalValue}>{shippingAmount === 0 ? 'Zdarma' : formatPrice(shippingAmount)}</Text></Column>
           </Row>
           <Row style={totalRow}>
-            <Column><Text style={grandTotalLabel}>Total</Text></Column>
+            <Column><Text style={grandTotalLabel}>Celkem</Text></Column>
             <Column><Text style={grandTotalValue}>{formatPrice(totalAmount)}</Text></Column>
           </Row>
 
           <Hr style={divider} />
 
           {/* Delivery */}
-          <Text style={sectionTitle}>Delivery</Text>
+          <Text style={sectionTitle}>Doručení</Text>
           {deliveryType === 'PICKUP_IN_STORE' ? (
             <Text style={paragraph}>
-              <strong style={{ color: '#F0F5F0' }}>Pickup in store</strong> — Your order will be
-              ready for pickup at our store. We&apos;ll contact you when it&apos;s ready.
+              <strong style={{ color: '#F0F5F0' }}>Osobní odběr</strong> — Vaše objednávka bude
+              připravena k vyzvednutí na naší prodejně. Kontaktujeme vás, jakmile bude připravena.
             </Text>
           ) : shippingAddress ? (
             <Text style={paragraph}>
-              <strong style={{ color: '#F0F5F0' }}>Courier delivery</strong>
+              <strong style={{ color: '#F0F5F0' }}>Doručení kurýrem</strong>
               <br />
               {shippingAddress.fullName}
               <br />
@@ -124,29 +124,29 @@ export function OrderConfirmation({
               {shippingAddress.country}
             </Text>
           ) : (
-            <Text style={paragraph}>Courier delivery</Text>
+            <Text style={paragraph}>Doručení kurýrem</Text>
           )}
 
           <Button style={button} href={`${APP_URL}/account/orders`}>
-            View My Orders
+            Zobrazit objednávky
           </Button>
 
           <Text style={paragraph}>
-            Questions? Contact us at{' '}
+            Máte otázky? Kontaktujte nás na{' '}
             <Link href="mailto:support@weedej.com" style={link}>
               support@weedej.com
             </Link>
           </Text>
 
           <Text style={paragraph}>
-            Thanks,
+            S pozdravem,
             <br />
-            The Weedej Team
+            Tým Weedej
           </Text>
 
           <Hr style={divider} />
           <Text style={footer}>
-            This email was sent because you placed an order at Weedej.
+            Tento e-mail byl odeslán, protože jste zadali objednávku ve Weedej.
           </Text>
         </Container>
       </Body>

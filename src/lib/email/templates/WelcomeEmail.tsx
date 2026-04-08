@@ -18,64 +18,65 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://weedej.com'
 
 export function WelcomeEmail({ name }: WelcomeEmailProps) {
   return (
-    <Html lang="en">
+    <Html lang="cs">
       <Head />
-      <Preview>You&apos;re in. Here&apos;s everything you need to know about your new account.</Preview>
+      <Preview>Vítáme vás. Zde je vše, co potřebujete vědět o svém novém účtu.</Preview>
       <Body style={body}>
         <Container style={container}>
           {/* Header */}
           <Text style={logo}>Weedej</Text>
 
           {/* Content */}
-          <Text style={heading}>Welcome to Weedej</Text>
-          <Text style={paragraph}>Hi {name},</Text>
+          <Text style={heading}>Vítejte ve Weedej</Text>
+          <Text style={paragraph}>Dobrý den, {name},</Text>
           <Text style={paragraph}>
-            Welcome to Weedej. Your account is now active and you&apos;re ready to start
-            exploring our curated cannabis catalogue.
+            Děkujeme, že jste se k nám přidali. Váš účet je nyní aktivní a můžete začít
+            prozkoumávat náš pečlivě sestavený katalog produktů.
           </Text>
 
-          <Text style={subheading}>Here&apos;s what you get as a Weedej member:</Text>
+          <Text style={subheading}>Co získáte jako člen Weedej:</Text>
 
           <Text style={listItem}>
-            <strong style={{ color: '#F0F5F0' }}>Full catalogue access</strong> — Browse hundreds
-            of lab-tested flowers, extracts, edibles, vapes, CBD products, accessories, and seeds.
+            <strong style={{ color: '#F0F5F0' }}>Přístup k celému katalogu</strong> — Prohlížejte
+            stovky laboratorně testovaných květů, extraktů, jedlých produktů, vaporizátorů, CBD
+            produktů, příslušenství a semínek.
           </Text>
           <Text style={listItem}>
-            <strong style={{ color: '#F0F5F0' }}>Loyalty Points</strong> — Earn 1 point per €1
-            spent. Redeem points for discounts and exclusive products.
+            <strong style={{ color: '#F0F5F0' }}>Věrnostní body</strong> — Získejte 1 bod za
+            každé utracené 1 Kč. Body lze vyměnit za slevy a exkluzivní produkty.
           </Text>
           <Text style={listItem}>
-            <strong style={{ color: '#F0F5F0' }}>Order Tracking</strong> — Real-time updates from
-            dispatch to delivery, all in your account dashboard.
+            <strong style={{ color: '#F0F5F0' }}>Sledování objednávek</strong> — Aktualizace
+            v reálném čase od odeslání až po doručení, vše ve vašem účtu.
           </Text>
           <Text style={listItem}>
-            <strong style={{ color: '#F0F5F0' }}>Wishlists</strong> — Save products you love for
-            later or share them with a friend.
+            <strong style={{ color: '#F0F5F0' }}>Seznamy přání</strong> — Uložte si oblíbené
+            produkty na později nebo je sdílejte s přítelem.
           </Text>
 
           <Button style={button} href={`${APP_URL}/products`}>
-            Shop Now
+            Začít nakupovat
           </Button>
 
           <Text style={paragraph}>
-            If you have any questions, our support team is here at{' '}
+            Máte-li jakékoli dotazy, náš tým podpory je k dispozici na{' '}
             <Link href="mailto:support@weedej.com" style={link}>
               support@weedej.com
             </Link>{' '}
-            or via live chat on the website.
+            nebo prostřednictvím živého chatu na webu.
           </Text>
 
           <Text style={paragraph}>
-            Thanks for joining us.
+            Děkujeme, že jste se k nám přidali.
             <br />
-            The Weedej Team
+            Tým Weedej
           </Text>
 
           <Hr style={divider} />
 
           <Text style={footer}>
-            You are receiving this email because you created a Weedej account. If you did not
-            create this account, please contact us immediately at{' '}
+            Tento e-mail jste obdrželi, protože jste si vytvořili účet ve Weedej. Pokud jste si
+            účet nevytvořili, kontaktujte nás neprodleně na{' '}
             <Link href="mailto:support@weedej.com" style={footerLink}>
               support@weedej.com
             </Link>

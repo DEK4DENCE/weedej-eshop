@@ -17,36 +17,36 @@ interface EmailVerificationProps {
 
 export function EmailVerification({ name, verifyUrl }: EmailVerificationProps) {
   return (
-    <Html lang="en">
+    <Html lang="cs">
       <Head />
-      <Preview>One click to confirm your email and activate your account.</Preview>
+      <Preview>Jediným kliknutím potvrďte svůj e-mail a aktivujte účet.</Preview>
       <Body style={body}>
         <Container style={container}>
           {/* Header */}
           <Text style={logo}>Weedej</Text>
 
           {/* Content */}
-          <Text style={heading}>Verify Your Email Address</Text>
-          <Text style={paragraph}>Hi {name},</Text>
+          <Text style={heading}>Ověřte svůj e-mail</Text>
+          <Text style={paragraph}>Dobrý den, {name},</Text>
           <Text style={paragraph}>
-            Thanks for registering at Weedej. Before you start shopping, we need to confirm
-            your email address.
+            Děkujeme za registraci ve Weedej. Než začnete nakupovat, potřebujeme ověřit
+            vaši e-mailovou adresu.
           </Text>
-          <Text style={paragraph}>Click the button below to verify your account:</Text>
+          <Text style={paragraph}>Klikněte na tlačítko níže pro ověření vaší e-mailové adresy:</Text>
 
           <Button style={button} href={verifyUrl}>
-            Verify My Email
+            Ověřit e-mail
           </Button>
 
           <Text style={paragraph}>
-            This link will expire in <strong>24 hours</strong>. If you did not create a
-            Weedej account, you can safely ignore this email.
+            Tento odkaz vyprší za <strong>24 hodin</strong>. Pokud jste si účet ve Weedej
+            nevytvořili, tento e-mail ignorujte.
           </Text>
 
           <Hr style={divider} />
 
           <Text style={footer}>
-            If the button above doesn&apos;t work, copy and paste this URL into your browser:
+            Pokud tlačítko výše nefunguje, zkopírujte a vložte tuto adresu URL do prohlížeče:
           </Text>
           <Link href={verifyUrl} style={link}>
             {verifyUrl}
@@ -55,7 +55,7 @@ export function EmailVerification({ name, verifyUrl }: EmailVerificationProps) {
           <Hr style={divider} />
 
           <Text style={footer}>
-            The Weedej Team &bull; support@weedej.com
+            Tým Weedej &bull; support@weedej.com
           </Text>
         </Container>
       </Body>

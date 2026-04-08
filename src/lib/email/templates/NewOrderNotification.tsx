@@ -28,7 +28,7 @@ interface NewOrderNotificationProps {
 }
 
 function formatPrice(cents: number) {
-  return `€${(cents / 100).toFixed(2)}`
+  return `${Math.round(cents / 100).toLocaleString('cs-CZ')} Kč`
 }
 
 export function NewOrderNotification({
@@ -43,26 +43,26 @@ export function NewOrderNotification({
   shippingAddress,
 }: NewOrderNotificationProps) {
   return (
-    <Html lang="en">
+    <Html lang="cs">
       <Head />
-      <Preview>New order #{orderNumber.slice(-8).toUpperCase()} from {customerName}</Preview>
+      <Preview>Nová objednávka #{orderNumber.slice(-8).toUpperCase()} od {customerName}</Preview>
       <Body style={body}>
         <Container style={container}>
-          <Text style={logo}>Weedej — New Order</Text>
-          <Text style={heading}>New Order Received</Text>
+          <Text style={logo}>Weedej — Nová objednávka</Text>
+          <Text style={heading}>Nová objednávka přijata</Text>
 
           <Section style={infoBox}>
-            <Text style={infoLabel}>Order #</Text>
+            <Text style={infoLabel}>Objednávka č.</Text>
             <Text style={infoValue}>{orderNumber.slice(-8).toUpperCase()}</Text>
-            <Text style={infoLabel}>Customer</Text>
+            <Text style={infoLabel}>Zákazník</Text>
             <Text style={infoValue}>{customerName} ({customerEmail})</Text>
-            <Text style={infoLabel}>Delivery</Text>
-            <Text style={infoValue}>{deliveryType === 'PICKUP_IN_STORE' ? 'Pickup in Store' : 'Courier'}</Text>
+            <Text style={infoLabel}>Doručení</Text>
+            <Text style={infoValue}>{deliveryType === 'PICKUP_IN_STORE' ? 'Osobní odběr' : 'Kurýr'}</Text>
           </Section>
 
           {shippingAddress && (
             <Section style={infoBox}>
-              <Text style={infoLabel}>Ship to</Text>
+              <Text style={infoLabel}>Doručovací adresa</Text>
               <Text style={infoValue}>
                 {shippingAddress.fullName}{'\n'}
                 {shippingAddress.line1}{'\n'}
@@ -72,7 +72,7 @@ export function NewOrderNotification({
             </Section>
           )}
 
-          <Text style={sectionTitle}>Items</Text>
+          <Text style={sectionTitle}>Položky</Text>
           {items.map((item, i) => (
             <Row key={i} style={itemRow}>
               <Column>
@@ -88,20 +88,20 @@ export function NewOrderNotification({
           <Hr style={divider} />
 
           <Row style={totalRow}>
-            <Column><Text style={totalLabel}>Subtotal</Text></Column>
+            <Column><Text style={totalLabel}>Mezisoučet</Text></Column>
             <Column><Text style={totalVal}>{formatPrice(subtotalAmount)}</Text></Column>
           </Row>
           <Row style={totalRow}>
-            <Column><Text style={totalLabel}>Shipping</Text></Column>
-            <Column><Text style={totalVal}>{shippingAmount === 0 ? 'Free' : formatPrice(shippingAmount)}</Text></Column>
+            <Column><Text style={totalLabel}>Doprava</Text></Column>
+            <Column><Text style={totalVal}>{shippingAmount === 0 ? 'Zdarma' : formatPrice(shippingAmount)}</Text></Column>
           </Row>
           <Row style={totalRow}>
-            <Column><Text style={grandLabel}>Total</Text></Column>
+            <Column><Text style={grandLabel}>Celkem</Text></Column>
             <Column><Text style={grandVal}>{formatPrice(totalAmount)}</Text></Column>
           </Row>
 
           <Hr style={divider} />
-          <Text style={footer}>Weedej Admin Notification</Text>
+          <Text style={footer}>Weedej — Oznámení administrátora</Text>
         </Container>
       </Body>
     </Html>
