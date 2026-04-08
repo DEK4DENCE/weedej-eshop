@@ -12,7 +12,7 @@ export default function HomePage() {
       <Header />
       <main className="flex-1 bg-[#F8F9FA]">
         {/* Hero */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-[#F8F9FA] via-white to-[#F8F9FA] py-14 px-4">
+        <section className="relative overflow-hidden bg-gradient-to-br from-[#F8F9FA] via-white to-[#F8F9FA] py-24 px-4">
           <div className="container mx-auto text-center max-w-3xl">
             <FadeIn delay={0}>
               <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#2E7D32]/10 text-[#2E7D32] border border-[#2E7D32]/20 text-sm font-medium mb-6">
@@ -41,7 +41,7 @@ export default function HomePage() {
         </section>
 
         {/* Features */}
-        <section className="py-14 px-4 bg-[#EDEEF0]">
+        <section className="py-16 px-4 border-y border-[#DEE2E6]/60">
           <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div className="flex flex-col items-center gap-3">
               <div className="p-3 rounded-full bg-[#2E7D32]/10">
