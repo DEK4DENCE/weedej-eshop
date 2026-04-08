@@ -43,6 +43,9 @@ export function Header() {
           <Link href="/contact" className="text-sm font-medium text-[#6e6e73] hover:text-[#1d1d1f] transition-colors">
             Kontakt
           </Link>
+          <Link href="/blog" className="text-sm font-medium text-[#6e6e73] hover:text-[#1d1d1f] transition-colors">
+            Blog
+          </Link>
         </nav>
 
         <div className="flex items-center gap-2">
