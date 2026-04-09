@@ -6,7 +6,7 @@ import { X, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react'
 export interface ImageAdjustment {
   x: number   // 0–100, objectPosition X
   y: number   // 0–100, objectPosition Y
-  zoom: number // 1.0–3.0, scale factor
+  zoom: number // 0.3–3.0, scale factor
 }
 
 interface Props {
@@ -126,7 +126,7 @@ export function ImagePositionEditor({ url, initial, onSave, onClose }: Props) {
             <ZoomOut size={13} className="text-[#aeaeb2] flex-shrink-0" />
             <input
               type="range"
-              min="1"
+              min="0.3"
               max="3"
               step="0.05"
               value={adj.zoom}
