@@ -41,9 +41,9 @@ export function ProductImages({ images, productName, adjustments }: ProductImage
     return {
       backgroundImage: `url(${url})`,
       backgroundRepeat: 'no-repeat',
-      backgroundSize: saved ? `${adj.zoom * 100}%` : 'cover',
+      backgroundSize: saved ? `${adj.zoom * 100}%` : 'contain',
       backgroundPosition: `${adj.x}% ${adj.y}%`,
-      backgroundColor: '#F8F9FA',
+      backgroundColor: '#ffffff',
     }
   }
 

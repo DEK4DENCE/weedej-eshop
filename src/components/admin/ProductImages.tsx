@@ -122,7 +122,7 @@ export function ProductImages({ productId, initialImages, initialAdjustments }: 
                     backgroundRepeat: 'no-repeat',
                     backgroundSize: `${adj.zoom * 100}%`,
                     backgroundPosition: `${adj.x}% ${adj.y}%`,
-                    backgroundColor: '#F8F9FA',
+                    backgroundColor: '#ffffff',
                   }}
                 />
 

@@ -58,9 +58,9 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
           style={{
             backgroundImage: `url(${mainImage})`,
             backgroundRepeat: 'no-repeat',
-            backgroundSize: savedAdj ? `${mainAdj.zoom * 100}%` : 'cover',
+            backgroundSize: savedAdj ? `${mainAdj.zoom * 100}%` : 'contain',
             backgroundPosition: `${mainAdj.x}% ${mainAdj.y}%`,
-            backgroundColor: '#F8F9FA',
+            backgroundColor: '#ffffff',
           }}
         >
 
