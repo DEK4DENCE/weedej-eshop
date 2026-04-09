@@ -11,6 +11,7 @@ interface Props {
   initialAdjustments?: string | null
 }
 
+// zoom: 1 = background-size: 100% = image fills container width (good default for most product photos)
 const DEFAULT_ADJ: ImageAdjustment = { x: 50, y: 50, zoom: 1 }
 
 export function ProductImages({ productId, initialImages, initialAdjustments }: Props) {
@@ -114,23 +115,16 @@ export function ProductImages({ productId, initialImages, initialAdjustments }: 
                 }`}
               >
                 {/* Image with stored adjustments */}
-                <div className="absolute inset-0 overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={url}
-                    alt={`Product image ${i + 1}`}
-                    style={{
-                      position: 'absolute',
-                      inset: 0,
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      objectPosition: `${adj.x}% ${adj.y}%`,
-                      transform: `scale(${adj.zoom})`,
-                      transformOrigin: `${adj.x}% ${adj.y}%`,
-                    }}
-                  />
-                </div>
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    backgroundImage: `url(${url})`,
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: `${adj.zoom * 100}%`,
+                    backgroundPosition: `${adj.x}% ${adj.y}%`,
+                    backgroundColor: '#F8F9FA',
+                  }}
+                />
 
                 {i === 0 && (
                   <div className="absolute top-1.5 left-1.5 z-10 bg-[#2E7D32] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1">
