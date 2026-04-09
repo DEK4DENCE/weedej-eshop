@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
@@ -36,20 +35,22 @@ export function ProductImages({ images, productName, adjustments }: ProductImage
     setSelectedIndex(newIndex)
   }
 
-  function getStyle(url: string) {
-    const adj = adjMap[url] ?? { x: 50, y: 50, zoom: 1 }
+  function getBgStyle(url: string): React.CSSProperties {
+    const saved = adjMap[url]
+    const adj = saved ?? { x: 50, y: 50, zoom: 1 }
     return {
-      objectFit: 'cover' as const,
-      objectPosition: `${adj.x}% ${adj.y}%`,
-      transform: `scale(${adj.zoom})`,
-      transformOrigin: `${adj.x}% ${adj.y}%`,
+      backgroundImage: `url(${url})`,
+      backgroundRepeat: 'no-repeat',
+      backgroundSize: saved ? `${adj.zoom * 100}%` : 'cover',
+      backgroundPosition: `${adj.x}% ${adj.y}%`,
+      backgroundColor: '#F8F9FA',
     }
   }
 
   return (
     <div className="flex flex-col gap-4">
       {/* Main image */}
-      <div className="relative aspect-square rounded-2xl overflow-hidden bg-[#F8F9FA] border border-[#DEE2E6] group">
+      <div className="relative aspect-square rounded-2xl overflow-hidden border border-[#DEE2E6] group">
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={selectedIndex}
@@ -59,17 +60,9 @@ export function ProductImages({ images, productName, adjustments }: ProductImage
             exit={{ opacity: 0, x: direction * -60 }}
             transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="absolute inset-0"
-          >
-            <Image
-              src={displayImages[selectedIndex]}
-              alt={`${productName} — image ${selectedIndex + 1}`}
-              fill
-              sizes="(max-width: 768px) 100vw, 50vw"
-              style={getStyle(displayImages[selectedIndex])}
-              priority={selectedIndex === 0}
-              unoptimized={displayImages[selectedIndex].startsWith('/images/')}
-            />
-          </motion.div>
+            style={getBgStyle(displayImages[selectedIndex])}
+            aria-label={`${productName} — image ${selectedIndex + 1}`}
+          />
         </AnimatePresence>
 
         {displayImages.length > 1 && (
@@ -77,14 +70,14 @@ export function ProductImages({ images, productName, adjustments }: ProductImage
             <button
               onClick={prev}
               aria-label="Previous image"
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 border border-[#DEE2E6] text-[#6e6e73] hover:text-[#2E7D32] hover:border-[#2E7D32] flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 shadow-sm"
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 border border-[#DEE2E6] text-[#6e6e73] hover:text-[#2E7D32] hover:border-[#2E7D32] flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 shadow-sm z-10"
             >
               <ChevronLeft size={16} />
             </button>
             <button
               onClick={next}
               aria-label="Next image"
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 border border-[#DEE2E6] text-[#6e6e73] hover:text-[#2E7D32] hover:border-[#2E7D32] flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 shadow-sm"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 border border-[#DEE2E6] text-[#6e6e73] hover:text-[#2E7D32] hover:border-[#2E7D32] flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 shadow-sm z-10"
             >
               <ChevronRight size={16} />
             </button>
@@ -101,21 +94,13 @@ export function ProductImages({ images, productName, adjustments }: ProductImage
               onClick={() => selectImage(i)}
               aria-label={`View image ${i + 1}`}
               className={[
-                'relative w-16 h-16 rounded-xl overflow-hidden border-2 transition-all duration-200 flex-shrink-0 bg-[#F8F9FA]',
+                'w-16 h-16 rounded-xl overflow-hidden border-2 transition-all duration-200 flex-shrink-0',
                 i === selectedIndex
                   ? 'border-[#2E7D32]'
                   : 'border-[#DEE2E6] hover:border-[#2E7D32]/50 opacity-70 hover:opacity-100',
               ].join(' ')}
-            >
-              <Image
-                src={src}
-                alt={`Thumbnail ${i + 1}`}
-                fill
-                sizes="64px"
-                style={getStyle(src)}
-                unoptimized={src.startsWith('/images/')}
-              />
-            </button>
+              style={getBgStyle(src)}
+            />
           ))}
         </div>
       )}

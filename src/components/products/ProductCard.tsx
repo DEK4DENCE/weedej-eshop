@@ -21,7 +21,8 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
   const isLowStock = defaultVariant ? defaultVariant.stock > 0 && defaultVariant.stock <= 5 : false
   const mainImage = product.imageUrls[0] ?? '/images/placeholder-product.webp'
   const adjustments = product.imageAdjustments ? JSON.parse(product.imageAdjustments) : {}
-  const mainAdj = adjustments[mainImage] ?? { x: 50, y: 50, zoom: 1 }
+  const savedAdj = adjustments[mainImage]
+  const mainAdj = savedAdj ?? { x: 50, y: 50, zoom: 1 }
   const { addItem } = useCart()
   const [added, setAdded] = useState(false)
 
@@ -57,7 +58,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
           style={{
             backgroundImage: `url(${mainImage})`,
             backgroundRepeat: 'no-repeat',
-            backgroundSize: `${mainAdj.zoom * 100}%`,
+            backgroundSize: savedAdj ? `${mainAdj.zoom * 100}%` : 'cover',
             backgroundPosition: `${mainAdj.x}% ${mainAdj.y}%`,
             backgroundColor: '#F8F9FA',
           }}
