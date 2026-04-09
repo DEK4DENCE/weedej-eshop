@@ -21,6 +21,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
   const isLowStock = defaultVariant ? defaultVariant.stock > 0 && defaultVariant.stock <= 5 : false
   const mainImage = product.imageUrls[0] ?? '/images/placeholder-product.webp'
   const adjustments = product.imageAdjustments ? JSON.parse(product.imageAdjustments) : {}
+  const hasAdj = !!adjustments[mainImage]
   const mainAdj = adjustments[mainImage] ?? { x: 50, y: 50, zoom: 1 }
   const { addItem } = useCart()
   const [added, setAdded] = useState(false)
@@ -52,22 +53,16 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
         className="group block bg-white rounded-2xl overflow-hidden border border-[#DEE2E6] hover:border-[#2E7D32] transition-all duration-300 shadow-[0_2px_16px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.14)]"
       >
         {/* Image */}
-        <div className="relative overflow-hidden h-[260px] bg-[#F8F9FA]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={mainImage}
-            alt={product.name}
-            style={{
-              position: 'absolute',
-              inset: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              objectPosition: `${mainAdj.x}% ${mainAdj.y}%`,
-              transform: `scale(${mainAdj.zoom})`,
-              transformOrigin: `${mainAdj.x}% ${mainAdj.y}%`,
-            }}
-          />
+        <div
+          className="relative overflow-hidden h-[220px]"
+          style={{
+            backgroundImage: `url(${mainImage})`,
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: hasAdj ? `${mainAdj.zoom * 100}%` : 'cover',
+            backgroundPosition: `${mainAdj.x}% ${mainAdj.y}%`,
+            backgroundColor: '#F8F9FA',
+          }}
+        >
 
           {/* Category badge */}
           {product.category && (
