@@ -54,7 +54,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
       >
         {/* Image */}
         <div
-          className="relative overflow-hidden h-[220px]"
+          className="relative overflow-hidden aspect-square"
           style={{
             backgroundImage: `url(${mainImage})`,
             backgroundRepeat: 'no-repeat',
