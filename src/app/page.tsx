@@ -10,14 +10,21 @@ import { db } from "@/lib/db"
 
 async function getBestsellers() {
   try {
+    const setting = await db.setting.findUnique({ where: { key: "bestsellers" } })
+    const ids: string[] = setting?.value ? JSON.parse(setting.value) : []
+    if (ids.length > 0) {
+      const products = await db.product.findMany({
+        where: { id: { in: ids }, isActive: true },
+        include: { category: true, variants: { orderBy: { price: "asc" } } },
+      })
+      // preserve admin-defined order
+      return ids.map((id) => products.find((p) => p.id === id)).filter(Boolean) as typeof products
+    }
     return await db.product.findMany({
       where: { isActive: true },
       take: 4,
       orderBy: { createdAt: "desc" },
-      include: {
-        category: true,
-        variants: { orderBy: { price: "asc" } },
-      },
+      include: { category: true, variants: { orderBy: { price: "asc" } } },
     })
   } catch {
     return []

@@ -10,13 +10,20 @@ export default async function AdminSettingsPage() {
   const session = await auth()
   if ((session?.user as any)?.role !== "ADMIN") redirect("/")
 
-  const settings = await db.setting.findMany()
+  const [settings, products] = await Promise.all([
+    db.setting.findMany(),
+    db.product.findMany({
+      where: { isActive: true },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
+  ])
   const map = Object.fromEntries(settings.map((s) => [s.key, s.value]))
 
   return (
     <div className="space-y-8 max-w-xl">
-      <h1 className="text-3xl font-bold font-playfair">Settings</h1>
-      <AdminSettingsForm settings={map} />
+      <h1 className="text-3xl font-bold font-playfair">Nastavení</h1>
+      <AdminSettingsForm settings={map} products={products} />
     </div>
   )
 }

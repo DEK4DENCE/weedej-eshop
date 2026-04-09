@@ -16,8 +16,8 @@ import { useRouter } from "next/navigation"
 
 const navLinks = [
   { href: "/products", label: "Vše" },
-  { href: "/products?category=flowers", label: "Flowers" },
-  { href: "/products?category=extracts", label: "Extracts" },
+  { href: "/products?category=kvety", label: "Květy" },
+  { href: "/products?category=extrakty", label: "Extrakty" },
   { href: "/products?category=edibles", label: "Edibles" },
   { href: "/contact", label: "Kontakt" },
   { href: "/blog", label: "Blog" },

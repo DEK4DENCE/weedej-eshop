@@ -71,6 +71,24 @@
       },
       "createdAt": "2026-04-08T23:02:43.991Z",
       "updatedAt": "2026-04-08T23:02:43.991Z"
+    },
+    "swarm-1775692617316-ceztvi": {
+      "swarmId": "swarm-1775692617316-ceztvi",
+      "topology": "hierarchical-mesh",
+      "maxAgents": 15,
+      "status": "running",
+      "agents": [],
+      "tasks": [],
+      "config": {
+        "topology": "hierarchical-mesh",
+        "maxAgents": 15,
+        "strategy": "specialized",
+        "communicationProtocol": "message-bus",
+        "autoScaling": true,
+        "consensusMechanism": "majority"
+      },
+      "createdAt": "2026-04-08T23:56:57.316Z",
+      "updatedAt": "2026-04-08T23:56:57.316Z"
     }
   },
   "version": "3.0.0"
