@@ -64,8 +64,14 @@ export default async function HomePage() {
                     Nakupovat <ArrowRight className="h-4 w-4" />
                   </Link>
                   <Link
-                    href="/contact"
+                    href="/login"
                     className="inline-flex items-center gap-2 bg-transparent border-2 border-[#2E7D32] text-[#2E7D32] hover:bg-[#2E7D32]/5 font-semibold px-7 py-3 rounded-xl text-sm transition-all duration-200"
+                  >
+                    Přihlásit se
+                  </Link>
+                  <Link
+                    href="/contact"
+                    className="inline-flex items-center gap-2 bg-transparent border-2 border-[#DEE2E6] text-[#6e6e73] hover:border-[#2E7D32] hover:text-[#2E7D32] font-semibold px-7 py-3 rounded-xl text-sm transition-all duration-200"
                   >
                     Více o nás
                   </Link>

@@ -52,12 +52,13 @@ export function Header() {
         <div className="flex items-center gap-1">
           <button
             onClick={toggleSidebar}
-            className="relative p-2 text-[#6e6e73] hover:text-[#1d1d1f] transition-colors"
+            className="relative flex items-center gap-1.5 px-3 py-2 text-[#6e6e73] hover:text-[#1d1d1f] transition-colors rounded-lg hover:bg-[#F8F9FA]"
             aria-label="Nákupní košík"
           >
             <ShoppingBag className="h-5 w-5" />
+            <span className="hidden md:inline text-sm font-medium">Košík</span>
             {totalItems > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#2E7D32] text-xs text-white font-bold">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#2E7D32] text-xs text-white font-bold">
                 {totalItems}
               </span>
             )}
@@ -89,9 +90,14 @@ export function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Link href="/login" className="hidden md:block text-sm font-medium text-[#6e6e73] hover:text-[#1d1d1f] transition-colors px-3 py-2">
-              Přihlásit se
-            </Link>
+            <div className="hidden md:flex items-center gap-1">
+              <Link href="/login" className="text-sm font-medium text-[#6e6e73] hover:text-[#1d1d1f] transition-colors px-3 py-2 rounded-lg hover:bg-[#F8F9FA]">
+                Přihlásit se
+              </Link>
+              <Link href="/register" className="text-sm font-semibold text-white bg-[#2E7D32] hover:bg-[#1a9020] transition-colors px-3 py-2 rounded-lg">
+                Registrovat se
+              </Link>
+            </div>
           )}
 
           {/* Hamburger — mobile only */}
@@ -142,9 +148,14 @@ export function Header() {
                   </button>
                 </>
               ) : (
-                <Link href="/login" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 text-sm font-medium text-white bg-[#2E7D32] hover:bg-[#1a9020] px-4 py-2.5 rounded-xl transition-colors">
-                  Přihlásit se
-                </Link>
+                <div className="flex flex-col gap-2">
+                  <Link href="/login" onClick={() => setMobileOpen(false)} className="flex items-center justify-center gap-2 text-sm font-medium text-[#2E7D32] border-2 border-[#2E7D32] hover:bg-[#2E7D32]/5 px-4 py-2.5 rounded-xl transition-colors">
+                    Přihlásit se
+                  </Link>
+                  <Link href="/register" onClick={() => setMobileOpen(false)} className="flex items-center justify-center gap-2 text-sm font-semibold text-white bg-[#2E7D32] hover:bg-[#1a9020] px-4 py-2.5 rounded-xl transition-colors">
+                    Registrovat se
+                  </Link>
+                </div>
               )}
             </div>
           </nav>

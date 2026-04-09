@@ -41,21 +41,23 @@ export default async function BlogPage() {
               key={post.id}
               className="bg-white border border-[#DEE2E6] rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden flex flex-col"
             >
-              {post.coverImage ? (
-                <div className="relative h-48 w-full bg-[#F8F9FA]">
-                  <Image
-                    src={post.coverImage}
-                    alt={post.title}
-                    fill
-                    className="object-cover"
-                    unoptimized
-                  />
-                </div>
-              ) : (
-                <div className="h-48 w-full bg-gradient-to-br from-[#2E7D32]/10 to-[#66BB6A]/20 flex items-center justify-center">
-                  <span className="text-4xl">🌿</span>
-                </div>
-              )}
+              <Link href={`/blog/${post.slug}`} className="block">
+                {post.coverImage ? (
+                  <div className="relative h-48 w-full bg-[#F8F9FA] overflow-hidden">
+                    <Image
+                      src={post.coverImage}
+                      alt={post.title}
+                      fill
+                      className="object-cover hover:scale-105 transition-transform duration-300"
+                      unoptimized
+                    />
+                  </div>
+                ) : (
+                  <div className="h-48 w-full bg-gradient-to-br from-[#2E7D32]/10 to-[#66BB6A]/20 flex items-center justify-center hover:from-[#2E7D32]/20 hover:to-[#66BB6A]/30 transition-colors duration-300">
+                    <span className="text-4xl">🌿</span>
+                  </div>
+                )}
+              </Link>
               <div className="flex flex-col flex-1 p-5">
                 <h2 className="text-lg font-semibold text-[#212121] mb-2 line-clamp-2">{post.title}</h2>
                 <p className="text-sm text-[#6e6e73] mb-4 line-clamp-3 flex-1">{post.excerpt}</p>
