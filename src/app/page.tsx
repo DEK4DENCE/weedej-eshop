@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import Link from "next/link"
 import { ArrowRight, Star, Shield, Truck } from "lucide-react"
 import { Header } from "@/components/layout/Header"
