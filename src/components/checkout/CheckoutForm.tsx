@@ -142,9 +142,11 @@ export function CheckoutForm({ user, addresses }: Props) {
                 const isFree = method.freeThreshold != null && totalPrice >= method.freeThreshold
                 const displayPrice = isFree ? "Zdarma" : `${method.price} Kč`
                 return (
-                  <button
+                  <motion.button
                     key={method.id}
                     type="button"
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
                     onClick={() => { setDeliveryType("COURIER"); setSelectedShippingId(method.id) }}
                     className={`w-full flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-colors ${
                       deliveryType === "COURIER" && selectedShippingId === method.id
@@ -159,13 +161,15 @@ export function CheckoutForm({ user, addresses }: Props) {
                       <p className="text-xs text-muted-foreground mt-0.5">{method.estimatedDays}</p>
                     </div>
                     <span className={`text-sm font-semibold shrink-0 ${isFree ? "text-green-600" : ""}`}>{displayPrice}</span>
-                  </button>
+                  </motion.button>
                 )
               })}
 
               {/* Always show PICKUP_IN_STORE */}
-              <button
+              <motion.button
                 type="button"
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
                 onClick={() => setDeliveryType("PICKUP_IN_STORE")}
                 className={`w-full flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-colors ${
                   deliveryType === "PICKUP_IN_STORE"
@@ -179,7 +183,7 @@ export function CheckoutForm({ user, addresses }: Props) {
                   <p className="text-xs text-muted-foreground">Vyzvedněte objednávku osobně v naší prodejně</p>
                 </div>
                 <span className="text-sm font-semibold shrink-0 text-green-600">Zdarma</span>
-              </button>
+              </motion.button>
             </CardContent>
           </Card>
 

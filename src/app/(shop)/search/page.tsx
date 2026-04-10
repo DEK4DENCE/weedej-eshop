@@ -11,7 +11,10 @@ interface Props {
   searchParams: Promise<{ q?: string; search?: string; sort?: string; page?: string }>
 }
 
-export const metadata = { title: "Vyhledávání — Weedej" }
+export const metadata = {
+  title: "Vyhledávání — Weedej",
+  robots: { index: false, follow: false },
+}
 
 export default async function SearchPage({ searchParams }: Props) {
   const params = await searchParams

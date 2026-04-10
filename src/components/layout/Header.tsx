@@ -129,13 +129,15 @@ export function Header() {
           )}
 
           {/* Hamburger — mobile only */}
-          <button
+          <motion.button
             className="md:hidden p-2 text-[#6e6e73] hover:text-[#1d1d1f] transition-colors"
             onClick={() => setMobileOpen((o) => !o)}
             aria-label={mobileOpen ? "Zavřít menu" : "Otevřít menu"}
+            animate={{ rotate: mobileOpen ? 90 : 0 }}
+            transition={{ duration: 0.2 }}
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
+          </motion.button>
         </div>
       </div>
 

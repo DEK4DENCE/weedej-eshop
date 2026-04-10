@@ -80,7 +80,23 @@ export default async function ProductDetailPage({ params }: Props) {
     url: `${BASE_URL}/products/${product.slug}`,
     brand: { '@type': 'Brand', name: 'Weedej' },
     category: product.category.name,
-    ...(defaultVariant ? {
+    ...(product.variants.length > 1 ? {
+      offers: {
+        '@type': 'AggregateOffer',
+        priceCurrency: 'CZK',
+        lowPrice: Math.min(...product.variants.map((v) => Number(v.price))).toFixed(2),
+        highPrice: Math.max(...product.variants.map((v) => Number(v.price))).toFixed(2),
+        offerCount: product.variants.length,
+        offers: product.variants.map((v) => ({
+          '@type': 'Offer',
+          name: v.name,
+          price: Number(v.price).toFixed(2),
+          priceCurrency: 'CZK',
+          availability: v.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+          seller: { '@type': 'Organization', name: 'Weedej' },
+        })),
+      },
+    } : defaultVariant ? {
       offers: {
         '@type': 'Offer',
         price: Number(defaultVariant.price).toFixed(2),

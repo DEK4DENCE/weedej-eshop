@@ -5,9 +5,10 @@ import { db } from '@/lib/db'
 import { BASE_URL } from '@/lib/config'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [products, blogPosts] = await Promise.all([
+  const [products, blogPosts, categories] = await Promise.all([
     db.product.findMany({ where: { isActive: true }, select: { slug: true, updatedAt: true } }),
     db.blogPost.findMany({ where: { published: true }, select: { slug: true, updatedAt: true } }),
+    db.category.findMany({ select: { slug: true, updatedAt: true } }),
   ])
 
   return [
@@ -25,6 +26,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: p.updatedAt,
       changeFrequency: 'monthly' as const,
       priority: 0.8,
+    })),
+    ...categories.map((c) => ({
+      url: `${BASE_URL}/categories/${c.slug}`,
+      lastModified: c.updatedAt,
+      changeFrequency: 'weekly' as const,
+      priority: 0.75,
     })),
     ...blogPosts.map((b) => ({
       url: `${BASE_URL}/blog/${b.slug}`,

@@ -81,14 +81,14 @@ export function ProductImages({ images, productName, adjustments }: ProductImage
             <button
               onClick={prev}
               aria-label="Předchozí obrázek"
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 border border-[#DEE2E6] text-[#6e6e73] hover:text-[#2E7D32] hover:border-[#2E7D32] flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 shadow-sm z-10"
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white border border-[#DEE2E6] text-[#6e6e73] hover:text-[#2E7D32] hover:border-[#2E7D32] flex items-center justify-center transition-all shadow-sm z-10"
             >
               <ChevronLeft size={16} />
             </button>
             <button
               onClick={next}
               aria-label="Další obrázek"
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 border border-[#DEE2E6] text-[#6e6e73] hover:text-[#2E7D32] hover:border-[#2E7D32] flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 shadow-sm z-10"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white border border-[#DEE2E6] text-[#6e6e73] hover:text-[#2E7D32] hover:border-[#2E7D32] flex items-center justify-center transition-all shadow-sm z-10"
             >
               <ChevronRight size={16} />
             </button>

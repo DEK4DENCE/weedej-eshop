@@ -48,22 +48,24 @@ export default function CartItem({ item, itemId, onUpdateQty, onRemove }: CartIt
         {/* Qty controls */}
         <div className="flex items-center gap-2 mt-2">
           <motion.button
+            whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.85 }}
             onClick={() => item.quantity > 1 && onUpdateQty(itemId, variantId, item.quantity - 1)}
             disabled={item.quantity <= 1}
             aria-label="Snížit množství"
-            className="w-6 h-6 rounded-full border border-[#DEE2E6] flex items-center justify-center text-[#6e6e73] hover:border-[#2E7D32] hover:text-[#2E7D32] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-8 h-8 rounded-full border border-[#DEE2E6] flex items-center justify-center text-[#6e6e73] hover:border-[#2E7D32] hover:text-[#2E7D32] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            <Minus size={12} />
+            <Minus size={14} />
           </motion.button>
-          <span className="text-sm font-medium text-[#1d1d1f] w-5 text-center">{item.quantity}</span>
+          <span className="text-sm font-medium text-[#1d1d1f] w-6 text-center">{item.quantity}</span>
           <motion.button
+            whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.85 }}
             onClick={() => onUpdateQty(itemId, variantId, item.quantity + 1)}
             aria-label="Zvýšit množství"
-            className="w-6 h-6 rounded-full border border-[#DEE2E6] flex items-center justify-center text-[#6e6e73] hover:border-[#2E7D32] hover:text-[#2E7D32] transition-colors"
+            className="w-8 h-8 rounded-full border border-[#DEE2E6] flex items-center justify-center text-[#6e6e73] hover:border-[#2E7D32] hover:text-[#2E7D32] transition-colors"
           >
-            <Plus size={12} />
+            <Plus size={14} />
           </motion.button>
         </div>
       </div>

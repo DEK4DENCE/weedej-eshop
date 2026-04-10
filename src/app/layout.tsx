@@ -24,6 +24,11 @@ export const metadata: Metadata = {
     siteName: 'Weedej',
     description: 'Prémiové konopné produkty s doručením po celé ČR.',
   },
+  twitter: {
+    card: 'summary_large_image',
+    site: '@weedej_cz',
+    creator: '@weedej_cz',
+  },
 }
 
 const organizationSchema = {
@@ -37,7 +42,33 @@ const organizationSchema = {
     '@type': 'ContactPoint',
     contactType: 'Zákaznická podpora',
     availableLanguage: 'Czech',
+    telephone: '+420792342324',
+    email: 'info@weedej.cz',
   },
+}
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: 'Weedej',
+  url: BASE_URL,
+  telephone: '+420792342324',
+  email: 'info@weedej.cz',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Benešovská 432/3',
+    addressLocality: 'Děčín',
+    postalCode: '405 02',
+    addressCountry: 'CZ',
+  },
+  openingHoursSpecification: [
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Thursday', 'Friday'], opens: '11:00', closes: '19:00' },
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Wednesday', 'Saturday'], opens: '11:00', closes: '17:00' },
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Sunday'], opens: '00:00', closes: '00:00' },
+  ],
+  priceRange: '$$',
+  currenciesAccepted: 'CZK',
+  paymentAccepted: 'Cash, Credit Card',
 }
 
 export default function RootLayout({
@@ -59,6 +90,10 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
         />
       </head>
       <body className="min-h-full flex flex-col bg-[#ebebeb] text-[#1d1d1f] antialiased">

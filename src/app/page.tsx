@@ -11,6 +11,11 @@ export const metadata: Metadata = {
     url: 'https://weedej-cannabis-eshop-dek4dences-projects.vercel.app',
     locale: 'cs_CZ',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Prémiový CBD E-Shop — Weedej',
+    description: 'Prémiové konopné produkty s doručením po celé ČR. Laboratořemi testováno, přírodou inspirováno.',
+  },
 }
 
 import Link from "next/link"
