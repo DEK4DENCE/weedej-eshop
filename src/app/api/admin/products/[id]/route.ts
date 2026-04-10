@@ -7,7 +7,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if ((session?.user as any)?.role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   const { id } = await params
   const body = await req.json()
-  const { variants, ...productData } = body
+  const { id: _id, variants, ...productData } = body
 
   const product = await db.$transaction(async (tx) => {
     const updated = await tx.product.update({ where: { id }, data: productData })

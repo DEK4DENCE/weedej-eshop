@@ -1,7 +1,7 @@
 'use client'
 import { useSession } from 'next-auth/react'
 import { useCartStore } from '@/store/cartStore'
-import { useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 interface AddItemPayload {
   variantId: string
@@ -14,6 +14,9 @@ interface AddItemPayload {
 }
 
 export function useCart() {
+  const [hydrated, setHydrated] = useState(false)
+  useEffect(() => setHydrated(true), [])
+
   const { data: session } = useSession()
   const guestCart = useCartStore()
   const serverItems = useCartStore((s) => s.serverItems)
@@ -110,7 +113,8 @@ export function useCart() {
 
   const items = session?.user ? serverItems : guestCart.items
 
-  const totalItems = items.reduce((sum, i: any) => sum + (i.quantity || 0), 0)
+  const actualTotalItems = items.reduce((sum, i: any) => sum + (i.quantity || 0), 0)
+  const totalItems = hydrated ? actualTotalItems : 0
 
   const totalPrice = items.reduce((sum, i: any) => {
     const price = i.variant?.price ?? i.price ?? 0

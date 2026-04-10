@@ -3,8 +3,29 @@ import { auth } from "@/lib/auth"
 import { stripe } from "@/lib/stripe"
 import { db } from "@/lib/db"
 
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
+function checkRateLimit(ip: string, limit = 10): boolean {
+  const now = Date.now()
+  const entry = rateLimitMap.get(ip)
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + 60_000 })
+    return true
+  }
+  if (entry.count >= limit) return false
+  entry.count++
+  return true
+}
+
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"
+    if (!checkRateLimit(ip)) {
+      return NextResponse.json(
+        { error: "Příliš mnoho požadavků. Zkuste to znovu za chvíli." },
+        { status: 429 }
+      )
+    }
+
     const session = await auth()
     if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
@@ -31,6 +52,7 @@ export async function POST(req: NextRequest) {
 
     // Handle address
     let resolvedAddressId: string | null = null
+    let resolvedAddr: Awaited<ReturnType<typeof db.address.create>> | null = null
     if (deliveryType === "COURIER" && address) {
       if (address.existingAddressId) {
         resolvedAddressId = address.existingAddressId
@@ -49,6 +71,7 @@ export async function POST(req: NextRequest) {
           },
         })
         resolvedAddressId = newAddr.id
+        resolvedAddr = newAddr
         // Also save phone to user
         if (address.phone) {
           await db.user.update({ where: { id: userId }, data: { phone: address.phone } })
@@ -62,7 +85,7 @@ export async function POST(req: NextRequest) {
     let shippingPostal = ""
     let shippingCountry = "CZ"
     if (resolvedAddressId) {
-      const addr = await db.address.findUnique({ where: { id: resolvedAddressId } })
+      const addr = resolvedAddr ?? await db.address.findUnique({ where: { id: resolvedAddressId } })
       if (addr) {
         shippingLine1 = addr.line1
         shippingCity = addr.city
