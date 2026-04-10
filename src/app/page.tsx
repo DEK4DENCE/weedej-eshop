@@ -1,4 +1,17 @@
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
+
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: 'Prémiový CBD E-Shop — Weedej',
+  description: 'Prémiové konopné produkty s doručením po celé ČR. Laboratořemi testováno, přírodou inspirováno.',
+  alternates: { canonical: 'https://weedej-cannabis-eshop-dek4dences-projects.vercel.app' },
+  openGraph: {
+    title: 'Prémiový CBD E-Shop — Weedej',
+    url: 'https://weedej-cannabis-eshop-dek4dences-projects.vercel.app',
+    locale: 'cs_CZ',
+  },
+}
 
 import Link from "next/link"
 import { ArrowRight, Star, Shield, Truck } from "lucide-react"

@@ -43,8 +43,23 @@ export default async function BlogPostPage({ params }: Props) {
 
   if (!post) notFound()
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: post.title,
+    description: post.excerpt,
+    datePublished: post.publishedAt?.toISOString(),
+    dateModified: post.updatedAt.toISOString(),
+    author: { '@type': 'Person', name: post.author.name ?? 'Weedej' },
+    publisher: { '@type': 'Organization', name: 'Weedej', url: BASE_URL },
+    url: `${BASE_URL}/blog/${slug}`,
+    ...(post.coverImage ? { image: post.coverImage } : {}),
+  }
+
   return (
-    <div className="container mx-auto px-4 py-12 max-w-3xl">
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <div className="container mx-auto px-4 py-12 max-w-3xl">
       <Link
         href="/blog"
         className="inline-flex items-center gap-1 text-sm text-[#6e6e73] hover:text-[#2E7D32] transition-colors mb-8"
@@ -85,5 +100,6 @@ export default async function BlogPostPage({ params }: Props) {
         <MarkdownContent content={post.content} />
       </div>
     </div>
+    </>
   )
 }

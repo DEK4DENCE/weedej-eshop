@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { User, Mail, Calendar } from "lucide-react"
 
-export const metadata = { title: "Můj účet — Weedej" }
+export const metadata = { title: "Můj účet — Weedej", robots: { index: false, follow: false } }
 
 export default async function AccountPage() {
   const session = await auth()

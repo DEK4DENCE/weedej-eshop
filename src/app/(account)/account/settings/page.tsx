@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import { AccountSettingsClient } from "@/components/account/AccountSettingsClient"
 
-export const metadata = { title: "Nastavení — Weedej" }
+export const metadata = { title: "Nastavení — Weedej", robots: { index: false, follow: false } }
 
 export default function SettingsPage() {
   return (

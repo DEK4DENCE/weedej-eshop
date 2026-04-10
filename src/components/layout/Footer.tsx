@@ -29,6 +29,7 @@ export function Footer() {
               <li><Link href="/account/orders" className="hover:text-[#2E7D32] transition-colors hover:underline underline-offset-2">Moje objednávky</Link></li>
               <li><Link href="/account/settings" className="hover:text-[#2E7D32] transition-colors hover:underline underline-offset-2">Nastavení účtu</Link></li>
               <li><Link href="/contact" className="hover:text-[#2E7D32] transition-colors hover:underline underline-offset-2">Kontakt</Link></li>
+              <li><Link href="/o-nas" className="hover:text-[#2E7D32] transition-colors hover:underline underline-offset-2">O nás</Link></li>
             </ul>
           </div>
           <div>

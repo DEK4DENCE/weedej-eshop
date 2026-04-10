@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic'
 
+import { cache } from 'react'
 import { notFound } from "next/navigation"
 import { db } from "@/lib/db"
 import { ProductImages } from "@/components/products/ProductImages"
@@ -13,12 +14,16 @@ interface Props {
 
 const BASE_URL = 'https://weedej-cannabis-eshop-dek4dences-projects.vercel.app'
 
+const getProduct = cache((slug: string) =>
+  db.product.findUnique({
+    where: { slug, isActive: true },
+    include: { category: true, variants: { orderBy: { isDefault: 'desc' } } },
+  })
+)
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const product = await db.product.findUnique({
-    where: { slug, isActive: true },
-    include: { category: true },
-  })
+  const product = await getProduct(slug)
   if (!product) return { title: "Produkt nenalezen — Weedej" }
   const description = product.shortDescription ?? product.description.slice(0, 160)
   const image = product.imageUrls[0]
@@ -29,7 +34,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: product.name,
       description,
-      type: 'website',
       locale: 'cs_CZ',
       ...(image ? { images: [{ url: image, width: 800, height: 800, alt: product.name }] } : {}),
     },
@@ -38,13 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProductDetailPage({ params }: Props) {
   const { slug } = await params
-  const raw = await db.product.findUnique({
-    where: { slug, isActive: true },
-    include: {
-      category: true,
-      variants: { orderBy: { isDefault: "desc" } },
-    },
-  })
+  const raw = await getProduct(slug)
 
   if (!raw) notFound()
 
@@ -92,6 +90,7 @@ export default async function ProductDetailPage({ params }: Props) {
           ? 'https://schema.org/InStock'
           : 'https://schema.org/OutOfStock',
         url: `${BASE_URL}/products/${product.slug}`,
+        seller: { '@type': 'Organization', name: 'Weedej' },
       },
     } : {}),
   }
