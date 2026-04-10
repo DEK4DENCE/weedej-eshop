@@ -32,10 +32,13 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold text-[#1d1d1f] mb-4">Právní informace</h4>
+            <h4 className="font-semibold text-[#1d1d1f] mb-4">Informace</h4>
             <ul className="space-y-2 text-sm text-[#6e6e73]">
-              <li><span className="text-xs">Pouze pro osoby 18+. Česká republika.</span></li>
-              <li><span className="text-xs">Všechny produkty splňují požadavky EU práva.</span></li>
+              <li><Link href="/doprava" className="hover:text-[#2E7D32] transition-colors hover:underline underline-offset-2">Doprava a platba</Link></li>
+              <li><Link href="/faq" className="hover:text-[#2E7D32] transition-colors hover:underline underline-offset-2">Časté dotazy (FAQ)</Link></li>
+              <li><Link href="/obchodni-podminky" className="hover:text-[#2E7D32] transition-colors hover:underline underline-offset-2">Obchodní podmínky</Link></li>
+              <li><Link href="/ochrana-osobnich-udaju" className="hover:text-[#2E7D32] transition-colors hover:underline underline-offset-2">Ochrana osobních údajů</Link></li>
+              <li><span className="text-xs text-[#aeaeb2] mt-1 block">Pouze pro osoby 18+. Produkty splňují EU předpisy.</span></li>
             </ul>
           </div>
         </div>

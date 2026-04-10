@@ -50,7 +50,7 @@ export function CheckoutClient() {
         body: JSON.stringify({ items }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || "Checkout failed")
+      if (!res.ok) throw new Error(data.error || "Chyba při zpracování objednávky")
       if (data.url) window.location.href = data.url
     } catch (err: any) {
       setError(err.message)

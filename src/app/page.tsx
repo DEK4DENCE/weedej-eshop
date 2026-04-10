@@ -64,16 +64,10 @@ export default async function HomePage() {
                     Nakupovat
                   </Link>
                   <Link
-                    href="/login"
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-transparent border-2 border-[#2E7D32] text-[#2E7D32] hover:bg-[#2E7D32]/5 font-semibold px-7 py-3 rounded-xl text-sm transition-all duration-200"
-                  >
-                    Přihlásit se
-                  </Link>
-                  <Link
-                    href="/contact"
+                    href="/doprava"
                     className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-transparent border-2 border-[#DEE2E6] text-[#6e6e73] hover:border-[#2E7D32] hover:text-[#2E7D32] font-semibold px-7 py-3 rounded-xl text-sm transition-all duration-200"
                   >
-                    Více o nás
+                    Doprava & platba
                   </Link>
                 </div>
               </div>
@@ -127,6 +121,38 @@ export default async function HomePage() {
                     <div>
                       <p className="font-semibold text-sm text-[#1d1d1f]">{title}</p>
                       <p className="text-xs text-[#6e6e73] mt-0.5">{desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        </FadeIn>
+
+        {/* Testimonials */}
+        <FadeIn delay={0}>
+          <section className="py-12 px-4">
+            <div className="container mx-auto">
+              <div className="text-center mb-8">
+                <p className="text-xs font-semibold uppercase tracking-widest text-[#2E7D32] mb-1">Zákazníci</p>
+                <h2 className="text-3xl font-bold text-[#1d1d1f] font-playfair">Co říkají naši zákazníci</h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {[
+                  { name: "Tomáš K.", rating: 5, text: "Výborná kvalita CBD květů, vůně i efekt jsou přesně takové, jaké jsem očekával. Doručení bylo rychlé a diskrétní. Určitě objednám znovu.", location: "Praha" },
+                  { name: "Markéta V.", rating: 5, text: "Konečně obchod, kde vědí, co prodávají. Poradili mi s výběrem produktu přes email a produkt překonal moje očekávání. Kvalita na špičkové úrovni.", location: "Brno" },
+                  { name: "Petr M.", rating: 5, text: "CBD gumičky pomáhají se spánkem lépe než cokoliv jiného, co jsem zkoušel. Složení je čisté, chuť výborná. Weedej je můj jediný dodavatel.", location: "Ostrava" },
+                ].map(({ name, rating, text, location }) => (
+                  <div key={name} className="bg-white rounded-2xl border border-[#DEE2E6] p-5 shadow-sm">
+                    <div className="flex gap-0.5 mb-3">
+                      {Array.from({ length: rating }).map((_, i) => (
+                        <Star key={i} className="h-4 w-4 fill-[#D4A017] text-[#D4A017]" />
+                      ))}
+                    </div>
+                    <p className="text-sm text-[#1d1d1f] leading-relaxed mb-4">"{text}"</p>
+                    <div>
+                      <p className="text-sm font-semibold text-[#1d1d1f]">{name}</p>
+                      <p className="text-xs text-[#aeaeb2]">{location}</p>
                     </div>
                   </div>
                 ))}

@@ -92,6 +92,12 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
             {product.name}
           </h3>
 
+          {product.shortDescription && (
+            <p className="text-xs text-[#6e6e73] line-clamp-2 leading-relaxed">
+              {product.shortDescription}
+            </p>
+          )}
+
           {/* THC/CBD if present */}
           {(product.thcContent || product.cbdContent) && (
             <div className="flex gap-3 text-xs text-[#6e6e73]">
