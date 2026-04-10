@@ -21,12 +21,12 @@ export function ProductDetailClient({ product }: { product: Product }) {
 
       <h1 className="text-4xl font-bold font-playfair text-[#1d1d1f]">{product.name}</h1>
 
-      {(product.thcContent || product.cbdContent) && (
+      {(product.thcContent !== undefined || product.cbdContent !== undefined) && (
         <div className="flex gap-4 text-sm">
-          {product.thcContent && (
+          {product.thcContent !== undefined && (
             <span className="text-[#2E7D32] font-medium">THC: {product.thcContent}%</span>
           )}
-          {product.cbdContent && (
+          {product.cbdContent !== undefined && product.cbdContent > 0 && (
             <span className="text-[#b8860b] font-medium">CBD: {product.cbdContent}%</span>
           )}
         </div>
