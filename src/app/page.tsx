@@ -56,22 +56,22 @@ export default async function HomePage() {
                 <p className="text-lg text-[#6e6e73] max-w-xl">
                   Objevte naši kurátorsky vybranou kolekci prémiových konopných produktů. Laboratořemi testováno, přírodou inspirováno.
                 </p>
-                <div className="flex gap-3 flex-wrap justify-center">
-                  <Link
-                    href="/login"
-                    className="inline-flex items-center gap-2 bg-transparent border-2 border-[#2E7D32] text-[#2E7D32] hover:bg-[#2E7D32]/5 font-semibold px-7 py-3 rounded-xl text-sm transition-all duration-200"
-                  >
-                    Přihlásit se
-                  </Link>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
                   <Link
                     href="/products"
-                    className="inline-flex items-center gap-2 bg-[#2E7D32] hover:bg-[#1a9020] text-white font-semibold px-7 py-3 rounded-xl text-sm transition-all duration-200 hover:shadow-[0_4px_20px_rgba(34,168,41,0.35)]"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#2E7D32] hover:bg-[#1a9020] text-white font-semibold px-7 py-3 rounded-xl text-sm transition-all duration-200 hover:shadow-[0_4px_20px_rgba(34,168,41,0.35)]"
                   >
                     Nakupovat
                   </Link>
                   <Link
+                    href="/login"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-transparent border-2 border-[#2E7D32] text-[#2E7D32] hover:bg-[#2E7D32]/5 font-semibold px-7 py-3 rounded-xl text-sm transition-all duration-200"
+                  >
+                    Přihlásit se
+                  </Link>
+                  <Link
                     href="/contact"
-                    className="inline-flex items-center gap-2 bg-transparent border-2 border-[#DEE2E6] text-[#6e6e73] hover:border-[#2E7D32] hover:text-[#2E7D32] font-semibold px-7 py-3 rounded-xl text-sm transition-all duration-200"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-transparent border-2 border-[#DEE2E6] text-[#6e6e73] hover:border-[#2E7D32] hover:text-[#2E7D32] font-semibold px-7 py-3 rounded-xl text-sm transition-all duration-200"
                   >
                     Více o nás
                   </Link>
@@ -116,13 +116,13 @@ export default async function HomePage() {
             <div className="container mx-auto px-4">
               <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[#DEE2E6]">
                 {[
-                  { icon: Star, color: "#D4A017", bg: "#FFF9E6", title: "Prémiová kvalita", desc: "Laboratořemi testované, ručně vybrané produkty" },
-                  { icon: Shield, color: "#2E7D32", bg: "#E8F5E9", title: "Bezpečné & legální", desc: "Plně v souladu s EU předpisy" },
-                  { icon: Truck, color: "#2E7D32", bg: "#E8F5E9", title: "Rychlé doručení", desc: "Diskrétní zásilky po celé ČR" },
-                ].map(({ icon: Icon, color, bg, title, desc }) => (
+                  { icon: Star, iconCls: "text-[#D4A017]", bgCls: "bg-[#FFF9E6]", title: "Prémiová kvalita", desc: "Laboratořemi testované, ručně vybrané produkty" },
+                  { icon: Shield, iconCls: "text-[#2E7D32]", bgCls: "bg-[#E8F5E9]", title: "Bezpečné & legální", desc: "Plně v souladu s EU předpisy" },
+                  { icon: Truck, iconCls: "text-[#2E7D32]", bgCls: "bg-[#E8F5E9]", title: "Rychlé doručení", desc: "Diskrétní zásilky po celé ČR" },
+                ].map(({ icon: Icon, iconCls, bgCls, title, desc }) => (
                   <div key={title} className="flex items-center gap-4 px-8 py-5">
-                    <div className="flex-shrink-0 p-2.5 rounded-xl" style={{ background: bg }}>
-                      <Icon className="h-5 w-5" style={{ color }} />
+                    <div className={`flex-shrink-0 p-2.5 rounded-xl ${bgCls}`}>
+                      <Icon className={`h-5 w-5 ${iconCls}`} />
                     </div>
                     <div>
                       <p className="font-semibold text-sm text-[#1d1d1f]">{title}</p>

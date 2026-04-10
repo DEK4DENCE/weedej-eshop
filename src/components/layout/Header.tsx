@@ -108,10 +108,10 @@ export function Header() {
             </DropdownMenu>
           ) : (
             <div className="hidden md:flex items-center gap-1">
-              <Link href="/login" className="text-sm font-medium text-[#6e6e73] hover:text-[#1d1d1f] transition-colors px-3 py-2 rounded-lg hover:bg-[#F8F9FA]">
+              <Link href="/login" className="text-sm font-medium text-[#6e6e73] hover:text-[#1d1d1f] transition-colors px-3 py-2 rounded-xl hover:bg-[#F8F9FA]">
                 Přihlásit se
               </Link>
-              <Link href="/register" className="text-sm font-semibold text-white bg-[#2E7D32] hover:bg-[#1a9020] transition-colors px-3 py-2 rounded-lg">
+              <Link href="/register" className="text-sm font-semibold text-white bg-[#2E7D32] hover:bg-[#1a9020] transition-colors px-3 py-2 rounded-xl">
                 Registrovat se
               </Link>
             </div>

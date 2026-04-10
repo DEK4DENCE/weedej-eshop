@@ -29,7 +29,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
             </span>
           )}
           {product.cbdContent !== undefined && product.cbdContent > 0 && (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#b8860b]/10 border border-[#b8860b]/20 text-[#b8860b] font-medium">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#b8860b]/10 border border-[#b8860b]/20 text-[#8B6914] font-medium">
               CBD: {product.cbdContent}%
             </span>
           )}
@@ -71,7 +71,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
               </span>
             )}
           </div>
-          <div className="text-3xl font-bold text-[#b8860b] font-mono">
+          <div className="text-3xl font-bold text-[#8B6914] font-mono">
             {formatPrice(selectedVariant.price)}
           </div>
           <AddToCartButton
@@ -104,7 +104,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
           <p className="text-sm font-medium text-[#515154] mb-2">Chutě</p>
           <div className="flex flex-wrap gap-2">
             {product.flavours.map((flavour) => (
-              <span key={flavour} className="px-3 py-1 rounded-full text-xs font-medium bg-[#b8860b]/10 border border-[#b8860b]/20 text-[#b8860b]">
+              <span key={flavour} className="px-3 py-1 rounded-full text-xs font-medium bg-[#b8860b]/10 border border-[#b8860b]/20 text-[#8B6914]">
                 {flavour}
               </span>
             ))}

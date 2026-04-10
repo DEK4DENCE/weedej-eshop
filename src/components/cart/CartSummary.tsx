@@ -50,7 +50,7 @@ export default function CartSummary({ totalPrice, itemCount, onCheckout, compact
 
       <div className="flex items-center justify-between py-2.5 border-t border-[#DEE2E6] mt-1">
         <span className="text-base font-bold text-[#1d1d1f]">Celkem</span>
-        <span className="text-lg font-bold text-[#b8860b] font-mono">{total.toLocaleString('cs-CZ')} Kč</span>
+        <span className="text-lg font-bold text-[#8B6914] font-mono">{total.toLocaleString('cs-CZ')} Kč</span>
       </div>
 
       <button

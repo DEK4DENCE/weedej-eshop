@@ -14,21 +14,21 @@ export function Footer() {
           <div>
             <h4 className="font-semibold text-[#1d1d1f] mb-4">Obchod</h4>
             <ul className="space-y-2 text-sm text-[#6e6e73]">
-              <li><Link href="/products" className="hover:text-[#2E7D32] transition-colors">Všechny produkty</Link></li>
-              <li><Link href="/products?category=kvety" className="hover:text-[#2E7D32] transition-colors">Květy</Link></li>
-              <li><Link href="/products?category=extrakty" className="hover:text-[#2E7D32] transition-colors">Extrakty</Link></li>
-              <li><Link href="/products?category=edibles" className="hover:text-[#2E7D32] transition-colors">Edibles</Link></li>
-              <li><Link href="/blog" className="hover:text-[#2E7D32] transition-colors">Blog</Link></li>
+              <li><Link href="/products" className="hover:text-[#2E7D32] transition-colors hover:underline underline-offset-2">Všechny produkty</Link></li>
+              <li><Link href="/products?category=kvety" className="hover:text-[#2E7D32] transition-colors hover:underline underline-offset-2">Květy</Link></li>
+              <li><Link href="/products?category=extrakty" className="hover:text-[#2E7D32] transition-colors hover:underline underline-offset-2">Extrakty</Link></li>
+              <li><Link href="/products?category=edibles" className="hover:text-[#2E7D32] transition-colors hover:underline underline-offset-2">Edibles</Link></li>
+              <li><Link href="/blog" className="hover:text-[#2E7D32] transition-colors hover:underline underline-offset-2">Blog</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-semibold text-[#1d1d1f] mb-4">Účet</h4>
             <ul className="space-y-2 text-sm text-[#6e6e73]">
-              <li><Link href="/login" className="hover:text-[#2E7D32] transition-colors">Přihlásit se</Link></li>
-              <li><Link href="/register" className="hover:text-[#2E7D32] transition-colors">Registrace</Link></li>
-              <li><Link href="/account/orders" className="hover:text-[#2E7D32] transition-colors">Moje objednávky</Link></li>
-              <li><Link href="/account/settings" className="hover:text-[#2E7D32] transition-colors">Nastavení účtu</Link></li>
-              <li><Link href="/contact" className="hover:text-[#2E7D32] transition-colors">Kontakt</Link></li>
+              <li><Link href="/login" className="hover:text-[#2E7D32] transition-colors hover:underline underline-offset-2">Přihlásit se</Link></li>
+              <li><Link href="/register" className="hover:text-[#2E7D32] transition-colors hover:underline underline-offset-2">Registrace</Link></li>
+              <li><Link href="/account/orders" className="hover:text-[#2E7D32] transition-colors hover:underline underline-offset-2">Moje objednávky</Link></li>
+              <li><Link href="/account/settings" className="hover:text-[#2E7D32] transition-colors hover:underline underline-offset-2">Nastavení účtu</Link></li>
+              <li><Link href="/contact" className="hover:text-[#2E7D32] transition-colors hover:underline underline-offset-2">Kontakt</Link></li>
             </ul>
           </div>
           <div>

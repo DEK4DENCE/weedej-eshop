@@ -120,7 +120,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
           )}
 
           <div className="flex items-center justify-between mt-1">
-            <span className="text-xl font-bold text-[#b8860b] font-mono">
+            <span className="text-xl font-bold text-[#8B6914] font-mono">
               {formatPrice(Number(price))}
             </span>
 
