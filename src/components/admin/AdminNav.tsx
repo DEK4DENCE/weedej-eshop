@@ -7,14 +7,14 @@ import { LayoutDashboard, Package, ShoppingCart, Users, Tag, Settings, ArrowLeft
 
 const links = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/products", label: "Products", icon: Package },
-  { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
-  { href: "/admin/users", label: "Users", icon: Users },
-  { href: "/admin/categories", label: "Categories", icon: Tag },
-  { href: "/admin/inventory", label: "Inventory", icon: Warehouse },
+  { href: "/admin/products", label: "Produkty", icon: Package },
+  { href: "/admin/orders", label: "Objednávky", icon: ShoppingCart },
+  { href: "/admin/users", label: "Uživatelé", icon: Users },
+  { href: "/admin/categories", label: "Kategorie", icon: Tag },
+  { href: "/admin/inventory", label: "Sklad", icon: Warehouse },
   { href: "/admin/blog", label: "Blog", icon: BookOpen },
   { href: "/admin/shipping", label: "Doprava", icon: Truck },
-  { href: "/admin/settings", label: "Settings", icon: Settings },
+  { href: "/admin/settings", label: "Nastavení", icon: Settings },
 ]
 
 export function AdminNav() {
@@ -38,7 +38,7 @@ export function AdminNav() {
       ))}
       <div className="mt-4 pt-4 border-t border-border/40">
         <Link href="/" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-          <ArrowLeft className="h-4 w-4" />Back to Shop
+          <ArrowLeft className="h-4 w-4" />Zpět do obchodu
         </Link>
       </div>
     </nav>
