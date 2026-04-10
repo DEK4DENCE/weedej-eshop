@@ -314,7 +314,7 @@ export function ProductForm({ categories, product }: Props) {
             <Button type="submit" disabled={loading} className="bg-green-500 hover:bg-green-600 text-white">
               {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</> : product ? "Update Product" : "Create Product"}
             </Button>
-            <Button type="button" variant="outline" onClick={() => router.push("/admin/products")}>Cancel</Button>
+            <Button type="button" variant="outline" onClick={() => router.push("/admin/products")}>Zrušit</Button>
           </div>
         </form>
 

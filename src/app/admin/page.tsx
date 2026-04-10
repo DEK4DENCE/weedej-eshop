@@ -22,10 +22,10 @@ export default async function AdminDashboard() {
   })
 
   const stats = [
-    { title: "Total Products", value: productCount, icon: Package, color: "text-green-400" },
-    { title: "Total Orders", value: orderCount, icon: ShoppingCart, color: "text-yellow-400" },
-    { title: "Customers", value: userCount, icon: Users, color: "text-blue-400" },
-    { title: "Revenue", value: formatPrice((revenueData._sum.totalAmount ?? 0) / 100), icon: DollarSign, color: "text-purple-400" },
+    { title: "Celkem produktů", value: productCount, icon: Package, color: "text-green-400" },
+    { title: "Celkem objednávek", value: orderCount, icon: ShoppingCart, color: "text-yellow-400" },
+    { title: "Zákazníci", value: userCount, icon: Users, color: "text-blue-400" },
+    { title: "Tržby", value: formatPrice((revenueData._sum.totalAmount ?? 0) / 100), icon: DollarSign, color: "text-purple-400" },
   ]
 
   return (
@@ -45,7 +45,7 @@ export default async function AdminDashboard() {
         ))}
       </div>
       <Card>
-        <CardHeader><CardTitle>Recent Orders</CardTitle></CardHeader>
+        <CardHeader><CardTitle>Nedávné objednávky</CardTitle></CardHeader>
         <CardContent>
           <div className="space-y-3">
             {recentOrders.map((order) => (
