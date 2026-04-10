@@ -6,14 +6,13 @@ import Link from "next/link"
 import Image from "next/image"
 import { CalendarDays, ArrowLeft } from "lucide-react"
 import { MarkdownContent } from "@/components/blog/MarkdownContent"
+import { BASE_URL } from "@/lib/config"
 
 interface Props { params: Promise<{ slug: string }> }
 
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat("cs-CZ", { day: "numeric", month: "long", year: "numeric" }).format(date)
 }
-
-const BASE_URL = 'https://weedej-cannabis-eshop-dek4dences-projects.vercel.app'
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from '@/components/Providers'
+import { BASE_URL } from '@/lib/config'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -29,7 +30,7 @@ const organizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: 'Weedej',
-  url: 'https://weedej-cannabis-eshop-dek4dences-projects.vercel.app',
+  url: BASE_URL,
   description: 'Prémiový e-shop s konopnými produkty. Doručení po celé České republice.',
   areaServed: 'CZ',
   contactPoint: {
@@ -49,8 +50,8 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="alternate" hrefLang="cs" href="https://weedej-cannabis-eshop-dek4dences-projects.vercel.app" />
-        <link rel="alternate" hrefLang="x-default" href="https://weedej-cannabis-eshop-dek4dences-projects.vercel.app" />
+        <link rel="alternate" hrefLang="cs" href={BASE_URL} />
+        <link rel="alternate" hrefLang="x-default" href={BASE_URL} />
         <link
           href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Space+Grotesk:wght@400;500;700&display=swap"
           rel="stylesheet"

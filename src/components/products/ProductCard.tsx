@@ -53,16 +53,19 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
         className="group block bg-white rounded-2xl overflow-hidden border border-[#DEE2E6] hover:border-[#2E7D32] transition-all duration-300 shadow-[0_2px_16px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.14)]"
       >
         {/* Image */}
-        <div
-          className="relative overflow-hidden aspect-square"
-          style={{
-            backgroundImage: `url(${mainImage})`,
-            backgroundRepeat: 'no-repeat',
-            backgroundSize: savedAdj ? `${mainAdj.zoom * 100}%` : 'contain',
-            backgroundPosition: `${mainAdj.x}% ${mainAdj.y}%`,
-            backgroundColor: '#ffffff',
-          }}
-        >
+        <div className="relative overflow-hidden aspect-square bg-white">
+          <Image
+            src={mainImage}
+            alt={product.name}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            className="object-contain"
+            style={{
+              objectPosition: `${mainAdj.x}% ${mainAdj.y}%`,
+              transform: mainAdj.zoom !== 1 ? `scale(${mainAdj.zoom})` : undefined,
+              transformOrigin: `${mainAdj.x}% ${mainAdj.y}%`,
+            }}
+          />
 
           {/* Category badge */}
           {product.category && (

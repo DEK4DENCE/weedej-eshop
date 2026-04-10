@@ -7,12 +7,11 @@ import { ProductImages } from "@/components/products/ProductImages"
 import { ProductDetailClient } from "@/components/products/ProductDetailClient"
 import type { Metadata } from "next"
 import type { Product } from "@/types/product"
+import { BASE_URL } from "@/lib/config"
 
 interface Props {
   params: Promise<{ slug: string }>
 }
-
-const BASE_URL = 'https://weedej-cannabis-eshop-dek4dences-projects.vercel.app'
 
 const getProduct = cache((slug: string) =>
   db.product.findUnique({

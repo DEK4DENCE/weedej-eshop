@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/useToast"
 import { Loader2, Plus, Trash2, Star, MapPin, Mail } from "lucide-react"
 import { useSession } from "next-auth/react"
+import { PasswordChangeForm } from "@/components/account/PasswordChangeForm"
 
 interface Address {
   id: string
@@ -33,12 +34,9 @@ export function AccountSettingsClient() {
   const { data: session, update } = useSession()
   const { toast } = useToast()
   const [nameLoading, setNameLoading] = useState(false)
-  const [pwLoading, setPwLoading] = useState(false)
   const [newsletterLoading, setNewsletterLoading] = useState(false)
   const [name, setName] = useState((session?.user as any)?.name ?? "")
   const [newsletter, setNewsletter] = useState(false)
-  const [currentPassword, setCurrentPassword] = useState("")
-  const [newPassword, setNewPassword] = useState("")
 
   // Address state
   const [addresses, setAddresses] = useState<Address[]>([])
@@ -97,28 +95,6 @@ export function AccountSettingsClient() {
       toast({ title: err.message, variant: "destructive" })
     } finally {
       setNewsletterLoading(false)
-    }
-  }
-
-  const handlePasswordChange = async () => {
-    setPwLoading(true)
-    try {
-      const res = await fetch("/api/account/password", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ currentPassword, newPassword }),
-      })
-      if (!res.ok) {
-        const d = await res.json()
-        throw new Error(d.error || "Failed to change password")
-      }
-      setCurrentPassword("")
-      setNewPassword("")
-      toast({ title: "Heslo bylo úspěšně změněno" })
-    } catch (err: any) {
-      toast({ title: err.message, variant: "destructive" })
-    } finally {
-      setPwLoading(false)
     }
   }
 
@@ -388,34 +364,7 @@ export function AccountSettingsClient() {
       </Card>
 
       {/* Change Password */}
-      <Card>
-        <CardHeader><CardTitle>Změna hesla</CardTitle></CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="current">Současné heslo</Label>
-            <Input
-              id="current"
-              type="password"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              className={inputClass}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="new">Nové heslo</Label>
-            <Input
-              id="new"
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              className={inputClass}
-            />
-          </div>
-          <Button onClick={handlePasswordChange} disabled={pwLoading}>
-            {pwLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Změna hesla...</> : "Změnit heslo"}
-          </Button>
-        </CardContent>
-      </Card>
+      <PasswordChangeForm />
     </div>
   )
 }

@@ -2,8 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import { MetadataRoute } from 'next'
 import { db } from '@/lib/db'
-
-const BASE_URL = 'https://weedej-cannabis-eshop-dek4dences-projects.vercel.app'
+import { BASE_URL } from '@/lib/config'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [products, blogPosts] = await Promise.all([

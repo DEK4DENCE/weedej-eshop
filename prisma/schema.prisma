@@ -184,6 +184,7 @@ model Product {
   @@index([slug])
   @@index([categoryId])
   @@index([isActive])
+  @@index([isActive, isFeatured])
 }
 
 model ProductVariant {
@@ -268,6 +269,8 @@ model Order {
   @@index([userId])
   @@index([status])
   @@index([stripeSessionId])
+  @@index([createdAt(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
 }
 
 model Setting {

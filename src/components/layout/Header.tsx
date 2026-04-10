@@ -20,6 +20,7 @@ const navLinks = [
   { href: "/products?category=kvety", label: "Květy" },
   { href: "/products?category=extrakty", label: "Extrakty" },
   { href: "/products?category=edibles", label: "Edibles" },
+  { href: "/doprava", label: "Doprava" },
   { href: "/contact", label: "Kontakt" },
   { href: "/blog", label: "Blog" },
 ]
@@ -35,6 +36,7 @@ export function Header() {
     if (href === "/products") return pathname.startsWith("/products")
     if (href === "/blog") return pathname.startsWith("/blog")
     if (href === "/contact") return pathname === "/contact"
+    if (href === "/doprava") return pathname === "/doprava"
     return pathname === href
   }
 
