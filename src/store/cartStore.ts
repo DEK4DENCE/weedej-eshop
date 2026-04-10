@@ -1,5 +1,8 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import type { CartItem as ServerCartItem } from '@/types/cart'
+
+export type { ServerCartItem }
 
 export interface GuestCartItem {
   id: string
@@ -14,7 +17,7 @@ export interface GuestCartItem {
 
 interface CartState {
   items: GuestCartItem[]
-  serverItems: any[]          // shared DB cart items across all useCart() instances
+  serverItems: ServerCartItem[]  // shared DB cart items across all useCart() instances
   sidebarOpen: boolean
   addItem: (item: Omit<GuestCartItem, 'quantity'> & { quantity?: number }) => void
   updateQty: (variantId: string, quantity: number) => void
@@ -25,7 +28,7 @@ interface CartState {
   toggleSidebar: () => void
   closeSidebar: () => void
   openSidebar: () => void
-  setServerItems: (items: any[]) => void
+  setServerItems: (items: ServerCartItem[]) => void
 }
 
 export const useCartStore = create<CartState>()(
@@ -35,7 +38,7 @@ export const useCartStore = create<CartState>()(
       serverItems: [],
       sidebarOpen: false,
 
-      setServerItems: (items: any[]) => set({ serverItems: items }),
+      setServerItems: (items: ServerCartItem[]) => set({ serverItems: items }),
       toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
       closeSidebar: () => set({ sidebarOpen: false }),
       openSidebar: () => set({ sidebarOpen: true }),

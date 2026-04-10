@@ -153,6 +153,33 @@ export default async function HomePage() {
           </section>
         </FadeIn>
 
+        {/* How it works */}
+        <FadeIn delay={0}>
+          <section className="py-12 px-4 bg-white">
+            <div className="container mx-auto max-w-4xl">
+              <div className="text-center mb-8">
+                <p className="text-xs font-semibold uppercase tracking-widest text-[#2E7D32] mb-1">Jednoduchý proces</p>
+                <h2 className="text-3xl font-bold text-[#1d1d1f] font-playfair">Jak to funguje</h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[
+                  { step: "1", title: "Vyberte produkt", desc: "Projděte náš katalog a vyberte produkt, který vám vyhovuje. Každý popis obsahuje obsah CBD/THC a laboratorní výsledky." },
+                  { step: "2", title: "Objednejte bezpečně", desc: "Přidejte do košíku, zvolte dopravu a plaťte kartou nebo převodem. Celý proces je šifrovaný a bezpečný." },
+                  { step: "3", title: "Doručení ke dveřím", desc: "Balíček dorazí v diskrétním obalu do 1–3 pracovních dnů kamkoliv po ČR." },
+                ].map(({ step, title, desc }) => (
+                  <div key={step} className="flex flex-col items-center text-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-[#2E7D32] text-white font-bold text-lg flex items-center justify-center shadow-md">
+                      {step}
+                    </div>
+                    <h3 className="font-semibold text-[#1d1d1f]">{title}</h3>
+                    <p className="text-sm text-[#6e6e73] leading-relaxed">{desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        </FadeIn>
+
         {/* Testimonials */}
         <FadeIn delay={0}>
           <section className="py-12 px-4">
@@ -173,6 +200,12 @@ export default async function HomePage() {
                         <Star key={i} className="h-4 w-4 fill-[#D4A017] text-[#D4A017]" />
                       ))}
                     </div>
+                    <span className="inline-flex items-center gap-1 text-xs text-[#2E7D32] font-medium bg-[#E8F5E9] px-2 py-0.5 rounded-full mb-3">
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                      </svg>
+                      Ověřený nákup
+                    </span>
                     <p className="text-sm text-[#1d1d1f] leading-relaxed mb-4">"{text}"</p>
                     <div>
                       <p className="text-sm font-semibold text-[#1d1d1f]">{name}</p>

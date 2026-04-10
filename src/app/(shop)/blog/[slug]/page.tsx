@@ -6,6 +6,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { CalendarDays, ArrowLeft } from "lucide-react"
 import { MarkdownContent } from "@/components/blog/MarkdownContent"
+import { ShareButton } from "@/components/blog/ShareButton"
 import { BASE_URL } from "@/lib/config"
 
 interface Props { params: Promise<{ slug: string }> }
@@ -108,6 +109,10 @@ export default async function BlogPostPage({ params }: Props) {
 
       <div className="max-w-none">
         <MarkdownContent content={post.content} />
+      </div>
+
+      <div className="mt-8 pt-6 border-t border-[#DEE2E6]">
+        <ShareButton title={post.title} url={`${BASE_URL}/blog/${slug}`} />
       </div>
     </div>
     </>

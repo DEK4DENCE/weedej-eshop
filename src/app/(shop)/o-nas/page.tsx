@@ -23,6 +23,20 @@ export default function ONasPage() {
         Weedej vznikl z vášně pro legální konopnou kulturu a přesvědčení, že prémiové produkty musí být dostupné každému.
       </p>
 
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-4 mb-10">
+        {[
+          { value: "500+", label: "Spokojených zákazníků" },
+          { value: "50+", label: "Prémiových produktů" },
+          { value: "2022", label: "Rok založení" },
+        ].map(({ value, label }) => (
+          <div key={label} className="text-center p-4 rounded-xl bg-[#F8F9FA] border border-[#DEE2E6]">
+            <p className="text-2xl font-bold text-[#2E7D32] font-playfair">{value}</p>
+            <p className="text-xs text-[#6e6e73] mt-1">{label}</p>
+          </div>
+        ))}
+      </div>
+
       <div className="prose prose-sm max-w-none text-[#1d1d1f] space-y-8">
         <section>
           <h2 className="text-xl font-semibold text-[#1d1d1f] mb-3">Kdo jsme</h2>
@@ -31,6 +45,24 @@ export default function ONasPage() {
             nabízet výhradně produkty, které bychom sami rádi používali — laboratořemi testované, legální a skutečně prémiové.
             Každý produkt v našem katalogu prochází pečlivým výběrem a splňuje přísné standardy kvality.
           </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold text-[#1d1d1f] mb-4">Náš příběh</h2>
+          <div className="relative border-l-2 border-[#DEE2E6] ml-3 space-y-6">
+            {[
+              { year: "2022", title: "Začátek", desc: "Weedej vznikl v Děčíně jako malý online obchod s jasnou vizí — nabízet pouze produkty, které sami věříme a používáme." },
+              { year: "2023", title: "Rozšíření nabídky", desc: "Přidali jsme extrakty a edibles. Zavedli jsme přísný výběrový proces a každý produkt testujeme v akreditované laboratoři." },
+              { year: "2024", title: "Vlastní e-shop", desc: "Spustili jsme nový e-shop s plnou podporou online plateb, sledováním zásilek a věrnostním programem pro stálé zákazníky." },
+            ].map(({ year, title, desc }) => (
+              <div key={year} className="pl-6 relative">
+                <div className="absolute -left-[9px] top-0.5 w-4 h-4 rounded-full bg-[#2E7D32] border-2 border-white shadow" />
+                <p className="text-xs font-bold text-[#2E7D32] uppercase tracking-wider">{year}</p>
+                <p className="font-semibold text-[#1d1d1f] mt-0.5">{title}</p>
+                <p className="text-sm text-[#6e6e73] mt-1">{desc}</p>
+              </div>
+            ))}
+          </div>
         </section>
 
         <section>

@@ -39,7 +39,13 @@ export default auth((req) => {
     return NextResponse.redirect(loginUrl)
   }
 
-  return NextResponse.next()
+  // Security headers on all matched routes
+  const res = NextResponse.next()
+  res.headers.set('X-Frame-Options', 'DENY')
+  res.headers.set('X-Content-Type-Options', 'nosniff')
+  res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+  res.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+  return res
 })
 
 export const config = {

@@ -105,16 +105,25 @@ export default async function ProductsPage({ searchParams }: Props) {
       <h1 className="text-3xl font-bold mb-6 font-playfair text-[#1d1d1f]">Produkty</h1>
       <div className="flex flex-col md:flex-row gap-8">
         <aside className="w-full md:w-64 shrink-0">
-          <Suspense>
+          <Suspense fallback={
+            <div className="space-y-3">
+              {Array.from({length: 5}).map((_, i) => (
+                <Skeleton key={i} className="h-8 w-full rounded-lg" />
+              ))}
+            </div>
+          }>
             <ProductFilters />
           </Suspense>
         </aside>
         <div className="flex-1">
           <div className="mb-4">
-            <Suspense>
+            <Suspense fallback={<Skeleton className="h-10 w-full rounded-xl" />}>
               <ProductSearch />
             </Suspense>
           </div>
+          <p className="text-sm text-[#6e6e73] mb-3">
+            Nalezeno <span className="font-semibold text-[#1d1d1f]">{products.length}</span> produktů
+          </p>
           <ProductGrid products={products} />
         </div>
       </div>
