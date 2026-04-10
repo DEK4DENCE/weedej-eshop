@@ -124,14 +124,15 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
               {formatPrice(Number(price))}
             </span>
 
-            <button
+            <motion.button
+              whileTap={{ scale: 0.85 }}
               onClick={handleAddToCart}
               disabled={isOutOfStock || added}
               aria-label={`Přidat ${product.name} do košíku`}
               className="w-9 h-9 rounded-full bg-[#2E7D32] hover:bg-[#1a9020] flex items-center justify-center text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-green-sm"
             >
               {added ? <Check size={18} strokeWidth={2.5} /> : <Plus size={18} strokeWidth={2.5} />}
-            </button>
+            </motion.button>
           </div>
         </div>
       </Link>

@@ -59,7 +59,7 @@ export default async function HomePage() {
                 <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
                   <Link
                     href="/products"
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#2E7D32] hover:bg-[#1a9020] text-white font-semibold px-7 py-3 rounded-xl text-sm transition-all duration-200 hover:shadow-[0_4px_20px_rgba(34,168,41,0.35)]"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#2E7D32] hover:bg-[#1a9020] text-white font-semibold px-7 py-3 rounded-xl text-sm transition-all duration-200 hover:shadow-[0_4px_20px_rgba(34,168,41,0.35)] active:scale-[0.97]"
                   >
                     Nakupovat
                   </Link>

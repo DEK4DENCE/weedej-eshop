@@ -74,11 +74,20 @@ export function Header() {
           >
             <ShoppingBag className="h-5 w-5" />
             <span className="hidden md:inline text-sm font-medium">Košík</span>
-            {totalItems > 0 && (
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#2E7D32] text-xs text-white font-bold">
-                {totalItems}
-              </span>
-            )}
+            <AnimatePresence mode="popLayout">
+              {totalItems > 0 && (
+                <motion.span
+                  key={totalItems}
+                  initial={{ scale: 0.4, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.4, opacity: 0 }}
+                  transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                  className="flex h-5 w-5 items-center justify-center rounded-full bg-[#2E7D32] text-xs text-white font-bold"
+                >
+                  {totalItems}
+                </motion.span>
+              )}
+            </AnimatePresence>
           </button>
 
           {session ? (

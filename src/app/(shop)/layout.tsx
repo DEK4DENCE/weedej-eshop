@@ -2,6 +2,7 @@ import { Header } from "@/components/layout/Header"
 import { Footer } from "@/components/layout/Footer"
 import { CartSidebarWrapper } from "@/components/layout/CartSidebarWrapper"
 import { Toaster } from "@/components/ui/toaster"
+import { ScrollToTop } from "@/components/ui/ScrollToTop"
 
 export default function ShopLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -11,6 +12,7 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
       <Footer />
       <CartSidebarWrapper />
       <Toaster />
+      <ScrollToTop />
     </div>
   )
 }

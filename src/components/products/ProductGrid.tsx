@@ -44,6 +44,7 @@ export function ProductGrid({ products, onAddToCart, emptyMessage }: ProductGrid
 
   return (
     <motion.div
+      key={products.map((p) => p.id).join(',')}
       variants={containerVariants}
       initial="hidden"
       animate="visible"

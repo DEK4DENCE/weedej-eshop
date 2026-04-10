@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
-import { SlidersHorizontal, RotateCcw } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { SlidersHorizontal, RotateCcw, ChevronDown } from 'lucide-react'
 import type { Category, StrainType } from '@/types/product'
 
 const STRAIN_TYPES: { value: StrainType; label: string }[] = [
@@ -17,6 +18,7 @@ export function ProductFilters() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
+  const [mobileOpen, setMobileOpen] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
     searchParams.getAll('category')
@@ -78,14 +80,37 @@ export function ProductFilters() {
   const hasActiveFilters =
     selectedCategories.length > 0 || selectedStrains.length > 0 || minPrice || maxPrice || inStock
 
+  const activeCount =
+    selectedCategories.length +
+    selectedStrains.length +
+    (minPrice ? 1 : 0) +
+    (maxPrice ? 1 : 0) +
+    (inStock ? 1 : 0)
+
   return (
-    <aside className="flex flex-col gap-6 w-full">
-      {/* Header */}
+    <aside className="flex flex-col gap-4 w-full">
+      {/* Header — tappable on mobile to toggle */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-[#1d1d1f] font-semibold">
+        <button
+          className="flex items-center gap-2 text-[#1d1d1f] font-semibold md:pointer-events-none"
+          onClick={() => setMobileOpen((o) => !o)}
+          aria-expanded={mobileOpen}
+        >
           <SlidersHorizontal size={16} className="text-[#2E7D32]" />
           Filtry
-        </div>
+          {hasActiveFilters && (
+            <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-[#2E7D32] text-white text-[9px] font-bold">
+              {activeCount}
+            </span>
+          )}
+          <motion.span
+            animate={{ rotate: mobileOpen ? 180 : 0 }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden"
+          >
+            <ChevronDown size={16} className="text-[#6e6e73]" />
+          </motion.span>
+        </button>
         {hasActiveFilters && (
           <button
             onClick={resetFilters}
@@ -97,93 +122,102 @@ export function ProductFilters() {
         )}
       </div>
 
-      {/* Category */}
-      {categories.length > 0 && (
+      {/* Filter body — collapses on mobile, always visible on md+ */}
+      <div
+        className={[
+          'flex flex-col gap-5 overflow-hidden transition-all duration-300 ease-in-out',
+          mobileOpen ? 'max-h-[700px] opacity-100' : 'max-h-0 opacity-0 md:max-h-[700px] md:opacity-100',
+        ].join(' ')}
+      >
+
+        {/* Category */}
+        {categories.length > 0 && (
+          <div>
+            <p className="text-sm font-medium text-[#515154] mb-3">Kategorie</p>
+            <div className="flex flex-col gap-2">
+              {categories.map((cat) => (
+                <label key={cat.id} className="flex items-center gap-2.5 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={selectedCategories.includes(cat.slug)}
+                    onChange={() => toggleCategory(cat.slug)}
+                    className="w-4 h-4 rounded border border-[#DEE2E6] accent-[#2E7D32] cursor-pointer"
+                  />
+                  <span className="text-sm text-[#6e6e73] group-hover:text-[#1d1d1f] transition-colors">
+                    {cat.name}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Price Range */}
         <div>
-          <p className="text-sm font-medium text-[#515154] mb-3">Kategorie</p>
-          <div className="flex flex-col gap-2">
-            {categories.map((cat) => (
-              <label key={cat.id} className="flex items-center gap-2.5 cursor-pointer group">
-                <input
-                  type="checkbox"
-                  checked={selectedCategories.includes(cat.slug)}
-                  onChange={() => toggleCategory(cat.slug)}
-                  className="w-4 h-4 rounded border border-[#DEE2E6] accent-[#2E7D32] cursor-pointer"
-                />
-                <span className="text-sm text-[#6e6e73] group-hover:text-[#1d1d1f] transition-colors">
-                  {cat.name}
-                </span>
-              </label>
+          <p className="text-sm font-medium text-[#515154] mb-3">Cenové rozmezí</p>
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              value={minPrice}
+              onChange={(e) => setMinPrice(e.target.value)}
+              placeholder="Min Kč"
+              min={0}
+              className="w-full bg-[#fafafa] border border-[#DEE2E6] rounded-xl px-3 py-2 text-sm text-[#1d1d1f] placeholder:text-[#aeaeb2] focus:outline-none focus:border-[#2E7D32] focus:ring-1 focus:ring-[#2E7D32]/30"
+            />
+            <span className="text-[#aeaeb2] text-sm flex-shrink-0">—</span>
+            <input
+              type="number"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(e.target.value)}
+              placeholder="Max Kč"
+              min={0}
+              className="w-full bg-[#fafafa] border border-[#DEE2E6] rounded-xl px-3 py-2 text-sm text-[#1d1d1f] placeholder:text-[#aeaeb2] focus:outline-none focus:border-[#2E7D32] focus:ring-1 focus:ring-[#2E7D32]/30"
+            />
+          </div>
+        </div>
+
+        {/* In Stock */}
+        <label className="flex items-center gap-2.5 cursor-pointer group">
+          <input
+            type="checkbox"
+            checked={inStock}
+            onChange={(e) => setInStock(e.target.checked)}
+            className="w-4 h-4 rounded border border-[#DEE2E6] accent-[#2E7D32] cursor-pointer"
+          />
+          <span className="text-sm text-[#6e6e73] group-hover:text-[#1d1d1f] transition-colors">
+            Pouze skladem
+          </span>
+        </label>
+
+        {/* Strain Type */}
+        <div>
+          <p className="text-sm font-medium text-[#515154] mb-3">Typ odrůdy</p>
+          <div className="flex flex-wrap gap-2">
+            {STRAIN_TYPES.map(({ value, label }) => (
+              <button
+                key={value}
+                onClick={() => toggleStrain(value)}
+                className={[
+                  'px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200',
+                  selectedStrains.includes(value)
+                    ? 'bg-[#2E7D32]/10 border-[#2E7D32] text-[#2E7D32]'
+                    : 'bg-[#fafafa] border-[#DEE2E6] text-[#6e6e73] hover:border-[#2E7D32]/50 hover:text-[#1d1d1f]',
+                ].join(' ')}
+              >
+                {label}
+              </button>
             ))}
           </div>
         </div>
-      )}
 
-      {/* Price Range */}
-      <div>
-        <p className="text-sm font-medium text-[#515154] mb-3">Cenové rozmezí</p>
-        <div className="flex items-center gap-2">
-          <input
-            type="number"
-            value={minPrice}
-            onChange={(e) => setMinPrice(e.target.value)}
-            placeholder="Min Kč"
-            min={0}
-            className="w-full bg-[#fafafa] border border-[#DEE2E6] rounded-xl px-3 py-2 text-sm text-[#1d1d1f] placeholder:text-[#aeaeb2] focus:outline-none focus:border-[#2E7D32] focus:ring-1 focus:ring-[#2E7D32]/30"
-          />
-          <span className="text-[#aeaeb2] text-sm flex-shrink-0">—</span>
-          <input
-            type="number"
-            value={maxPrice}
-            onChange={(e) => setMaxPrice(e.target.value)}
-            placeholder="Max Kč"
-            min={0}
-            className="w-full bg-[#fafafa] border border-[#DEE2E6] rounded-xl px-3 py-2 text-sm text-[#1d1d1f] placeholder:text-[#aeaeb2] focus:outline-none focus:border-[#2E7D32] focus:ring-1 focus:ring-[#2E7D32]/30"
-          />
-        </div>
+        {/* Apply */}
+        <button
+          onClick={() => { applyFilters(); setMobileOpen(false) }}
+          className="w-full bg-[#2E7D32] hover:bg-[#1a9020] text-white font-semibold py-2.5 rounded-xl text-sm transition-all duration-200 hover:shadow-[0_4px_16px_rgba(34,168,41,0.3)]"
+        >
+          Použít filtry
+        </button>
       </div>
-
-      {/* In Stock */}
-      <label className="flex items-center gap-2.5 cursor-pointer group">
-        <input
-          type="checkbox"
-          checked={inStock}
-          onChange={(e) => setInStock(e.target.checked)}
-          className="w-4 h-4 rounded border border-[#DEE2E6] accent-[#2E7D32] cursor-pointer"
-        />
-        <span className="text-sm text-[#6e6e73] group-hover:text-[#1d1d1f] transition-colors">
-          Pouze skladem
-        </span>
-      </label>
-
-      {/* Strain Type */}
-      <div>
-        <p className="text-sm font-medium text-[#515154] mb-3">Typ odrůdy</p>
-        <div className="flex flex-wrap gap-2">
-          {STRAIN_TYPES.map(({ value, label }) => (
-            <button
-              key={value}
-              onClick={() => toggleStrain(value)}
-              className={[
-                'px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200',
-                selectedStrains.includes(value)
-                  ? 'bg-[#2E7D32]/10 border-[#2E7D32] text-[#2E7D32]'
-                  : 'bg-[#fafafa] border-[#DEE2E6] text-[#6e6e73] hover:border-[#2E7D32]/50 hover:text-[#1d1d1f]',
-              ].join(' ')}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Apply */}
-      <button
-        onClick={applyFilters}
-        className="w-full bg-[#2E7D32] hover:bg-[#1a9020] text-white font-semibold py-2.5 rounded-xl text-sm transition-all duration-200 hover:shadow-[0_4px_16px_rgba(34,168,41,0.3)]"
-      >
-        Použít filtry
-      </button>
     </aside>
   )
 }
