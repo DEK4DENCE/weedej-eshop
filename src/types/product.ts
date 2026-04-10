@@ -13,6 +13,8 @@ export interface Product {
   thcContent?: number
   cbdContent?: number
   strainType?: 'INDICA' | 'SATIVA' | 'HYBRID' | 'CBD'
+  sativaPercent?: number
+  indicaPercent?: number
   effects: string[]
   flavours: string[]
   terpenes: string[]

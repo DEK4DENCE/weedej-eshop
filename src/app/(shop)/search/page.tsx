@@ -44,6 +44,8 @@ export default async function SearchPage({ searchParams }: Props) {
     updatedAt: p.updatedAt.toISOString(),
     shortDescription: p.shortDescription ?? undefined,
     strainType: p.strainType ?? undefined,
+    sativaPercent: p.sativaPercent !== null ? p.sativaPercent : undefined,
+    indicaPercent: p.indicaPercent !== null ? p.indicaPercent : undefined,
     variants: p.variants.map((v) => ({
       ...v,
       price: Number(v.price),

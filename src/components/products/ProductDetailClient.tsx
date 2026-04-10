@@ -22,12 +22,23 @@ export function ProductDetailClient({ product }: { product: Product }) {
       <h1 className="text-4xl font-bold font-playfair text-[#1d1d1f]">{product.name}</h1>
 
       {(product.thcContent !== undefined || product.cbdContent !== undefined) && (
-        <div className="flex gap-4 text-sm">
+        <div className="flex flex-wrap gap-3 text-sm">
           {product.thcContent !== undefined && (
-            <span className="text-[#2E7D32] font-medium">THC: {product.thcContent}%</span>
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#2E7D32]/10 border border-[#2E7D32]/20 text-[#2E7D32] font-medium">
+              THC: {product.thcContent}%
+            </span>
           )}
           {product.cbdContent !== undefined && product.cbdContent > 0 && (
-            <span className="text-[#b8860b] font-medium">CBD: {product.cbdContent}%</span>
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#b8860b]/10 border border-[#b8860b]/20 text-[#b8860b] font-medium">
+              CBD: {product.cbdContent}%
+            </span>
+          )}
+          {product.sativaPercent != null && product.indicaPercent != null && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#F8F9FA] border border-[#DEE2E6] text-xs font-medium text-[#515154]">
+              <span className="text-green-600">Sativa {product.sativaPercent}%</span>
+              <span className="text-[#DEE2E6]">/</span>
+              <span className="text-purple-600">Indica {product.indicaPercent}%</span>
+            </span>
           )}
         </div>
       )}

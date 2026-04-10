@@ -167,6 +167,8 @@ model Product {
   thcContent       Decimal?    @db.Decimal(5, 2)
   cbdContent       Decimal?    @db.Decimal(5, 2)
   strainType       StrainType?
+  sativaPercent    Int?
+  indicaPercent    Int?
   effects            String[]
   flavours           String[]
   terpenes           String[]

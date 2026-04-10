@@ -82,6 +82,8 @@ async function fetchProducts(params: Awaited<Props["searchParams"]>): Promise<Pr
     },
     shortDescription: p.shortDescription ?? undefined,
     strainType: p.strainType ?? undefined,
+    sativaPercent: p.sativaPercent !== null ? p.sativaPercent : undefined,
+    indicaPercent: p.indicaPercent !== null ? p.indicaPercent : undefined,
   })) as Product[]
 }
 

@@ -57,6 +57,8 @@ export default async function ProductDetailPage({ params }: Props) {
     updatedAt: raw.updatedAt.toISOString(),
     shortDescription: raw.shortDescription ?? undefined,
     strainType: raw.strainType ?? undefined,
+    sativaPercent: raw.sativaPercent ?? undefined,
+    indicaPercent: raw.indicaPercent ?? undefined,
     variants: raw.variants.map((v) => ({
       ...v,
       price: Number(v.price),

@@ -26,7 +26,15 @@ interface Variant {
 interface Product {
   id: string; name: string; slug: string; description: string | null
   categoryId: string | null; thcContent: number | null; cbdContent: number | null
+  sativaPercent?: number | null; indicaPercent?: number | null
   isActive: boolean; variants: Variant[]; imageUrls?: string[]; imageAdjustments?: string | null
+}
+
+function calcStrainType(sativa: number, indica: number, cbd: number): string {
+  if (cbd > 1) return 'CBD'
+  const minority = Math.min(sativa, indica)
+  if (minority > 20) return 'HYBRID'
+  return sativa >= indica ? 'SATIVA' : 'INDICA'
 }
 
 interface Props {
@@ -44,6 +52,24 @@ export function ProductForm({ categories, product }: Props) {
   const [categoryId, setCategoryId] = useState(product?.categoryId ?? "")
   const [thcContent, setThcContent] = useState(String(product?.thcContent ?? ""))
   const [cbdContent, setCbdContent] = useState(String(product?.cbdContent ?? ""))
+  const [sativaPercent, setSativaPercent] = useState(product?.sativaPercent != null ? String(product.sativaPercent) : "")
+  const [indicaPercent, setIndicaPercent] = useState(product?.indicaPercent != null ? String(product.indicaPercent) : "")
+
+  const autoStrainType = sativaPercent !== "" && indicaPercent !== ""
+    ? calcStrainType(Number(sativaPercent), Number(indicaPercent), Number(cbdContent) || 0)
+    : null
+
+  function handleSativaChange(val: string) {
+    setSativaPercent(val)
+    const s = Number(val)
+    if (!isNaN(s) && s >= 0 && s <= 100) setIndicaPercent(String(100 - s))
+  }
+
+  function handleIndicaChange(val: string) {
+    setIndicaPercent(val)
+    const i = Number(val)
+    if (!isNaN(i) && i >= 0 && i <= 100) setSativaPercent(String(100 - i))
+  }
   const [variants, setVariants] = useState<Variant[]>(
     product?.variants?.map((v) => ({ ...v, isDefault: v.isDefault ?? false, isActive: v.isActive ?? true })) ?? []
   )
@@ -71,6 +97,9 @@ export function ProductForm({ categories, product }: Props) {
         categoryId: categoryId || null,
         thcContent: thcContent ? Number(thcContent) : null,
         cbdContent: cbdContent ? Number(cbdContent) : null,
+        sativaPercent: sativaPercent !== "" ? Number(sativaPercent) : null,
+        indicaPercent: indicaPercent !== "" ? Number(indicaPercent) : null,
+        strainType: autoStrainType ?? undefined,
         variants: variants.map((v) => ({
           id: v.id,
           name: v.name,
@@ -127,13 +156,67 @@ export function ProductForm({ categories, product }: Props) {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="thc">THC % (optional)</Label>
-              <Input id="thc" type="number" step="0.1" value={thcContent} onChange={(e) => setThcContent(e.target.value)} />
+              <Label htmlFor="thc">THC % (nepovinné)</Label>
+              <Input id="thc" type="number" step="0.01" min="0" max="100" value={thcContent} onChange={(e) => setThcContent(e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="cbd">CBD % (optional)</Label>
-              <Input id="cbd" type="number" step="0.1" value={cbdContent} onChange={(e) => setCbdContent(e.target.value)} />
+              <Label htmlFor="cbd">CBD % (nepovinné)</Label>
+              <Input id="cbd" type="number" step="0.01" min="0" max="100" value={cbdContent} onChange={(e) => setCbdContent(e.target.value)} />
             </div>
+          </div>
+
+          {/* Sativa / Indica ratio */}
+          <div className="border border-[#DEE2E6] rounded-2xl p-4 bg-[#F8F9FA] space-y-3">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-semibold text-[#1d1d1f]">Poměr Sativa / Indica</Label>
+              {autoStrainType && (
+                <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+                  autoStrainType === 'SATIVA' ? 'bg-green-100 text-green-700' :
+                  autoStrainType === 'INDICA' ? 'bg-purple-100 text-purple-700' :
+                  autoStrainType === 'HYBRID' ? 'bg-orange-100 text-orange-700' :
+                  'bg-blue-100 text-blue-700'
+                }`}>
+                  → {autoStrainType}
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-[#6e6e73]">
+              Sativa + Indica musí dávat 100 %. Při změně jedné hodnoty se druhá doplní automaticky.
+              Pravidlo: &gt;80% jedné složky = čistá odrůda, 21–79 % = Hybrid, CBD &gt;1 % = CBD kategorie.
+            </p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="sativa" className="text-sm text-green-700 font-medium">Sativa %</Label>
+                <Input
+                  id="sativa"
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="1"
+                  value={sativaPercent}
+                  onChange={(e) => handleSativaChange(e.target.value)}
+                  placeholder="např. 80"
+                  className="border-green-200 focus:border-green-400"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="indica" className="text-sm text-purple-700 font-medium">Indica %</Label>
+                <Input
+                  id="indica"
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="1"
+                  value={indicaPercent}
+                  onChange={(e) => handleIndicaChange(e.target.value)}
+                  placeholder="např. 20"
+                  className="border-purple-200 focus:border-purple-400"
+                />
+              </div>
+            </div>
+            {sativaPercent !== "" && indicaPercent !== "" && Number(sativaPercent) + Number(indicaPercent) !== 100 && (
+              <p className="text-xs text-red-500">⚠ Součet musí být 100 % (aktuálně {Number(sativaPercent) + Number(indicaPercent)} %)</p>
+            )}
           </div>
 
           {/* Variants section */}
