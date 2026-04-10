@@ -13,14 +13,17 @@ export async function POST(req: NextRequest) {
 
     if (!items?.length) return NextResponse.json({ error: "Cart is empty" }, { status: 400 })
 
-    // Stock validation
+    // Stock validation — batch fetch all variants in one query
+    const variantIds = items.map((i: any) => i.variantId ?? i.variant?.id).filter(Boolean)
+    const variants = await db.productVariant.findMany({ where: { id: { in: variantIds } } })
+    const variantMap = new Map(variants.map((v) => [v.id, v]))
     for (const item of items) {
       const variantId = item.variantId ?? item.variant?.id
       if (!variantId) continue
-      const variant = await db.productVariant.findUnique({ where: { id: variantId } })
+      const variant = variantMap.get(variantId)
       if (!variant || variant.stock < item.quantity) {
         return NextResponse.json(
-          { error: `${item.productName ?? item.product?.name ?? 'Product'} is out of stock or insufficient quantity` },
+          { error: `${item.productName ?? item.product?.name ?? 'Produkt'} není skladem nebo nemá dostatečný počet kusů` },
           { status: 400 }
         )
       }
@@ -117,7 +120,7 @@ export async function POST(req: NextRequest) {
               shipping_rate_data: {
                 type: "fixed_amount",
                 fixed_amount: { amount: shippingCents, currency: "czk" },
-                display_name: "Standard Delivery (3–5 business days)",
+                display_name: "Standardní doručení (3–5 pracovních dní)",
               },
             }],
           }

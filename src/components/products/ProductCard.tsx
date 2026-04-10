@@ -71,12 +71,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
             </span>
           )}
 
-          {/* Stock status badge */}
-          {isOutOfStock && (
-            <span className="absolute top-3 right-3 text-xs font-medium px-2.5 py-1 rounded-full bg-red-100 text-red-600">
-              Není skladem
-            </span>
-          )}
+          {/* Low stock / out of stock overlay badge */}
           {isLowStock && !isOutOfStock && (
             <span className="absolute top-3 right-3 text-xs font-medium px-2.5 py-1 rounded-full bg-amber-100 text-amber-700">
               Poslední kusy

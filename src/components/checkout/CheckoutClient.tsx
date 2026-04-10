@@ -63,8 +63,8 @@ export function CheckoutClient() {
     return (
       <div className="text-center py-16">
         <ShoppingBag className="h-12 w-12 text-[#6B8A6B] mx-auto mb-4" />
-        <p className="text-[#6B8A6B] mb-4">Your cart is empty</p>
-        <Button asChild><Link href="/products">Browse Products</Link></Button>
+        <p className="text-[#6B8A6B] mb-4">Váš košík je prázdný</p>
+        <Button asChild><Link href="/products">Procházet produkty</Link></Button>
       </div>
     )
   }
@@ -75,7 +75,7 @@ export function CheckoutClient() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <Card>
-        <CardHeader><CardTitle>Order Summary</CardTitle></CardHeader>
+        <CardHeader><CardTitle>Souhrn objednávky</CardTitle></CardHeader>
         <CardContent className="space-y-4">
           {items.map((rawItem) => {
             const item = getItemDetails(rawItem as DbCartItem | GuestCartItem)
@@ -88,7 +88,7 @@ export function CheckoutClient() {
                 )}
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate">{item.name}</p>
-                  <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                  <p className="text-sm text-muted-foreground">Počet: {item.quantity}</p>
                 </div>
                 <p className="font-medium shrink-0">{formatPrice(item.price * item.quantity)}</p>
               </div>
@@ -96,19 +96,19 @@ export function CheckoutClient() {
           })}
           <Separator />
           <div className="space-y-2 text-sm">
-            <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>{formatPrice(totalPrice)}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">Shipping</span><span>{formatPrice(shipping)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Mezisoučet</span><span>{formatPrice(totalPrice)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Doprava</span><span>{formatPrice(shipping)}</span></div>
             <Separator />
-            <div className="flex justify-between font-semibold text-base"><span>Total</span><span>{formatPrice(total)}</span></div>
+            <div className="flex justify-between font-semibold text-base"><span>Celkem</span><span>{formatPrice(total)}</span></div>
           </div>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>Payment</CardTitle></CardHeader>
+        <CardHeader><CardTitle>Platba</CardTitle></CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            You will be redirected to Stripe to complete your payment securely.
+            Budete přesměrováni na Stripe pro bezpečné dokončení platby.
           </p>
           {error && <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded">{error}</p>}
           <Button
@@ -117,10 +117,10 @@ export function CheckoutClient() {
             className="w-full bg-green-500 hover:bg-green-600 text-white"
             size="lg"
           >
-            {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Processing...</> : `Pay ${formatPrice(total)}`}
+            {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Zpracovávám...</> : `Zaplatit ${formatPrice(total)}`}
           </Button>
           <p className="text-xs text-center text-muted-foreground">
-            Secured by Stripe • 18+ only
+            Zabezpečeno Stripe • pouze 18+
           </p>
         </CardContent>
       </Card>

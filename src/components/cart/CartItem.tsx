@@ -1,4 +1,5 @@
 'use client'
+import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { Minus, Plus, Trash2 } from 'lucide-react'
 import type { CartItem as CartItemType } from '@/types/cart'
@@ -27,7 +28,13 @@ export default function CartItem({ item, itemId, onUpdateQty, onRemove }: CartIt
   const variantId = item.variantId
 
   return (
-    <div className="flex items-start gap-3 py-4 border-b border-[#DEE2E6] last:border-0">
+    <motion.div
+      layout
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 40, transition: { duration: 0.2 } }}
+      className="flex items-start gap-3 py-4 border-b border-[#DEE2E6] last:border-0"
+    >
       {/* Thumbnail */}
       <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-[#F8F9FA]">
         <Image src={imageUrl} alt={productName} fill className="object-cover" sizes="64px" />
@@ -40,22 +47,24 @@ export default function CartItem({ item, itemId, onUpdateQty, onRemove }: CartIt
 
         {/* Qty controls */}
         <div className="flex items-center gap-2 mt-2">
-          <button
+          <motion.button
+            whileTap={{ scale: 0.85 }}
             onClick={() => item.quantity > 1 && onUpdateQty(itemId, variantId, item.quantity - 1)}
             disabled={item.quantity <= 1}
             aria-label="Decrease quantity"
             className="w-6 h-6 rounded-full border border-[#DEE2E6] flex items-center justify-center text-[#6e6e73] hover:border-[#2E7D32] hover:text-[#2E7D32] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Minus size={12} />
-          </button>
+          </motion.button>
           <span className="text-sm font-medium text-[#1d1d1f] w-5 text-center">{item.quantity}</span>
-          <button
+          <motion.button
+            whileTap={{ scale: 0.85 }}
             onClick={() => onUpdateQty(itemId, variantId, item.quantity + 1)}
             aria-label="Increase quantity"
             className="w-6 h-6 rounded-full border border-[#DEE2E6] flex items-center justify-center text-[#6e6e73] hover:border-[#2E7D32] hover:text-[#2E7D32] transition-colors"
           >
             <Plus size={12} />
-          </button>
+          </motion.button>
         </div>
       </div>
 
@@ -72,6 +81,6 @@ export default function CartItem({ item, itemId, onUpdateQty, onRemove }: CartIt
           <Trash2 size={16} />
         </button>
       </div>
-    </div>
+    </motion.div>
   )
 }

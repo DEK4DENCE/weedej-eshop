@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/useToast"
-import { Loader2, Plus, Trash2, Star, MapPin } from "lucide-react"
+import { Loader2, Plus, Trash2, Star, MapPin, Mail } from "lucide-react"
 import { useSession } from "next-auth/react"
 
 interface Address {
@@ -34,7 +34,9 @@ export function AccountSettingsClient() {
   const { toast } = useToast()
   const [nameLoading, setNameLoading] = useState(false)
   const [pwLoading, setPwLoading] = useState(false)
+  const [newsletterLoading, setNewsletterLoading] = useState(false)
   const [name, setName] = useState((session?.user as any)?.name ?? "")
+  const [newsletter, setNewsletter] = useState(false)
   const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
 
@@ -56,6 +58,12 @@ export function AccountSettingsClient() {
 
   useEffect(() => { fetchAddresses() }, [])
 
+  useEffect(() => {
+    fetch("/api/account/profile").then((r) => r.json()).then((d) => {
+      if (typeof d.newsletter === "boolean") setNewsletter(d.newsletter)
+    })
+  }, [])
+
   const handleNameSave = async () => {
     setNameLoading(true)
     try {
@@ -71,6 +79,24 @@ export function AccountSettingsClient() {
       toast({ title: err.message, variant: "destructive" })
     } finally {
       setNameLoading(false)
+    }
+  }
+
+  const handleNewsletterSave = async (value: boolean) => {
+    setNewsletterLoading(true)
+    try {
+      const res = await fetch("/api/account/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ newsletter: value }),
+      })
+      if (!res.ok) throw new Error("Nepodařilo se uložit")
+      setNewsletter(value)
+      toast({ title: value ? "Přihlásili jste se k odběru novinek" : "Odhlásili jste se z odběru novinek" })
+    } catch (err: any) {
+      toast({ title: err.message, variant: "destructive" })
+    } finally {
+      setNewsletterLoading(false)
     }
   }
 
@@ -324,6 +350,40 @@ export function AccountSettingsClient() {
               </div>
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Newsletter */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Mail size={18} />
+            Newsletter
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <label className="flex items-start gap-3 cursor-pointer group">
+            <div className="relative mt-0.5">
+              <input
+                type="checkbox"
+                checked={newsletter}
+                onChange={(e) => handleNewsletterSave(e.target.checked)}
+                disabled={newsletterLoading}
+                className="sr-only peer"
+              />
+              <div className="w-10 h-6 bg-[#DEE2E6] rounded-full peer-checked:bg-[#2E7D32] transition-colors peer-disabled:opacity-50" />
+              <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-[#1d1d1f] group-hover:text-[#2E7D32] transition-colors">
+                Přihlásit se k odběru novinek
+              </p>
+              <p className="text-xs text-[#6e6e73] mt-0.5">
+                Dostávejte novinky, slevy a informace o nových produktech na email.
+              </p>
+            </div>
+            {newsletterLoading && <Loader2 className="h-4 w-4 animate-spin text-[#2E7D32] ml-auto mt-1" />}
+          </label>
         </CardContent>
       </Card>
 

@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useState } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import { useSession, signOut } from "next-auth/react"
 import { ShoppingBag, User, LogOut, Settings, Package, Menu, X } from "lucide-react"
 import { useCart } from "@/hooks/useCart"
@@ -12,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 
 const navLinks = [
   { href: "/products", label: "Vše" },
@@ -27,7 +28,15 @@ export function Header() {
   const { data: session } = useSession()
   const { totalItems, toggleSidebar } = useCart()
   const router = useRouter()
+  const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  function isActive(href: string) {
+    if (href === "/products") return pathname.startsWith("/products")
+    if (href === "/blog") return pathname.startsWith("/blog")
+    if (href === "/contact") return pathname === "/contact"
+    return pathname === href
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#DEE2E6] bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
@@ -42,7 +51,15 @@ export function Header() {
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-6">
           {navLinks.map(({ href, label }) => (
-            <Link key={href} href={href} className="text-sm font-medium text-[#6e6e73] hover:text-[#1d1d1f] transition-colors">
+            <Link
+              key={href}
+              href={href}
+              className={`text-sm font-medium transition-colors ${
+                isActive(href)
+                  ? "text-[#2E7D32] font-semibold border-b-2 border-[#2E7D32] pb-0.5"
+                  : "text-[#6e6e73] hover:text-[#1d1d1f]"
+              }`}
+            >
               {label}
             </Link>
           ))}
@@ -112,8 +129,14 @@ export function Header() {
       </div>
 
       {/* Mobile drawer */}
+      <AnimatePresence>
       {mobileOpen && (
-        <div className="md:hidden border-t border-[#DEE2E6] bg-white/98 backdrop-blur">
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: "auto", opacity: 1, transition: { duration: 0.22, ease: "easeOut" } }}
+          exit={{ height: 0, opacity: 0, transition: { duration: 0.18, ease: "easeIn" } }}
+          className="md:hidden border-t border-[#DEE2E6] bg-white/98 backdrop-blur overflow-hidden"
+        >
           <nav className="container mx-auto px-4 py-4 flex flex-col gap-1">
             {navLinks.map(({ href, label }) => (
               <Link
@@ -159,8 +182,9 @@ export function Header() {
               )}
             </div>
           </nav>
-        </div>
+        </motion.div>
       )}
+      </AnimatePresence>
     </header>
   )
 }

@@ -5,6 +5,7 @@ import { notFound } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { CalendarDays, ArrowLeft } from "lucide-react"
+import { MarkdownContent } from "@/components/blog/MarkdownContent"
 
 interface Props { params: Promise<{ slug: string }> }
 
@@ -12,11 +13,25 @@ function formatDate(date: Date) {
   return new Intl.DateTimeFormat("cs-CZ", { day: "numeric", month: "long", year: "numeric" }).format(date)
 }
 
+const BASE_URL = 'https://weedej-cannabis-eshop-dek4dences-projects.vercel.app'
+
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params
   const post = await db.blogPost.findUnique({ where: { slug, published: true } })
-  if (!post) return { title: "Not found" }
-  return { title: `${post.title} — Weedej Blog`, description: post.excerpt }
+  if (!post) return { title: "Článek nenalezen — Weedej Blog" }
+  return {
+    title: `${post.title} — Weedej Blog`,
+    description: post.excerpt,
+    alternates: { canonical: `${BASE_URL}/blog/${slug}` },
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      type: 'article',
+      locale: 'cs_CZ',
+      publishedTime: post.publishedAt?.toISOString(),
+      ...(post.coverImage ? { images: [{ url: post.coverImage, alt: post.title }] } : {}),
+    },
+  }
 }
 
 export default async function BlogPostPage({ params }: Props) {
@@ -66,8 +81,8 @@ export default async function BlogPostPage({ params }: Props) {
 
       <p className="text-lg text-[#6e6e73] mb-8 italic">{post.excerpt}</p>
 
-      <div className="prose prose-green max-w-none text-[#212121] whitespace-pre-wrap leading-relaxed">
-        {post.content}
+      <div className="max-w-none">
+        <MarkdownContent content={post.content} />
       </div>
     </div>
   )

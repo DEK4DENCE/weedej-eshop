@@ -31,7 +31,7 @@ function formatPrice(cents: number, currency: string = 'CZK'): string {
 }
 
 function formatDate(dateStr: string): string {
-  return new Intl.DateTimeFormat('en-GB', {
+  return new Intl.DateTimeFormat('cs-CZ', {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
@@ -51,7 +51,7 @@ export function OrderDetail({ order }: OrderDetailProps) {
               Order #{order.id.slice(-8).toUpperCase()}
             </h2>
             <p className="text-sm text-[#6e6e73]">
-              Placed on {formatDate(order.createdAt)}
+              Zadáno {formatDate(order.createdAt)}
             </p>
           </div>
           <OrderStatusBadge status={order.status} />
@@ -62,18 +62,18 @@ export function OrderDetail({ order }: OrderDetailProps) {
       <div className="bg-white border border-[#DEE2E6] rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
         <div className="px-6 py-4 border-b border-[#DEE2E6]">
           <h3 className="text-sm font-semibold text-[#1d1d1f] flex items-center gap-2">
-            <Package className="w-4 h-4 text-[#2E7D32]" /> Items
+            <Package className="w-4 h-4 text-[#2E7D32]" /> Položky
           </h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-[#F8F9FA]">
-                <th className="text-left px-6 py-3 text-xs font-medium text-[#6e6e73] uppercase tracking-wider">Product</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-[#6e6e73] uppercase tracking-wider">Variant</th>
-                <th className="text-right px-6 py-3 text-xs font-medium text-[#6e6e73] uppercase tracking-wider">Unit Price</th>
-                <th className="text-right px-6 py-3 text-xs font-medium text-[#6e6e73] uppercase tracking-wider">Qty</th>
-                <th className="text-right px-6 py-3 text-xs font-medium text-[#6e6e73] uppercase tracking-wider">Subtotal</th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-[#6e6e73] uppercase tracking-wider">Produkt</th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-[#6e6e73] uppercase tracking-wider">Varianta</th>
+                <th className="text-right px-6 py-3 text-xs font-medium text-[#6e6e73] uppercase tracking-wider">Cena/ks</th>
+                <th className="text-right px-6 py-3 text-xs font-medium text-[#6e6e73] uppercase tracking-wider">Počet</th>
+                <th className="text-right px-6 py-3 text-xs font-medium text-[#6e6e73] uppercase tracking-wider">Mezisoučet</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#F8F9FA]">
@@ -111,7 +111,7 @@ export function OrderDetail({ order }: OrderDetailProps) {
           <div className="bg-white border border-[#DEE2E6] rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
             <div className="flex items-center gap-2 mb-4">
               <MapPin className="w-4 h-4 text-[#2E7D32]" />
-              <h3 className="text-sm font-semibold text-[#1d1d1f]">Delivery Address</h3>
+              <h3 className="text-sm font-semibold text-[#1d1d1f]">Doručovací adresa</h3>
             </div>
             <div className="space-y-1 text-sm text-[#515154]">
               <p className="font-medium text-[#1d1d1f]">{order.address.fullName}</p>
@@ -128,7 +128,7 @@ export function OrderDetail({ order }: OrderDetailProps) {
           <div className="bg-white border border-[#DEE2E6] rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
             <div className="flex items-center gap-2 mb-4">
               <User className="w-4 h-4 text-[#2E7D32]" />
-              <h3 className="text-sm font-semibold text-[#1d1d1f]">Contact Information</h3>
+              <h3 className="text-sm font-semibold text-[#1d1d1f]">Kontaktní informace</h3>
             </div>
             <div className="space-y-1 text-sm text-[#515154]">
               {order.user.name && <p className="font-medium text-[#1d1d1f]">{order.user.name}</p>}
@@ -142,27 +142,27 @@ export function OrderDetail({ order }: OrderDetailProps) {
         <div className="bg-white border border-[#DEE2E6] rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
           <div className="flex items-center gap-2 mb-4">
             <CreditCard className="w-4 h-4 text-[#2E7D32]" />
-            <h3 className="text-sm font-semibold text-[#1d1d1f]">Payment Summary</h3>
+            <h3 className="text-sm font-semibold text-[#1d1d1f]">Přehled platby</h3>
           </div>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-[#6e6e73]">Subtotal</span>
+              <span className="text-[#6e6e73]">Mezisoučet</span>
               <span className="font-mono text-[#1d1d1f]">{formatPrice(order.subtotalAmount, order.currency)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-[#6e6e73]">Shipping</span>
+              <span className="text-[#6e6e73]">Doprava</span>
               <span className="font-mono text-[#1d1d1f]">
-                {order.shippingAmount === 0 ? 'Free' : formatPrice(order.shippingAmount, order.currency)}
+                {order.shippingAmount === 0 ? 'Zdarma' : formatPrice(order.shippingAmount, order.currency)}
               </span>
             </div>
             {order.taxAmount > 0 && (
               <div className="flex justify-between text-sm">
-                <span className="text-[#6e6e73]">Tax</span>
+                <span className="text-[#6e6e73]">DPH</span>
                 <span className="font-mono text-[#1d1d1f]">{formatPrice(order.taxAmount, order.currency)}</span>
               </div>
             )}
             <div className="border-t border-[#DEE2E6] pt-2 mt-2 flex justify-between">
-              <span className="font-semibold text-[#1d1d1f]">Total</span>
+              <span className="font-semibold text-[#1d1d1f]">Celkem</span>
               <span className="font-mono font-bold text-lg text-[#2E7D32]">
                 {formatPrice(order.totalAmount, order.currency)}
               </span>

@@ -11,11 +11,29 @@ interface Props {
   params: Promise<{ slug: string }>
 }
 
+const BASE_URL = 'https://weedej-cannabis-eshop-dek4dences-projects.vercel.app'
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const product = await db.product.findUnique({ where: { slug, isActive: true } })
+  const product = await db.product.findUnique({
+    where: { slug, isActive: true },
+    include: { category: true },
+  })
   if (!product) return { title: "Produkt nenalezen — Weedej" }
-  return { title: `${product.name} — Weedej` }
+  const description = product.shortDescription ?? product.description.slice(0, 160)
+  const image = product.imageUrls[0]
+  return {
+    title: `${product.name} — Weedej`,
+    description,
+    alternates: { canonical: `${BASE_URL}/products/${slug}` },
+    openGraph: {
+      title: product.name,
+      description,
+      type: 'website',
+      locale: 'cs_CZ',
+      ...(image ? { images: [{ url: image, width: 800, height: 800, alt: product.name }] } : {}),
+    },
+  }
 }
 
 export default async function ProductDetailPage({ params }: Props) {
@@ -53,12 +71,41 @@ export default async function ProductDetailPage({ params }: Props) {
     },
   }
 
+  const defaultVariant = raw.variants.find((v) => v.isDefault) ?? raw.variants[0]
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: product.shortDescription ?? product.description.slice(0, 200),
+    image: product.imageUrls,
+    url: `${BASE_URL}/products/${product.slug}`,
+    brand: { '@type': 'Brand', name: 'Weedej' },
+    category: product.category.name,
+    ...(defaultVariant ? {
+      offers: {
+        '@type': 'Offer',
+        price: Number(defaultVariant.price).toFixed(2),
+        priceCurrency: 'CZK',
+        availability: defaultVariant.stock > 0
+          ? 'https://schema.org/InStock'
+          : 'https://schema.org/OutOfStock',
+        url: `${BASE_URL}/products/${product.slug}`,
+      },
+    } : {}),
+  }
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        <ProductImages images={product.imageUrls} productName={product.name} adjustments={raw.imageAdjustments} />
-        <ProductDetailClient product={product} />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <ProductImages images={product.imageUrls} productName={product.name} adjustments={raw.imageAdjustments} />
+          <ProductDetailClient product={product} />
+        </div>
       </div>
-    </div>
+    </>
   )
 }

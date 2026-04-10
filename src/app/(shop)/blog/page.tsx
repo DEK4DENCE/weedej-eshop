@@ -5,7 +5,15 @@ import Link from "next/link"
 import Image from "next/image"
 import { CalendarDays } from "lucide-react"
 
-export const metadata = { title: "Blog — Weedej" }
+export const metadata = {
+  title: "Blog — Weedej",
+  description: "Novinky, tipy a informace ze světa cannabis. Čtěte naše články o CBD, THC-X produktech, wellness a zdravém životním stylu.",
+  openGraph: {
+    title: "Blog — Weedej",
+    description: "Novinky, tipy a informace ze světa cannabis.",
+    locale: "cs_CZ",
+  },
+}
 
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat("cs-CZ", { day: "numeric", month: "long", year: "numeric" }).format(date)
@@ -31,7 +39,7 @@ export default async function BlogPage() {
       {posts.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">
           <div className="text-5xl mb-4">🌿</div>
-          <h2 className="text-2xl font-semibold text-[#212121] mb-2">Coming soon</h2>
+          <h2 className="text-2xl font-semibold text-[#212121] mb-2">Brzy zde bude obsah</h2>
           <p className="text-[#6e6e73]">Brzy zde najdete zajímavé články o cannabis.</p>
         </div>
       ) : (

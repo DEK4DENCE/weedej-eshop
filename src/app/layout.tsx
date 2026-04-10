@@ -11,16 +11,31 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Weedej — Premium Cannabis E-Shop',
+    default: 'Weedej — Prémiový Cannabis E-Shop',
     template: '%s | Weedej',
   },
   description:
-    'Discover premium cannabis products at Weedej. Quality flowers, edibles, concentrates and accessories. Age-verified, discreet delivery.',
-  keywords: ['cannabis', 'CBD', 'premium', 'online shop', 'flowers', 'edibles'],
+    'Prémiové konopné produkty s doručením po celé ČR. Květy, extrakty, edibles a doplňky. Otestováno laboratořemi, diskrétní balení.',
+  keywords: ['cannabis', 'CBD', 'THC', 'konopí', 'prémiové produkty', 'online shop', 'CBD obchod', 'Czech Republic'],
   openGraph: {
     type: 'website',
-    locale: 'en_US',
+    locale: 'cs_CZ',
     siteName: 'Weedej',
+    description: 'Prémiové konopné produkty s doručením po celé ČR.',
+  },
+}
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Weedej',
+  url: 'https://weedej-cannabis-eshop-dek4dences-projects.vercel.app',
+  description: 'Prémiový e-shop s konopnými produkty. Doručení po celé České republice.',
+  areaServed: 'CZ',
+  contactPoint: {
+    '@type': 'ContactPoint',
+    contactType: 'Zákaznická podpora',
+    availableLanguage: 'Czech',
   },
 }
 
@@ -30,13 +45,17 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full`} suppressHydrationWarning>
+    <html lang="cs" className={`${inter.variable} h-full`} suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Space+Grotesk:wght@400;500;700&display=swap"
           rel="stylesheet"
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
       </head>
       <body className="min-h-full flex flex-col bg-[#ebebeb] text-[#1d1d1f] antialiased">

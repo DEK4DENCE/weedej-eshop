@@ -74,7 +74,7 @@ export default function ContactPage() {
             </div>
           </div>
           <div className="bg-[#2E7D32] rounded-2xl p-6 shadow-sm text-white md:col-span-2 flex flex-col justify-center">
-            <h3 className="text-xl font-bold mb-2">Prémiové CBD produkty</h3>
+            <h3 className="text-xl font-bold mb-2">Prémiové produkty</h3>
             <p className="text-green-100 mb-4">Navštivte naši prodejnu v Děčíně a nechte se poradit s výběrem produktů.</p>
             <a href="/products" className="inline-flex items-center gap-2 bg-white text-[#2E7D32] font-bold px-6 py-3 rounded-xl w-fit hover:bg-[#E8F5E9] transition-colors">
               Prohlédnout produkty →

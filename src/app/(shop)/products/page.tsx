@@ -13,14 +13,14 @@ export const metadata: Metadata = { title: "Produkty — Weedej" }
 
 interface Props {
   searchParams: Promise<{
-    category?: string
+    category?: string | string[]
     search?: string
     sort?: string
     page?: string
     minPrice?: string
     maxPrice?: string
     inStock?: string
-    strainType?: string
+    strainType?: string | string[]
   }>
 }
 
@@ -28,8 +28,9 @@ async function fetchProducts(params: Awaited<Props["searchParams"]>): Promise<Pr
   const where: any = { isActive: true }
 
   if (params.category) {
-    const cat = await db.category.findUnique({ where: { slug: params.category } })
-    if (cat) where.categoryId = cat.id
+    const slugs = Array.isArray(params.category) ? params.category : [params.category]
+    const cats = await db.category.findMany({ where: { slug: { in: slugs } }, select: { id: true } })
+    if (cats.length > 0) where.categoryId = { in: cats.map((c) => c.id) }
   }
 
   if (params.search) {
@@ -46,7 +47,8 @@ async function fetchProducts(params: Awaited<Props["searchParams"]>): Promise<Pr
   }
 
   if (params.strainType) {
-    where.strainType = params.strainType
+    const strains = Array.isArray(params.strainType) ? params.strainType : [params.strainType]
+    where.strainType = { in: strains }
   }
 
   const products = await db.product.findMany({

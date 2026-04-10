@@ -76,14 +76,14 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
             animate="visible"
             exit="exit"
             className="fixed right-0 top-0 z-50 h-full w-[400px] max-w-[90vw] bg-white border-l border-[#DEE2E6] shadow-[-8px_0_32px_rgba(0,0,0,0.12)] flex flex-col"
-            aria-label="Shopping cart"
+            aria-label="Nákupní košík"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-[#DEE2E6] flex-shrink-0">
               <div className="flex items-center gap-2">
                 <ShoppingBag size={20} className="text-[#2E7D32]" />
                 <h2 className="text-base font-semibold text-[#1d1d1f]">
-                  Cart
+                  Košík
                   {totalItems > 0 && (
                     <span className="ml-2 inline-flex items-center justify-center bg-[#2E7D32] text-white text-xs font-bold rounded-full w-5 h-5">
                       {totalItems}
@@ -93,7 +93,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
               </div>
               <button
                 onClick={onClose}
-                aria-label="Close cart"
+                aria-label="Zavřít košík"
                 className="text-[#aeaeb2] hover:text-[#1d1d1f] transition-colors"
               >
                 <X size={20} />
@@ -109,30 +109,32 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
               ) : items.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 text-center gap-4">
                   <ShoppingBag size={48} className="text-[#DEE2E6]" />
-                  <p className="text-[#1d1d1f] font-medium">Your cart is empty</p>
-                  <p className="text-sm text-[#6e6e73]">Add some products to get started</p>
+                  <p className="text-[#1d1d1f] font-medium">Váš košík je prázdný</p>
+                  <p className="text-sm text-[#6e6e73]">Přidejte produkty a začněte nakupovat</p>
                   <Link
                     href="/products"
                     onClick={onClose}
                     className="mt-2 bg-[#2E7D32] hover:bg-[#1a9020] text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition-colors"
                   >
-                    Shop Now
+                    Nakupovat
                   </Link>
                 </div>
               ) : (
                 <div className="py-2">
-                  {items.map((item) => {
-                    const itemId = getItemId(item as CartItemType | GuestCartItem)
-                    return (
-                      <CartItem
-                        key={itemId}
-                        item={item as CartItemType | GuestCartItem}
-                        itemId={itemId}
-                        onUpdateQty={updateQty}
-                        onRemove={removeItem}
-                      />
-                    )
-                  })}
+                  <AnimatePresence initial={false}>
+                    {items.map((item) => {
+                      const itemId = getItemId(item as CartItemType | GuestCartItem)
+                      return (
+                        <CartItem
+                          key={itemId}
+                          item={item as CartItemType | GuestCartItem}
+                          itemId={itemId}
+                          onUpdateQty={updateQty}
+                          onRemove={removeItem}
+                        />
+                      )
+                    })}
+                  </AnimatePresence>
                 </div>
               )}
             </div>
