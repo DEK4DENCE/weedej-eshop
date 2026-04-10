@@ -56,7 +56,7 @@ export default async function HomePage() {
 
         {/* Hero — centered with light green gradient */}
         <section className="relative overflow-hidden bg-gradient-to-br from-[#E8F5E9] via-[#F0FAF0] to-white">
-          <div className="container mx-auto px-4 py-12 md:py-16">
+          <div className="container mx-auto px-4 py-8 md:py-10">
             <FadeIn delay={0}>
               <div className="flex flex-col items-center text-center gap-6 max-w-2xl mx-auto">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#2E7D32]/10 text-[#2E7D32] border border-[#2E7D32]/20 text-sm font-medium">
@@ -90,7 +90,7 @@ export default async function HomePage() {
 
         {/* Bestsellers */}
         {products.length > 0 && (
-          <section className="py-12 px-4">
+          <section className="py-6 px-4">
             <div className="container mx-auto">
               <FadeIn delay={0}>
                 <div className="flex items-end justify-between mb-6">
