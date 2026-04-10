@@ -6,10 +6,28 @@ import { Suspense } from "react"
 import { ProductGrid } from "@/components/products/ProductGrid"
 import { Skeleton } from "@/components/ui/skeleton"
 import type { Product } from "@/types/product"
+import type { Metadata } from "next"
+import { BASE_URL } from "@/lib/config"
 
 interface Props {
   params: Promise<{ slug: string }>
   searchParams: Promise<{ sort?: string; page?: string }>
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const category = await db.category.findUnique({ where: { slug } })
+  if (!category) return {}
+  return {
+    title: `${category.name} — Weedej`,
+    description: category.description ?? `Prémiové CBD produkty v kategorii ${category.name}. Laboratořemi testováno, rychlé doručení po celé ČR.`,
+    alternates: { canonical: `${BASE_URL}/categories/${slug}` },
+    openGraph: {
+      title: `${category.name} — Weedej`,
+      url: `${BASE_URL}/categories/${slug}`,
+      locale: 'cs_CZ',
+    },
+  }
 }
 
 export default async function CategoryPage({ params, searchParams }: Props) {

@@ -31,11 +31,11 @@ export function ProductGrid({ products, onAddToCart, emptyMessage }: ProductGrid
   if (products.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
-        <Leaf size={48} className="text-[#1F3D1F] mb-4" />
-        <p className="text-lg font-medium text-[#6B8A6B]">
+        <Leaf size={48} className="text-[#2E7D32] mb-4" />
+        <p className="text-lg font-medium text-[#1d1d1f]">
           {emptyMessage ?? 'Žádné produkty nenalezeny'}
         </p>
-        <p className="text-sm text-[#3D5C3D] mt-1">
+        <p className="text-sm text-[#6e6e73] mt-1">
           Zkuste upravit filtry nebo se vraťte později.
         </p>
       </div>

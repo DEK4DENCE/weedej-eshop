@@ -1,6 +1,15 @@
 import type { Metadata } from "next"
 
-export const metadata: Metadata = { title: "Ochrana osobních údajů — Weedej" }
+export const metadata: Metadata = {
+  title: "Ochrana osobních údajů — Weedej",
+  description: "Zásady zpracování osobních údajů v e-shopu Weedej. GDPR, cookies a ochrana soukromí zákazníků.",
+  alternates: { canonical: 'https://weedej-cannabis-eshop-dek4dences-projects.vercel.app/ochrana-osobnich-udaju' },
+  openGraph: {
+    title: "Ochrana osobních údajů — Weedej",
+    url: 'https://weedej-cannabis-eshop-dek4dences-projects.vercel.app/ochrana-osobnich-udaju',
+    locale: 'cs_CZ',
+  },
+}
 
 export default function OchranaOsobnichUdajuPage() {
   return (

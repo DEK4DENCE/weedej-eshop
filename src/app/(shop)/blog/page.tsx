@@ -54,7 +54,7 @@ export default async function BlogPage() {
                   <div className="relative h-48 w-full bg-[#F8F9FA] overflow-hidden">
                     <Image
                       src={post.coverImage}
-                      alt={post.title}
+                      alt={`Obrázek k článku: ${post.title}`}
                       fill
                       className="object-cover hover:scale-105 transition-transform duration-300"
                       unoptimized

@@ -18,11 +18,11 @@ interface Movement {
 }
 
 const TYPE_LABELS: Record<string, { label: string; classes: string }> = {
-  IN: { label: "Stock In", classes: "bg-green-100 text-[#2E7D32]" },
-  OUT: { label: "Stock Out", classes: "bg-red-100 text-red-700" },
-  RESERVED: { label: "Reserved", classes: "bg-blue-100 text-blue-700" },
-  RELEASED: { label: "Released", classes: "bg-amber-100 text-amber-700" },
-  SOLD: { label: "Sold", classes: "bg-purple-100 text-purple-700" },
+  IN: { label: "Příjem", classes: "bg-green-100 text-[#2E7D32]" },
+  OUT: { label: "Výdej", classes: "bg-red-100 text-red-700" },
+  RESERVED: { label: "Rezervováno", classes: "bg-blue-100 text-blue-700" },
+  RELEASED: { label: "Uvolněno", classes: "bg-amber-100 text-amber-700" },
+  SOLD: { label: "Prodáno", classes: "bg-purple-100 text-purple-700" },
 }
 
 export default function MovementsPage() {
@@ -46,38 +46,38 @@ export default function MovementsPage() {
           className="flex items-center gap-2 text-sm text-[#6e6e73] hover:text-[#212121] transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Inventory
+          Zpět na sklad
         </Link>
       </div>
       <div>
-        <h1 className="text-2xl font-bold text-[#212121]">Stock Movement Log</h1>
-        <p className="text-sm text-[#6e6e73] mt-1">Audit trail of all inventory changes</p>
+        <h1 className="text-2xl font-bold text-[#212121]">Přehled pohybů skladu</h1>
+        <p className="text-sm text-[#6e6e73] mt-1">Historie všech změn zásob</p>
       </div>
 
       <div className="bg-white rounded-xl border border-[#DEE2E6] overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-[#DEE2E6] bg-[#F8F9FA]">
-              <th className="text-left px-4 py-3 font-semibold text-[#212121]">Date</th>
-              <th className="text-left px-4 py-3 font-semibold text-[#212121]">Product</th>
-              <th className="text-left px-4 py-3 font-semibold text-[#212121]">Variant</th>
-              <th className="text-left px-4 py-3 font-semibold text-[#212121]">Type</th>
-              <th className="text-left px-4 py-3 font-semibold text-[#212121]">Qty</th>
-              <th className="text-left px-4 py-3 font-semibold text-[#212121]">Reason</th>
-              <th className="text-left px-4 py-3 font-semibold text-[#212121]">Order #</th>
+              <th className="text-left px-4 py-3 font-semibold text-[#212121]">Datum</th>
+              <th className="text-left px-4 py-3 font-semibold text-[#212121]">Produkt</th>
+              <th className="text-left px-4 py-3 font-semibold text-[#212121]">Varianta</th>
+              <th className="text-left px-4 py-3 font-semibold text-[#212121]">Typ</th>
+              <th className="text-left px-4 py-3 font-semibold text-[#212121]">Množství</th>
+              <th className="text-left px-4 py-3 font-semibold text-[#212121]">Důvod</th>
+              <th className="text-left px-4 py-3 font-semibold text-[#212121]">Objednávka</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
                 <td colSpan={7} className="px-4 py-8 text-center text-[#6e6e73]">
-                  Loading...
+                  Načítám...
                 </td>
               </tr>
             ) : movements.length === 0 ? (
               <tr>
                 <td colSpan={7} className="px-4 py-8 text-center text-[#6e6e73]">
-                  No movements recorded yet
+                  Zatím žádné pohyby skladu
                 </td>
               </tr>
             ) : (

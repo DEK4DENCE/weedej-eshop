@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
@@ -17,6 +17,17 @@ export function ProductImages({ images, productName, adjustments }: ProductImage
 
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [direction, setDirection] = useState(0)
+
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      if (displayImages.length <= 1) return
+      if (e.key === 'ArrowLeft') prev()
+      else if (e.key === 'ArrowRight') next()
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedIndex, displayImages.length])
 
   function selectImage(index: number) {
     setDirection(index > selectedIndex ? 1 : -1)
@@ -69,14 +80,14 @@ export function ProductImages({ images, productName, adjustments }: ProductImage
           <>
             <button
               onClick={prev}
-              aria-label="Previous image"
+              aria-label="Předchozí obrázek"
               className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 border border-[#DEE2E6] text-[#6e6e73] hover:text-[#2E7D32] hover:border-[#2E7D32] flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 shadow-sm z-10"
             >
               <ChevronLeft size={16} />
             </button>
             <button
               onClick={next}
-              aria-label="Next image"
+              aria-label="Další obrázek"
               className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 border border-[#DEE2E6] text-[#6e6e73] hover:text-[#2E7D32] hover:border-[#2E7D32] flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 shadow-sm z-10"
             >
               <ChevronRight size={16} />
@@ -87,22 +98,40 @@ export function ProductImages({ images, productName, adjustments }: ProductImage
 
       {/* Thumbnails */}
       {displayImages.length > 1 && (
-        <div className="flex gap-3">
-          {displayImages.map((src, i) => (
-            <button
-              key={i}
-              onClick={() => selectImage(i)}
-              aria-label={`View image ${i + 1}`}
-              className={[
-                'w-16 h-16 rounded-xl overflow-hidden border-2 transition-all duration-200 flex-shrink-0',
-                i === selectedIndex
-                  ? 'border-[#2E7D32]'
-                  : 'border-[#DEE2E6] hover:border-[#2E7D32]/50 opacity-70 hover:opacity-100',
-              ].join(' ')}
-              style={getBgStyle(src)}
-            />
-          ))}
-        </div>
+        <>
+          <div className="flex gap-3">
+            {displayImages.map((src, i) => (
+              <button
+                key={i}
+                onClick={() => selectImage(i)}
+                aria-label={`Zobrazit obrázek ${i + 1}`}
+                className={[
+                  'w-16 h-16 rounded-xl overflow-hidden border-2 transition-all duration-200 flex-shrink-0',
+                  i === selectedIndex
+                    ? 'border-[#2E7D32]'
+                    : 'border-[#DEE2E6] hover:border-[#2E7D32]/50 opacity-70 hover:opacity-100',
+                ].join(' ')}
+                style={getBgStyle(src)}
+              />
+            ))}
+          </div>
+          {/* Dot indicators */}
+          <div className="flex justify-center gap-1.5">
+            {displayImages.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => selectImage(i)}
+                aria-label={`Obrázek ${i + 1}`}
+                className={[
+                  'rounded-full transition-all duration-200',
+                  i === selectedIndex
+                    ? 'w-4 h-2 bg-[#2E7D32]'
+                    : 'w-2 h-2 bg-[#DEE2E6] hover:bg-[#2E7D32]/50',
+                ].join(' ')}
+              />
+            ))}
+          </div>
+        </>
       )}
     </div>
   )

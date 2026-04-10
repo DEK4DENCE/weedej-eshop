@@ -70,8 +70,8 @@ function FaqItem({ q, a }: { q: string; a: string }) {
           <motion.div
             key="answer"
             initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1, transition: { duration: 0.25, ease: 'easeOut' } }}
-            exit={{ height: 0, opacity: 0, transition: { duration: 0.18, ease: 'easeIn' } }}
+            animate={{ height: 'auto', opacity: 1, transition: { duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] } }}
+            exit={{ height: 0, opacity: 0, transition: { duration: 0.2, ease: [0.55, 0, 1, 0.45] } }}
             className="overflow-hidden"
           >
             <p className="pb-4 text-sm text-[#6e6e73] leading-relaxed">{a}</p>
@@ -82,9 +82,23 @@ function FaqItem({ q, a }: { q: string; a: string }) {
   )
 }
 
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map(({ q, a }) => ({
+    '@type': 'Question',
+    name: q,
+    acceptedAnswer: { '@type': 'Answer', text: a },
+  })),
+}
+
 export default function FaqPage() {
   return (
     <div className="container mx-auto px-4 py-12 max-w-2xl">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <p className="text-xs font-semibold uppercase tracking-widest text-[#2E7D32] mb-2">Pomoc</p>
       <h1 className="text-3xl font-bold font-playfair text-[#1d1d1f] mb-2">Časté dotazy</h1>
       <p className="text-[#6e6e73] mb-10">Nenašli jste odpověď? Napište nám na{' '}

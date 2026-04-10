@@ -94,11 +94,25 @@ export default async function ProductDetailPage({ params }: Props) {
     } : {}),
   }
 
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Domů', item: BASE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Produkty', item: `${BASE_URL}/products` },
+      { '@type': 'ListItem', position: 3, name: product.name, item: `${BASE_URL}/products/${product.slug}` },
+    ],
+  }
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">

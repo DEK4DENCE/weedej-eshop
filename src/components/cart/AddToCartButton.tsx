@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Plus, Check, Loader2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '@/hooks/useCart'
+import { useToast } from '@/hooks/useToast'
 
 interface AddToCartButtonProps {
   variantId: string
@@ -31,6 +32,7 @@ export default function AddToCartButton({
 }: AddToCartButtonProps) {
   const [state, setState] = useState<ButtonState>('idle')
   const { addItem } = useCart()
+  const { toast } = useToast()
 
   const handleClick = async () => {
     if (state !== 'idle' || disabled) return
@@ -39,6 +41,7 @@ export default function AddToCartButton({
     try {
       await addItem({ variantId, productId, productName, variantName, price, imageUrl, quantity })
       setState('success')
+      toast({ title: 'Přidáno do košíku', description: `${quantity}× ${productName}` })
       setTimeout(() => setState('idle'), 1500)
     } catch {
       setState('idle')
@@ -52,7 +55,7 @@ export default function AddToCartButton({
     <button
       onClick={handleClick}
       disabled={disabled || state !== 'idle'}
-      aria-label="Add to cart"
+      aria-label="Přidat do košíku"
       className={`${baseClass} ${className ?? ''}`}
     >
       <AnimatePresence mode="wait" initial={false}>

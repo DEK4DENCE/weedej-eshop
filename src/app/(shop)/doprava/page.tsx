@@ -2,7 +2,17 @@ import type { Metadata } from "next"
 import { Truck, CreditCard, Package, Clock, Shield } from "lucide-react"
 import Link from "next/link"
 
-export const metadata: Metadata = { title: "Doprava a platba — Weedej" }
+export const metadata: Metadata = {
+  title: "Doprava a platba — Weedej",
+  description: "Informace o možnostech doručení a platbách v Weedej. Dopravujeme diskrétně po celé ČR. Česká pošta, zásilkovna, DPD.",
+  alternates: { canonical: 'https://weedej-cannabis-eshop-dek4dences-projects.vercel.app/doprava' },
+  openGraph: {
+    title: "Doprava a platba — Weedej",
+    description: "Informace o možnostech doručení a platbách v Weedej. Dopravujeme diskrétně po celé ČR.",
+    url: 'https://weedej-cannabis-eshop-dek4dences-projects.vercel.app/doprava',
+    locale: 'cs_CZ',
+  },
+}
 
 export default function DopravaPage() {
   return (

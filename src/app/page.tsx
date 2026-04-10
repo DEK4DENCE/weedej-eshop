@@ -52,6 +52,12 @@ export default async function HomePage() {
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
+      {/* Age notice bar */}
+      <div className="bg-amber-50 border-b border-amber-200 text-center py-2 px-4">
+        <p className="text-xs text-amber-800 font-medium">
+          🔞 Pouze pro osoby starší 18 let. Nákupem potvrzujete dosažení plnoletosti.
+        </p>
+      </div>
       <main className="flex-1 bg-[#F8F9FA]">
 
         {/* Hero — centered with light green gradient */}

@@ -56,7 +56,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
         <div className="relative overflow-hidden aspect-square bg-white">
           <Image
             src={mainImage}
-            alt={product.name}
+            alt={`${product.name}${product.strainType ? ` — ${product.strainType}` : ''}${product.cbdContent ? `, CBD ${product.cbdContent}%` : ''}`}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             className="object-contain"

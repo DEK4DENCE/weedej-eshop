@@ -1,5 +1,6 @@
 'use client'
 
+import { motion } from 'framer-motion'
 import type { ProductVariant } from '@/types/product'
 import { formatPrice } from '@/lib/utils/formatPrice'
 
@@ -21,8 +22,10 @@ export function ProductVariantSelector({ variants, selectedVariantId, onSelect }
           const isOutOfStock = variant.stock === 0
 
           return (
-            <button
+            <motion.button
               key={variant.id}
+              whileHover={!isOutOfStock ? { scale: 1.03 } : {}}
+              whileTap={!isOutOfStock ? { scale: 0.97 } : {}}
               onClick={() => !isOutOfStock && onSelect(variant.id)}
               disabled={isOutOfStock}
               className={[
@@ -41,7 +44,7 @@ export function ProductVariantSelector({ variants, selectedVariantId, onSelect }
               <span className="text-xs font-bold text-[#8B6914] font-mono mt-0.5">
                 {formatPrice(Number(variant.price))}
               </span>
-            </button>
+            </motion.button>
           )
         })}
       </div>

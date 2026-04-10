@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { formatPrice } from "@/lib/utils/formatPrice"
-import { Loader2, Truck, Store, MapPin, Plus } from "lucide-react"
+import { Loader2, Truck, Store, MapPin, Plus, Shield, Lock } from "lucide-react"
+import { motion } from "framer-motion"
 import Link from "next/link"
 
 type DeliveryType = "COURIER" | "PICKUP_IN_STORE"
@@ -48,6 +49,7 @@ export function CheckoutForm({ user, addresses }: Props) {
   const { items, totalPrice } = useCart()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [postalError, setPostalError] = useState<string | null>(null)
   const [deliveryType, setDeliveryType] = useState<DeliveryType>("COURIER")
   const [shippingMethods, setShippingMethods] = useState<ShippingMethod[]>([])
   const [selectedShippingId, setSelectedShippingId] = useState<string | null>(null)
@@ -239,7 +241,17 @@ export function CheckoutForm({ user, addresses }: Props) {
                       </div>
                       <div className="space-y-1">
                         <Label>PSČ</Label>
-                        <Input value={newAddress.postalCode} onChange={(e) => setNewAddress((p) => ({ ...p, postalCode: e.target.value }))} required placeholder="110 00" />
+                        <Input
+                          value={newAddress.postalCode}
+                          onChange={(e) => { setNewAddress((p) => ({ ...p, postalCode: e.target.value })); setPostalError(null) }}
+                          onBlur={(e) => {
+                            const val = e.target.value.replace(/\s/g, '')
+                            if (val && !/^\d{5}$/.test(val)) setPostalError('PSČ musí mít 5 číslic (např. 11000)')
+                          }}
+                          required
+                          placeholder="110 00"
+                        />
+                        {postalError && <p className="text-xs text-red-600 mt-1">{postalError}</p>}
                       </div>
                       <div className="space-y-1">
                         <Label>Město</Label>
@@ -327,8 +339,22 @@ export function CheckoutForm({ user, addresses }: Props) {
                 </div>
                 <Separator />
                 <div className="flex justify-between font-semibold text-base pt-1">
-                  <span>Celkem</span><span>{formatPrice(total)}</span>
+                  <span>Celkem</span>
+                  <motion.span
+                    key={total}
+                    initial={{ scale: 1.08, color: '#2E7D32' }}
+                    animate={{ scale: 1, color: '#1d1d1f' }}
+                    transition={{ duration: 0.3 }}
+                    className="font-mono"
+                  >
+                    {formatPrice(total)}
+                  </motion.span>
                 </div>
+              </div>
+
+              <div className="flex items-center justify-center gap-4 py-2 text-xs text-[#6e6e73]">
+                <span className="flex items-center gap-1"><Shield className="h-3.5 w-3.5 text-[#2E7D32]" />SSL šifrování</span>
+                <span className="flex items-center gap-1"><Lock className="h-3.5 w-3.5 text-[#2E7D32]" />Bezpečná platba</span>
               </div>
 
               <Button
