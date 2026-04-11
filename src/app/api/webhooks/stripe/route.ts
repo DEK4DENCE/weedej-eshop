@@ -64,6 +64,7 @@ export async function POST(req: NextRequest) {
         stripePaymentIntentId: typeof session.payment_intent === "string" ? session.payment_intent : null,
         status: "PROCESSING",
         deliveryType,
+        currency: (session.currency ?? "czk").toUpperCase(),
         totalAmount,
         subtotalAmount,
         shippingAmount,

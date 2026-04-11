@@ -257,7 +257,7 @@ model Order {
   taxAmount             Int          @default(0)
   shippingAmount        Int          @default(0)
   totalAmount           Int
-  currency              String       @default("EUR")
+  currency              String       @default("CZK")
   notes                 String?
   createdAt             DateTime    @default(now())
   updatedAt             DateTime    @updatedAt
