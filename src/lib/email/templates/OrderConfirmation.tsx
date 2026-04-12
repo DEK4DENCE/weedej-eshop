@@ -108,12 +108,12 @@ export function OrderConfirmation({
           <Text style={sectionTitle}>Doručení</Text>
           {deliveryType === 'PICKUP_IN_STORE' ? (
             <Text style={paragraph}>
-              <strong style={{ color: '#F0F5F0' }}>Osobní odběr</strong> — Vaše objednávka bude
+              <strong style={{ color: '#1d1d1f' }}>Osobní odběr</strong> — Vaše objednávka bude
               připravena k vyzvednutí na naší prodejně. Kontaktujeme vás, jakmile bude připravena.
             </Text>
           ) : shippingAddress ? (
             <Text style={paragraph}>
-              <strong style={{ color: '#F0F5F0' }}>Doručení kurýrem</strong>
+              <strong style={{ color: '#1d1d1f' }}>Doručení kurýrem</strong>
               <br />
               {shippingAddress.fullName}
               <br />
@@ -133,8 +133,8 @@ export function OrderConfirmation({
 
           <Text style={paragraph}>
             Máte otázky? Kontaktujte nás na{' '}
-            <Link href="mailto:support@weedej.com" style={link}>
-              support@weedej.com
+            <Link href="mailto:support@weedej.cz" style={link}>
+              support@weedej.cz
             </Link>
           </Text>
 
@@ -155,14 +155,14 @@ export function OrderConfirmation({
 }
 
 const body = {
-  backgroundColor: '#0A0D0A',
+  backgroundColor: '#F8F9FA',
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
 }
 
 const container = {
-  backgroundColor: '#111714',
-  border: '1px solid #1F3D1F',
-  borderRadius: '16px',
+  backgroundColor: '#ffffff',
+  border: '1px solid #DEE2E6',
+  borderRadius: '12px',
   margin: '40px auto',
   padding: '40px',
   maxWidth: '560px',
@@ -170,44 +170,44 @@ const container = {
 
 const logo = {
   color: '#2E7D32',
-  fontSize: '22px',
+  fontSize: '20px',
   fontWeight: '700',
   letterSpacing: '-0.5px',
-  marginBottom: '32px',
+  marginBottom: '24px',
 }
 
 const heading = {
-  color: '#F0F5F0',
+  color: '#1d1d1f',
   fontSize: '22px',
   fontWeight: '700',
   marginBottom: '8px',
 }
 
 const paragraph = {
-  color: '#A8C5A0',
+  color: '#6e6e73',
   fontSize: '15px',
   lineHeight: '1.6',
   marginBottom: '16px',
 }
 
 const orderBox = {
-  backgroundColor: '#1A2219',
-  border: '1px solid #1F3D1F',
+  backgroundColor: '#F8F9FA',
+  border: '1px solid #DEE2E6',
   borderRadius: '10px',
   padding: '16px 20px',
   marginBottom: '24px',
 }
 
 const orderLabel = {
-  color: '#6B8A6B',
-  fontSize: '12px',
+  color: '#6e6e73',
+  fontSize: '11px',
   textTransform: 'uppercase' as const,
   letterSpacing: '0.05em',
   margin: '0 0 4px 0',
 }
 
 const orderNumber2 = {
-  color: '#F0F5F0',
+  color: '#1d1d1f',
   fontSize: '18px',
   fontWeight: '700',
   fontFamily: 'monospace',
@@ -215,10 +215,10 @@ const orderNumber2 = {
 }
 
 const sectionTitle = {
-  color: '#F0F5F0',
-  fontSize: '15px',
+  color: '#1d1d1f',
+  fontSize: '14px',
   fontWeight: '600',
-  marginBottom: '12px',
+  marginBottom: '10px',
   marginTop: '8px',
 }
 
@@ -231,14 +231,14 @@ const itemInfo = {
 }
 
 const itemName = {
-  color: '#F0F5F0',
+  color: '#1d1d1f',
   fontSize: '14px',
   fontWeight: '500',
   margin: '0 0 2px 0',
 }
 
 const itemVariant = {
-  color: '#6B8A6B',
+  color: '#6e6e73',
   fontSize: '13px',
   margin: '0',
 }
@@ -249,48 +249,47 @@ const itemPrice = {
 }
 
 const itemPriceText = {
-  color: '#A8C5A0',
+  color: '#1d1d1f',
   fontSize: '14px',
   margin: '0',
 }
 
 const totalRow = {
-  marginBottom: '6px',
+  marginBottom: '4px',
 }
 
 const totalLabel = {
-  color: '#6B8A6B',
-  fontSize: '14px',
+  color: '#6e6e73',
+  fontSize: '13px',
   margin: '0',
 }
 
 const totalValue = {
-  color: '#A8C5A0',
-  fontSize: '14px',
+  color: '#1d1d1f',
+  fontSize: '13px',
   textAlign: 'right' as const,
   margin: '0',
 }
 
 const grandTotalLabel = {
-  color: '#F0F5F0',
-  fontSize: '16px',
+  color: '#1d1d1f',
+  fontSize: '15px',
   fontWeight: '700',
   margin: '0',
 }
 
 const grandTotalValue = {
-  color: '#D4A017',
-  fontSize: '16px',
+  color: '#2E7D32',
+  fontSize: '15px',
   fontWeight: '700',
   textAlign: 'right' as const,
-  fontFamily: 'monospace',
   margin: '0',
 }
 
 const button = {
   backgroundColor: '#2E7D32',
-  borderRadius: '10px',
-  color: '#000000',
+  borderRadius: '8px',
+  color: '#ffffff',
   display: 'inline-block',
   fontWeight: '600',
   fontSize: '15px',
@@ -301,9 +300,9 @@ const button = {
 }
 
 const divider = {
-  borderColor: '#1F3D1F',
-  marginTop: '20px',
-  marginBottom: '20px',
+  borderColor: '#DEE2E6',
+  marginTop: '16px',
+  marginBottom: '16px',
 }
 
 const link = {
@@ -311,7 +310,7 @@ const link = {
 }
 
 const footer = {
-  color: '#4A6B4A',
-  fontSize: '12px',
+  color: '#aeaeb2',
+  fontSize: '11px',
   lineHeight: '1.5',
 }
