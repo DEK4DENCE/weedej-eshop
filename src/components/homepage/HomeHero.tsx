@@ -11,7 +11,7 @@ const fadeUp = (delay: number) => ({
 
 export function HomeHero() {
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
+    <section className="relative min-h-screen flex flex-col items-center justify-start overflow-hidden bg-black">
       {/* Background video */}
       <video
         autoPlay
@@ -25,11 +25,11 @@ export function HomeHero() {
       <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-black to-transparent z-[1]" />
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center text-center px-6 pt-10 md:pt-14 max-w-4xl mx-auto">
+      <div className="relative z-10 flex flex-col items-center text-center px-6 pt-16 md:pt-20 max-w-4xl mx-auto w-full">
         {/* Heading */}
         <motion.h1
           {...fadeUp(0.1)}
-          className="text-5xl md:text-7xl lg:text-8xl font-medium tracking-[-2px] text-white leading-[1.05] mb-6"
+          className="text-5xl md:text-7xl lg:text-8xl font-medium tracking-[-2px] text-white leading-[1.05] mb-28 md:mb-36"
         >
           Objev sílu{" "}
           <em style={{ fontFamily: '"Playfair Display", Georgia, serif' }} className="font-normal not-italic italic">
@@ -41,7 +41,7 @@ export function HomeHero() {
         {/* Subtitle */}
         <motion.p
           {...fadeUp(0.2)}
-          className="text-lg text-[hsl(210,17%,82%)] max-w-xl mb-10"
+          className="text-lg text-[hsl(210,17%,82%)] max-w-xl mb-8"
         >
           Laboratořemi testované CBD a konopné produkty. Legální, diskrétní, prémiové.
           Doručení po celé ČR do 2–3 pracovních dnů.
