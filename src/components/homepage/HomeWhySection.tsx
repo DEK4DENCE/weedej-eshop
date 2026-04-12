@@ -34,7 +34,7 @@ const categories: { name: string; href: string; Icon: LucideIcon; desc: string }
 
 export function HomeWhySection() {
   return (
-    <section className="bg-white pt-32 pb-16 px-6 text-center">
+    <section className="bg-black pt-32 pb-16 px-6 text-center">
       <div className="max-w-5xl mx-auto">
         <motion.h2
           {...fadeUp(0)}
