@@ -2,6 +2,7 @@
 import { useEffect, useRef } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
+import { Logo } from "@/components/ui/Logo"
 
 const fadeUp = (delay: number) => ({
   initial: { opacity: 0, y: 20 },
@@ -48,11 +49,9 @@ export function HomeCTASection() {
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center text-center max-w-2xl mx-auto">
-        {/* Logo mark */}
-        <motion.div {...fadeUp(0)} className="mb-8">
-          <div className="relative w-10 h-10 flex items-center justify-center rounded-full border-2 border-white/60 mx-auto">
-            <div className="w-5 h-5 rounded-full border border-white/60" />
-          </div>
+        {/* Logo */}
+        <motion.div {...fadeUp(0)} className="mb-8 flex justify-center">
+          <Logo variant="light" size="lg" />
         </motion.div>
 
         <motion.h2

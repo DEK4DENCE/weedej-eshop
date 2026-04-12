@@ -2,6 +2,7 @@
 import Link from "next/link"
 import { ShoppingBag } from "lucide-react"
 import { useCart } from "@/hooks/useCart"
+import { Logo } from "@/components/ui/Logo"
 
 const InstagramIcon = () => (
   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -20,12 +21,7 @@ export function HomeNavbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-16 py-4 bg-white/95 backdrop-blur border-b border-[#DEE2E6]">
       {/* Logo */}
-      <Link href="/" className="flex items-center gap-2.5">
-        <div className="relative w-7 h-7 flex items-center justify-center rounded-full border-2 border-[#1d1d1f]/60">
-          <div className="w-3 h-3 rounded-full border border-[#1d1d1f]/60" />
-        </div>
-        <span className="text-[#1d1d1f] font-bold text-lg tracking-tight">Weedej</span>
-      </Link>
+      <Logo variant="dark" size="md" />
 
       {/* Center nav */}
       <div className="hidden md:flex items-center gap-3 text-sm">

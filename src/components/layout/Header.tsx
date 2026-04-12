@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useSession, signOut } from "next-auth/react"
 import { ShoppingBag, User, LogOut, Settings, Package, Menu, X } from "lucide-react"
 import { useCart } from "@/hooks/useCart"
+import { Logo } from "@/components/ui/Logo"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,11 +45,9 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-[#DEE2E6] bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
-          <span className="text-2xl font-bold text-[#2E7D32] font-playfair">
-            Weedej
-          </span>
-        </Link>
+        <div onClick={() => setMobileOpen(false)}>
+          <Logo variant="dark" size="md" />
+        </div>
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-6">

@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { Logo } from "@/components/ui/Logo"
 
 export function Footer() {
   return (
@@ -6,7 +7,7 @@ export function Footer() {
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-xl font-bold text-[#2E7D32] mb-4 font-playfair">Weedej</h3>
+            <Logo variant="dark" size="md" className="mb-4" />
             <p className="text-sm text-[#6e6e73] leading-relaxed mb-4">
               Prémiové konopné produkty doručené až ke dveřím. Laboratořemi testováno, přírodou inspirováno.
             </p>
