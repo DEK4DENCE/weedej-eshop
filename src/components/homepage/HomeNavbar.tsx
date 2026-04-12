@@ -18,21 +18,21 @@ const FacebookIcon = () => (
 export function HomeNavbar() {
   const { totalItems, toggleSidebar } = useCart()
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-16 py-5">
+    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-16 py-4 bg-white/95 backdrop-blur border-b border-[#DEE2E6]">
       {/* Logo */}
       <Link href="/" className="flex items-center gap-2.5">
-        <div className="relative w-7 h-7 flex items-center justify-center rounded-full border-2 border-white/60">
-          <div className="w-3 h-3 rounded-full border border-white/60" />
+        <div className="relative w-7 h-7 flex items-center justify-center rounded-full border-2 border-[#1d1d1f]/60">
+          <div className="w-3 h-3 rounded-full border border-[#1d1d1f]/60" />
         </div>
-        <span className="text-white font-bold text-lg tracking-tight">Weedej</span>
+        <span className="text-[#1d1d1f] font-bold text-lg tracking-tight">Weedej</span>
       </Link>
 
       {/* Center nav */}
       <div className="hidden md:flex items-center gap-3 text-sm">
         {([["Produkty", "/products"], ["Doprava", "/doprava"], ["Blog", "/blog"], ["Kontakt", "/contact"]] as [string, string][]).map(([label, href], i) => (
           <span key={href} className="flex items-center gap-3">
-            {i > 0 && <span className="text-white/20">•</span>}
-            <Link href={href} className="text-white/55 hover:text-white transition-colors duration-200">{label}</Link>
+            {i > 0 && <span className="text-[#DEE2E6]">•</span>}
+            <Link href={href} className="text-[#6e6e73] hover:text-[#1d1d1f] transition-colors duration-200">{label}</Link>
           </span>
         ))}
       </div>
@@ -43,13 +43,13 @@ export function HomeNavbar() {
         <div className="hidden md:flex items-center gap-1 mr-2">
           <Link
             href="/login"
-            className="text-white/55 hover:text-white text-sm font-medium px-3 py-2 rounded-lg transition-colors duration-200"
+            className="text-[#6e6e73] hover:text-[#1d1d1f] text-sm font-medium px-3 py-2 rounded-lg transition-colors duration-200"
           >
             Přihlásit se
           </Link>
           <Link
             href="/register"
-            className="bg-white text-black text-sm font-semibold px-4 py-2 rounded-full hover:bg-white/90 transition-colors duration-200"
+            className="bg-[#2E7D32] text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#1a9020] transition-colors duration-200"
           >
             Registrovat
           </Link>
@@ -58,7 +58,7 @@ export function HomeNavbar() {
           href="https://www.instagram.com/weedej.cz"
           target="_blank"
           rel="noopener noreferrer"
-          className="liquid-glass w-10 h-10 rounded-full flex items-center justify-center text-white/60 hover:text-white transition-colors"
+          className="w-10 h-10 rounded-full border border-[#DEE2E6] flex items-center justify-center text-[#6e6e73] hover:text-[#1d1d1f] hover:border-[#1d1d1f] transition-colors"
         >
           <InstagramIcon />
         </a>
@@ -66,17 +66,17 @@ export function HomeNavbar() {
           href="https://www.facebook.com/weedej.cz"
           target="_blank"
           rel="noopener noreferrer"
-          className="liquid-glass w-10 h-10 rounded-full flex items-center justify-center text-white/60 hover:text-white transition-colors"
+          className="w-10 h-10 rounded-full border border-[#DEE2E6] flex items-center justify-center text-[#6e6e73] hover:text-[#1d1d1f] hover:border-[#1d1d1f] transition-colors"
         >
           <FacebookIcon />
         </a>
         <button
           onClick={toggleSidebar}
-          className="liquid-glass w-10 h-10 rounded-full flex items-center justify-center text-white/60 hover:text-white transition-colors relative"
+          className="w-10 h-10 rounded-full border border-[#DEE2E6] flex items-center justify-center text-[#6e6e73] hover:text-[#1d1d1f] hover:border-[#1d1d1f] transition-colors relative"
         >
           <ShoppingBag className="w-4 h-4" />
           {totalItems > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-white text-black text-[10px] font-bold rounded-full flex items-center justify-center">
+            <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#2E7D32] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
               {totalItems}
             </span>
           )}

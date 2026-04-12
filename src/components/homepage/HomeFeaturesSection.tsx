@@ -39,17 +39,17 @@ interface Props {
 
 export function HomeFeaturesSection({ products }: Props) {
   return (
-    <section className="bg-black py-32 md:py-44 px-6 border-t border-white/10">
+    <section className="bg-[#F8F9FA] py-32 md:py-44 px-6 border-t border-[#DEE2E6]">
       <div className="max-w-5xl mx-auto">
         {/* Label */}
-        <motion.p {...fadeUp(0)} className="text-xs tracking-[3px] uppercase text-white/40 mb-4">
+        <motion.p {...fadeUp(0)} className="text-xs tracking-[3px] uppercase text-[#aeaeb2] mb-4">
           Proč Weedej
         </motion.p>
 
         {/* Heading */}
         <motion.h2
           {...fadeUp(0.05)}
-          className="text-4xl md:text-6xl font-medium tracking-[-1px] text-white mb-16"
+          className="text-4xl md:text-6xl font-medium tracking-[-1px] text-[#1d1d1f] mb-16"
         >
           Platforma pro{" "}
           <em style={{ fontFamily: '"Playfair Display", Georgia, serif' }} className="font-normal italic">
@@ -75,9 +75,9 @@ export function HomeFeaturesSection({ products }: Props) {
           {features.map(({ icon: Icon, title, desc }, i) => (
             <motion.div key={title} {...fadeUp(i * 0.08)}>
               <div className="flex flex-col gap-3">
-                <Icon className="w-5 h-5 text-white/40" />
-                <p className="font-semibold text-white text-base">{title}</p>
-                <p className="text-white/45 text-sm leading-relaxed">{desc}</p>
+                <Icon className="w-5 h-5 text-[#6e6e73]" />
+                <p className="font-semibold text-[#1d1d1f] text-base">{title}</p>
+                <p className="text-[#6e6e73] text-sm leading-relaxed">{desc}</p>
               </div>
             </motion.div>
           ))}
@@ -87,8 +87,8 @@ export function HomeFeaturesSection({ products }: Props) {
         {products.length > 0 && (
           <motion.div {...fadeUp(0.2)}>
             <div className="flex items-center justify-between mb-6">
-              <p className="text-xs tracking-[3px] uppercase text-white/40">Bestsellery</p>
-              <Link href="/products" className="text-white/40 text-sm hover:text-white transition-colors">
+              <p className="text-xs tracking-[3px] uppercase text-[#aeaeb2]">Bestsellery</p>
+              <Link href="/products" className="text-[#aeaeb2] text-sm hover:text-[#1d1d1f] transition-colors">
                 Zobrazit vše →
               </Link>
             </div>
@@ -99,9 +99,9 @@ export function HomeFeaturesSection({ products }: Props) {
                   <Link
                     key={product.id}
                     href={`/products/${product.slug}`}
-                    className="group liquid-glass rounded-xl p-4 hover:bg-white/5 transition-colors"
+                    className="group border border-[#DEE2E6] bg-white rounded-xl p-4 hover:border-[#1d1d1f]/20 hover:bg-[#F8F9FA] transition-colors"
                   >
-                    <div className="aspect-square rounded-lg overflow-hidden bg-white/5 mb-3">
+                    <div className="aspect-square rounded-lg overflow-hidden bg-[#F8F9FA] mb-3">
                       {product.imageUrls?.[0] ? (
                         <img
                           src={product.imageUrls[0]}
@@ -110,12 +110,12 @@ export function HomeFeaturesSection({ products }: Props) {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <Package className="w-8 h-8 text-white/20" />
+                          <Package className="w-8 h-8 text-[#aeaeb2]" />
                         </div>
                       )}
                     </div>
-                    <p className="text-white text-sm font-medium truncate">{product.name}</p>
-                    <p className="text-white/45 text-xs mt-0.5">
+                    <p className="text-[#1d1d1f] text-sm font-medium truncate">{product.name}</p>
+                    <p className="text-[#6e6e73] text-xs mt-0.5">
                       od {Number(price).toLocaleString("cs-CZ")} Kč
                     </p>
                   </Link>

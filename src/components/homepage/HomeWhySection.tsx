@@ -34,11 +34,11 @@ const categories: { name: string; href: string; Icon: LucideIcon; desc: string }
 
 export function HomeWhySection() {
   return (
-    <section className="bg-black pt-32 pb-16 px-6 text-center">
+    <section className="bg-white pt-32 pb-16 px-6 text-center">
       <div className="max-w-5xl mx-auto">
         <motion.h2
           {...fadeUp(0)}
-          className="text-5xl md:text-7xl lg:text-8xl font-medium tracking-[-2px] text-white mb-6"
+          className="text-5xl md:text-7xl lg:text-8xl font-medium tracking-[-2px] text-[#1d1d1f] mb-6"
         >
           Kvalita, která{" "}
           <em style={{ fontFamily: '"Playfair Display", Georgia, serif' }} className="font-normal italic">
@@ -48,7 +48,7 @@ export function HomeWhySection() {
         </motion.h2>
         <motion.p
           {...fadeUp(0.1)}
-          className="text-white/55 text-lg max-w-2xl mx-auto mb-20"
+          className="text-[#6e6e73] text-lg max-w-2xl mx-auto mb-20"
         >
           Každý produkt v našem katalogu prošel přísným výběrem a splňuje
           nejvyšší standardy EU. Žádné kompromisy.
@@ -60,19 +60,19 @@ export function HomeWhySection() {
             <motion.div key={name} {...fadeUp(i * 0.1)}>
               <Link
                 href={href}
-                className="group flex flex-col items-center gap-4 p-6 rounded-2xl liquid-glass hover:bg-white/5 transition-colors"
+                className="group flex flex-col items-center gap-4 p-6 rounded-2xl border border-[#DEE2E6] bg-white hover:border-[#1d1d1f]/20 hover:bg-[#F8F9FA] transition-colors"
               >
-                <div className="w-44 h-44 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors duration-300">
-                  <Icon className="w-20 h-20 text-white/60 group-hover:text-white/80 transition-colors duration-300" strokeWidth={1} />
+                <div className="w-44 h-44 rounded-xl bg-[#F8F9FA] flex items-center justify-center group-hover:bg-[#DEE2E6]/50 transition-colors duration-300">
+                  <Icon className="w-20 h-20 text-[#6e6e73] group-hover:text-[#1d1d1f] transition-colors duration-300" strokeWidth={1} />
                 </div>
-                <p className="font-semibold text-white text-base">{name}</p>
-                <p className="text-white/50 text-sm leading-relaxed">{desc}</p>
+                <p className="font-semibold text-[#1d1d1f] text-base">{name}</p>
+                <p className="text-[#6e6e73] text-sm leading-relaxed">{desc}</p>
               </Link>
             </motion.div>
           ))}
         </div>
 
-        <motion.p {...fadeUp(0.4)} className="text-white/30 text-sm">
+        <motion.p {...fadeUp(0.4)} className="text-[#aeaeb2] text-sm">
           Vše laboratořemi testováno. Certifikáty k dispozici na vyžádání.
         </motion.p>
       </div>

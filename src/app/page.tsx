@@ -56,7 +56,7 @@ export default async function HomePage() {
   const products = await getBestsellers()
 
   return (
-    <div className="bg-black min-h-screen">
+    <div className="bg-white min-h-screen">
       <HomeNavbar />
       <HomeHero />
       <HomeWhySection />

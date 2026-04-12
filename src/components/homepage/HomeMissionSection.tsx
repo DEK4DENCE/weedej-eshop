@@ -25,7 +25,7 @@ function ScrollRevealText({ text, className }: { text: string; className?: strin
 
 export function HomeMissionSection() {
   return (
-    <section className="bg-black pt-0 pb-32 md:pb-44 px-6">
+    <section className="bg-white pt-0 pb-32 md:pb-44 px-6">
       <div className="max-w-4xl mx-auto">
         {/* Video */}
         <div className="flex justify-center mb-20">
@@ -41,11 +41,11 @@ export function HomeMissionSection() {
 
         <ScrollRevealText
           text="Weedej vznikl z vášně pro legální konopnou kulturu — kde zákazníci nacházejí prémiové produkty, pěstitelé prémiové partnery, a každá zásilka přináší zkušenost, na kterou se těšíte."
-          className="text-2xl md:text-4xl lg:text-5xl font-medium tracking-[-1px] leading-[1.3] mb-10 text-white"
+          className="text-2xl md:text-4xl lg:text-5xl font-medium tracking-[-1px] leading-[1.3] mb-10 text-[#1d1d1f]"
         />
         <ScrollRevealText
           text="Platforma, kde obsah, komunita a produkty proudí společně — s méně hlukem, méně kompromisy a více autenticitou pro každého zákazníka."
-          className="text-xl md:text-2xl lg:text-3xl font-medium leading-[1.4] text-white/70"
+          className="text-xl md:text-2xl lg:text-3xl font-medium leading-[1.4] text-[#6e6e73]"
         />
       </div>
     </section>

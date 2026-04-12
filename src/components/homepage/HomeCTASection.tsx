@@ -33,7 +33,7 @@ export function HomeCTASection() {
   }, [])
 
   return (
-    <section className="relative bg-black py-32 md:py-44 px-6 border-t border-white/10 overflow-hidden">
+    <section className="relative bg-[#F8F9FA] py-32 md:py-44 px-6 border-t border-[#DEE2E6] overflow-hidden">
       {/* HLS background video */}
       <video
         ref={videoRef}
@@ -41,23 +41,23 @@ export function HomeCTASection() {
         loop
         muted
         playsInline
-        className="absolute inset-0 w-full h-full object-cover z-0 opacity-30"
+        className="absolute inset-0 w-full h-full object-cover z-0 opacity-10"
       />
-      {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black/55 z-[1]" />
+      {/* Light overlay */}
+      <div className="absolute inset-0 bg-[#F8F9FA]/80 z-[1]" />
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center text-center max-w-2xl mx-auto">
         {/* Logo mark */}
         <motion.div {...fadeUp(0)} className="mb-8">
-          <div className="relative w-10 h-10 flex items-center justify-center rounded-full border-2 border-white/60 mx-auto">
-            <div className="w-5 h-5 rounded-full border border-white/60" />
+          <div className="relative w-10 h-10 flex items-center justify-center rounded-full border-2 border-[#1d1d1f]/60 mx-auto">
+            <div className="w-5 h-5 rounded-full border border-[#1d1d1f]/60" />
           </div>
         </motion.div>
 
         <motion.h2
           {...fadeUp(0.1)}
-          className="text-5xl md:text-6xl font-medium tracking-[-1.5px] text-white mb-5"
+          className="text-5xl md:text-6xl font-medium tracking-[-1.5px] text-[#1d1d1f] mb-5"
         >
           Začni svou cestu s{" "}
           <em style={{ fontFamily: '"Playfair Display", Georgia, serif' }} className="font-normal italic">
@@ -66,7 +66,7 @@ export function HomeCTASection() {
           wellness
         </motion.h2>
 
-        <motion.p {...fadeUp(0.2)} className="text-white/55 text-lg mb-10">
+        <motion.p {...fadeUp(0.2)} className="text-[#6e6e73] text-lg mb-10">
           Prémiové CBD produkty doručené diskrétně až ke dveřím.
           Laboratořemi testováno, přírodou inspirováno.
         </motion.p>
@@ -75,7 +75,7 @@ export function HomeCTASection() {
           <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
             <Link
               href="/products"
-              className="bg-white text-black font-semibold rounded-lg px-8 py-3.5 text-sm hover:bg-white/90 transition-colors"
+              className="bg-[#2E7D32] text-white font-semibold rounded-lg px-8 py-3.5 text-sm hover:bg-[#1a9020] transition-colors"
             >
               Nakupovat nyní
             </Link>
@@ -83,7 +83,7 @@ export function HomeCTASection() {
           <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
             <Link
               href="/o-nas"
-              className="liquid-glass text-white font-medium rounded-lg px-8 py-3.5 text-sm hover:text-white/80 transition-colors"
+              className="border border-[#DEE2E6] bg-white text-[#1d1d1f] font-medium rounded-lg px-8 py-3.5 text-sm hover:border-[#1d1d1f]/40 transition-colors"
             >
               Náš příběh
             </Link>
