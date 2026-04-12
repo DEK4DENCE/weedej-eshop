@@ -111,7 +111,7 @@ export function Header() {
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator className="bg-[#DEE2E6]" />
-                <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })} className="text-[#6e6e73] hover:text-[#1d1d1f] cursor-pointer">
+                <DropdownMenuItem onClick={() => signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL ?? "/" })} className="text-[#6e6e73] hover:text-[#1d1d1f] cursor-pointer">
                   <LogOut className="mr-2 h-4 w-4" />Odhlásit se
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -176,7 +176,7 @@ export function Header() {
                     </Link>
                   )}
                   <button
-                    onClick={() => { setMobileOpen(false); signOut({ callbackUrl: "/" }) }}
+                    onClick={() => { setMobileOpen(false); signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL ?? "/" }) }}
                     className="flex items-center gap-2 w-full text-sm font-medium text-[#6e6e73] hover:text-red-600 hover:bg-red-50 px-3 py-2.5 rounded-xl transition-colors mt-1"
                   >
                     <LogOut className="h-4 w-4" />Odhlásit se
