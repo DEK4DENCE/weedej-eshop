@@ -30,6 +30,23 @@ export const metadata: Metadata = {
   },
 }
 
+async function getCategoryImages(): Promise<Record<string, string>> {
+  try {
+    const slugs = ["kvety", "extrakty", "edibles"]
+    const result: Record<string, string> = {}
+    for (const slug of slugs) {
+      const product = await db.product.findFirst({
+        where: { category: { slug }, isActive: true, imageUrls: { isEmpty: false } },
+        select: { imageUrls: true },
+      })
+      if (product?.imageUrls?.[0]) result[slug] = product.imageUrls[0]
+    }
+    return result
+  } catch {
+    return {}
+  }
+}
+
 async function getBestsellers() {
   try {
     const setting = await db.setting.findUnique({ where: { key: "bestsellers" } })
@@ -53,13 +70,13 @@ async function getBestsellers() {
 }
 
 export default async function HomePage() {
-  const products = await getBestsellers()
+  const [products, categoryImages] = await Promise.all([getBestsellers(), getCategoryImages()])
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-black min-h-screen">
       <HomeNavbar />
       <HomeHero />
-      <HomeWhySection />
+      <HomeWhySection categoryImages={categoryImages} />
       <HomeMissionSection />
       <HomeFeaturesSection products={products} />
       <HomeCTASection />
