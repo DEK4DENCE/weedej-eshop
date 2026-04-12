@@ -25,7 +25,7 @@ export function HomeHero() {
       <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-black to-transparent z-[1]" />
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center text-center px-6 pt-28 md:pt-32 max-w-4xl mx-auto">
+      <div className="relative z-10 flex flex-col items-center text-center px-6 pt-10 md:pt-14 max-w-4xl mx-auto">
         {/* Heading */}
         <motion.h1
           {...fadeUp(0.1)}
