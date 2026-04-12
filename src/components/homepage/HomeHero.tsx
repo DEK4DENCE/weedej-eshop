@@ -35,7 +35,7 @@ export function HomeHero() {
           <em style={{ fontFamily: '"Playfair Display", Georgia, serif' }} className="font-normal not-italic italic">
             přírody
           </em>
-          ,<br />doručenou ke&nbsp;vám
+          ,<br />doručenou až k&nbsp;Vašim dveřím
         </motion.h1>
 
         {/* Subtitle */}
