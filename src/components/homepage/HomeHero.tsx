@@ -29,13 +29,17 @@ export function HomeHero() {
         {/* Badge */}
         <motion.div {...fadeUp(0)} className="flex items-center gap-2 mb-8">
           <div className="flex -space-x-2">
-            {["/1.jpg", "/2.png", "/3.png"].map((src, i) => (
-              <img
+            {[
+              "bg-gradient-to-br from-emerald-400 to-green-700",
+              "bg-gradient-to-br from-teal-400 to-emerald-600",
+              "bg-gradient-to-br from-green-300 to-teal-600",
+            ].map((grad, i) => (
+              <div
                 key={i}
-                src={src}
-                alt="customer"
-                className="w-8 h-8 rounded-full border-2 border-black object-cover bg-white/10"
-              />
+                className={`w-8 h-8 rounded-full border-2 border-black ${grad} flex items-center justify-center`}
+              >
+                <span className="text-white text-[10px] font-bold">{["T", "M", "P"][i]}</span>
+              </div>
             ))}
           </div>
           <span className="text-white/55 text-sm ml-1">50+ prémiových produktů</span>

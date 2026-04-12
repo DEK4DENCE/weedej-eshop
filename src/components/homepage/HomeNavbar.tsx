@@ -39,6 +39,21 @@ export function HomeNavbar() {
 
       {/* Right actions */}
       <div className="flex items-center gap-2">
+        {/* Auth links — desktop only */}
+        <div className="hidden md:flex items-center gap-1 mr-2">
+          <Link
+            href="/login"
+            className="text-white/55 hover:text-white text-sm font-medium px-3 py-2 rounded-lg transition-colors duration-200"
+          >
+            Přihlásit se
+          </Link>
+          <Link
+            href="/register"
+            className="bg-white text-black text-sm font-semibold px-4 py-2 rounded-full hover:bg-white/90 transition-colors duration-200"
+          >
+            Registrovat
+          </Link>
+        </div>
         <a
           href="https://www.instagram.com/weedej.cz"
           target="_blank"

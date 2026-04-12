@@ -1,6 +1,8 @@
 "use client"
 import { motion } from "framer-motion"
 import Link from "next/link"
+import { Flower2, FlaskConical, Candy } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
 
 const fadeUp = (delay: number) => ({
   initial: { opacity: 0, y: 20 },
@@ -9,23 +11,23 @@ const fadeUp = (delay: number) => ({
   transition: { duration: 0.6, delay, ease: "easeOut" as const },
 })
 
-const categories = [
+const categories: { name: string; href: string; Icon: LucideIcon; desc: string }[] = [
   {
     name: "Květy CBD",
     href: "/products?category=kvety",
-    img: "/auto-girl-scout-cookies.jpg",
+    Icon: Flower2,
     desc: "Prémiové sušené CBD květy z certifikovaných evropských pěstíren. Bohaté terpény, bez THC.",
   },
   {
     name: "Extrakty",
     href: "/products?category=extrakty",
-    img: "/cbdiso.png",
+    Icon: FlaskConical,
     desc: "CBD oleje, vosky a koncentráty. Přesné dávkování, maximální čistota, laboratorně ověřeno.",
   },
   {
     name: "Edibles",
     href: "/products?category=edibles",
-    img: "/cbdgummies.png",
+    Icon: Candy,
     desc: "CBD gumičky, čokolády a nápoje. Diskrétní, chutné a pohodlné použití kdykoliv.",
   },
 ]
@@ -54,18 +56,14 @@ export function HomeWhySection() {
 
         {/* Category cards */}
         <div className="grid md:grid-cols-3 gap-8 mb-16">
-          {categories.map(({ name, href, img, desc }, i) => (
+          {categories.map(({ name, href, Icon, desc }, i) => (
             <motion.div key={name} {...fadeUp(i * 0.1)}>
               <Link
                 href={href}
                 className="group flex flex-col items-center gap-4 p-6 rounded-2xl liquid-glass hover:bg-white/5 transition-colors"
               >
-                <div className="w-44 h-44 rounded-xl overflow-hidden bg-white/5 flex items-center justify-center">
-                  <img
-                    src={img}
-                    alt={name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
+                <div className="w-44 h-44 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors duration-300">
+                  <Icon className="w-20 h-20 text-white/60 group-hover:text-white/80 transition-colors duration-300" strokeWidth={1} />
                 </div>
                 <p className="font-semibold text-white text-base">{name}</p>
                 <p className="text-white/50 text-sm leading-relaxed">{desc}</p>
