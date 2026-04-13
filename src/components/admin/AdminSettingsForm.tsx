@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Save, Star } from 'lucide-react'
+import { Save, Star, Link2, RefreshCw, CheckCircle, XCircle, Download } from 'lucide-react'
 
 interface Product { id: string; name: string }
 
@@ -17,6 +17,15 @@ export function AdminSettingsForm({ settings, products }: Props) {
   })
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+
+  // ERP integration state
+  const [erpUrl, setErpUrl] = useState(settings.erpApiUrl ?? '')
+  const [erpKey, setErpKey] = useState(settings.erpApiKey ?? '')
+  const [testing, setTesting] = useState(false)
+  const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null)
+  const [importing, setImporting] = useState(false)
+  const [importResult, setImportResult] = useState<{ created: number; updated: number; skipped: number } | null>(null)
+  const [importError, setImportError] = useState<string | null>(null)
 
   function toggleBestseller(id: string) {
     setBestsellers((prev) => {
@@ -37,12 +46,69 @@ export function AdminSettingsForm({ settings, products }: Props) {
         body: JSON.stringify({
           orderNotificationEmail: orderEmail,
           bestsellers: JSON.stringify(bestsellers),
+          erpApiUrl: erpUrl,
+          erpApiKey: erpKey,
         }),
       })
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } finally {
       setSaving(false)
+    }
+  }
+
+  async function handleTestErp() {
+    if (!erpUrl || !erpKey) {
+      setTestResult({ ok: false, message: 'Vyplňte ERP URL a API klíč.' })
+      return
+    }
+    setTesting(true)
+    setTestResult(null)
+    try {
+      const res = await fetch('/api/admin/erp/import', {
+        method: 'GET',
+        headers: {
+          'x-erp-url': erpUrl,
+          'x-erp-key': erpKey,
+        },
+      })
+      const data = await res.json()
+      if (res.ok && data.ok) {
+        setTestResult({ ok: true, message: `Připojeno! Nalezeno ${data.productCount} produktů v ERP.` })
+      } else {
+        setTestResult({ ok: false, message: data.error ?? 'Nepodařilo se připojit k ERP.' })
+      }
+    } catch {
+      setTestResult({ ok: false, message: 'Chyba sítě — zkontrolujte URL.' })
+    } finally {
+      setTesting(false)
+    }
+  }
+
+  async function handleImportFromErp() {
+    if (!erpUrl || !erpKey) {
+      setImportError('Nejdřív uložte ERP URL a API klíč.')
+      return
+    }
+    setImporting(true)
+    setImportResult(null)
+    setImportError(null)
+    try {
+      const res = await fetch('/api/admin/erp/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ erpUrl, erpKey }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setImportResult({ created: data.created, updated: data.updated, skipped: data.skipped })
+      } else {
+        setImportError(data.error ?? 'Import selhal.')
+      }
+    } catch {
+      setImportError('Chyba sítě při importu.')
+    } finally {
+      setImporting(false)
     }
   }
 
@@ -109,6 +175,100 @@ export function AdminSettingsForm({ settings, products }: Props) {
             )
           })}
           {products.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">Žádné aktivní produkty</p>}
+        </div>
+      </div>
+
+      {/* ERP Integration */}
+      <div className="bg-card border border-border/40 rounded-xl p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <Link2 className="h-4 w-4 text-blue-500" />
+          <h2 className="text-base font-semibold text-foreground">Propojení s ERP</h2>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Zadejte přístupové údaje k ERP systému. Pomocí tlačítka níže importujte produkty — název a cena se vezmou z ERP, obrázky a popis doplníte zde.
+        </p>
+
+        <div className="space-y-3">
+          <div>
+            <label className="block text-sm font-medium text-muted-foreground mb-1.5">
+              ERP API URL
+            </label>
+            <input
+              type="url"
+              value={erpUrl}
+              onChange={(e) => { setErpUrl(e.target.value); setTestResult(null) }}
+              placeholder="http://localhost:3000"
+              className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-muted-foreground mb-1.5">
+              ERP API klíč
+            </label>
+            <input
+              type="password"
+              value={erpKey}
+              onChange={(e) => { setErpKey(e.target.value); setTestResult(null) }}
+              placeholder="erp_live_..."
+              className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+            />
+            <p className="text-xs text-muted-foreground mt-1.5">
+              API klíč vygenerujete v ERP pod Nastavení → API klíče.
+            </p>
+          </div>
+        </div>
+
+        {/* Test connection */}
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            disabled={testing || !erpUrl || !erpKey}
+            onClick={handleTestErp}
+            className="flex items-center gap-2 bg-background border border-border hover:border-blue-500 disabled:opacity-50 text-foreground font-medium px-4 py-2 rounded-lg text-sm transition-colors"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${testing ? 'animate-spin' : ''}`} />
+            {testing ? 'Testuji…' : 'Otestovat připojení'}
+          </button>
+          {testResult && (
+            <div className={`flex items-center gap-1.5 text-sm ${testResult.ok ? 'text-green-600' : 'text-red-500'}`}>
+              {testResult.ok ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
+              {testResult.message}
+            </div>
+          )}
+        </div>
+
+        {/* Import */}
+        <div className="border-t border-border/40 pt-4 space-y-3">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              disabled={importing || !erpUrl || !erpKey}
+              onClick={handleImportFromErp}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors"
+            >
+              <Download className={`h-3.5 w-3.5 ${importing ? 'animate-bounce' : ''}`} />
+              {importing ? 'Importuji…' : 'Importovat produkty z ERP'}
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Nové produkty se vytvoří jako skryté — aktivujete je ručně po doplnění obrázků. Již propojené produkty se aktualizují (cena, sklad).
+          </p>
+          {importResult && (
+            <div className="flex items-start gap-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2.5 text-sm text-green-800">
+              <CheckCircle className="h-4 w-4 mt-0.5 shrink-0" />
+              <div>
+                Import dokončen: <strong>{importResult.created}</strong> nových,{' '}
+                <strong>{importResult.updated}</strong> aktualizováno,{' '}
+                <strong>{importResult.skipped}</strong> přeskočeno.
+              </div>
+            </div>
+          )}
+          {importError && (
+            <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-lg px-3 py-2.5 text-sm text-red-700">
+              <XCircle className="h-4 w-4 shrink-0" />
+              {importError}
+            </div>
+          )}
         </div>
       </div>
 

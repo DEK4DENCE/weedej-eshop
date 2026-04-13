@@ -4,6 +4,7 @@ import { db } from "@/lib/db"
 import { sendEmail } from "@/lib/email/send"
 import { OrderConfirmation } from "@/lib/email/templates/OrderConfirmation"
 import { NewOrderNotification } from "@/lib/email/templates/NewOrderNotification"
+import { createErpOrder, isErpConfigured } from "@/lib/erp"
 import type Stripe from "stripe"
 
 export async function POST(req: NextRequest) {
@@ -80,6 +81,48 @@ export async function POST(req: NextRequest) {
         },
       },
     })
+
+    // Odešli objednávku do ERP (fire-and-forget — nepřerušíme flow při chybě)
+    if (isErpConfigured()) {
+      try {
+        const user = await db.user.findUnique({
+          where: { id: userId },
+          select: { id: true, name: true, email: true, phone: true },
+        })
+
+        let addressStr: string | undefined
+        if (addressId) {
+          const addr = await db.address.findUnique({ where: { id: addressId } })
+          if (addr) {
+            addressStr = [addr.fullName, addr.line1, addr.line2, `${addr.postalCode} ${addr.city}`, addr.country]
+              .filter(Boolean)
+              .join(', ')
+          }
+        }
+
+        await createErpOrder({
+          stripeSessionId: session.id,
+          stripePaymentIntent: typeof session.payment_intent === "string" ? session.payment_intent : undefined,
+          eshopUserId: userId,
+          eshopOrderId: order.id,
+          customerName: user?.name ?? user?.email ?? "Zákazník",
+          customerEmail: user?.email ?? undefined,
+          customerAddress: addressStr,
+          totalAmountCents: session.amount_total ?? 0,
+          items: items.map((item) => ({
+            productName: item.productName,
+            quantity: item.quantity,
+            unit: "ks",
+            // Ceny v haléřích → Kč, dělíme 100
+            priceWithoutVat: Math.round(item.unitPrice / 1.21) / 100,
+            vatRate: 21,
+          })),
+        })
+      } catch (erpError) {
+        // ERP chyba nesmí zablokovat eshop — jen zalogujeme
+        console.error("[ERP] Nepodařilo se odeslat objednávku do ERP:", erpError)
+      }
+    }
 
     // Send order confirmation email
     try {

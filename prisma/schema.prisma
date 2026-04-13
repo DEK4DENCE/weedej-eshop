@@ -188,14 +188,15 @@ model Product {
 }
 
 model ProductVariant {
-  id          String  @id @default(cuid())
-  productId   String
-  name        String
-  sku         String? @unique
-  price       Decimal @db.Decimal(10, 2)
-  weightGrams Float?
-  stock       Int     @default(0)
-  isDefault   Boolean @default(false)
+  id           String  @id @default(cuid())
+  productId    String
+  name         String
+  sku          String? @unique
+  price        Decimal @db.Decimal(10, 2)
+  weightGrams  Float?
+  stock        Int     @default(0)
+  isDefault    Boolean @default(false)
+  erpProductId String? // ID produktu v ERP pro synchronizaci ceny a skladu
 
   product        Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
   cartItems      CartItem[]

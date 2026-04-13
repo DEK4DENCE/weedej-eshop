@@ -70,6 +70,8 @@ export function ProductForm({ categories, product }: Props) {
     const i = Number(val)
     if (!isNaN(i) && i >= 0 && i <= 100) setSativaPercent(String(100 - i))
   }
+  const [isActive, setIsActive] = useState(product?.isActive ?? false)
+
   const [variants, setVariants] = useState<Variant[]>(
     product?.variants?.map((v) => ({ ...v, isDefault: v.isDefault ?? false, isActive: v.isActive ?? true })) ?? []
   )
@@ -100,6 +102,7 @@ export function ProductForm({ categories, product }: Props) {
         sativaPercent: sativaPercent !== "" ? Number(sativaPercent) : null,
         indicaPercent: indicaPercent !== "" ? Number(indicaPercent) : null,
         strainType: autoStrainType ?? undefined,
+        isActive,
         variants: variants.map((v) => ({
           id: v.id,
           name: v.name,
@@ -217,6 +220,23 @@ export function ProductForm({ categories, product }: Props) {
             {sativaPercent !== "" && indicaPercent !== "" && Number(sativaPercent) + Number(indicaPercent) !== 100 && (
               <p className="text-xs text-red-500">⚠ Součet musí být 100 % (aktuálně {Number(sativaPercent) + Number(indicaPercent)} %)</p>
             )}
+          </div>
+
+          {/* Active toggle */}
+          <div className="flex items-center justify-between border border-[#DEE2E6] rounded-2xl p-4 bg-[#F8F9FA]">
+            <div>
+              <Label className="text-sm font-semibold text-[#1d1d1f]">Zobrazit produkt v eshopu</Label>
+              <p className="text-xs text-[#6e6e73] mt-0.5">Neaktivní produkty se zákazníkům nezobrazí.</p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={isActive}
+              onClick={() => setIsActive((v) => !v)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isActive ? 'bg-[#2E7D32]' : 'bg-gray-300'}`}
+            >
+              <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${isActive ? 'translate-x-6' : 'translate-x-1'}`} />
+            </button>
           </div>
 
           {/* Variants section */}
