@@ -24,16 +24,17 @@ export function ProductVariantSelector({ variants, selectedVariantId, onSelect }
           return (
             <motion.button
               key={variant.id}
-              whileHover={!isOutOfStock ? { scale: 1.03 } : {}}
-              whileTap={!isOutOfStock ? { scale: 0.97 } : {}}
-              onClick={() => !isOutOfStock && onSelect(variant.id)}
-              disabled={isOutOfStock}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => onSelect(variant.id)}
               className={[
                 'flex flex-col items-center px-4 py-2.5 rounded-xl border text-sm font-medium transition-all duration-200',
-                isSelected
+                isSelected && !isOutOfStock
                   ? 'border-[#2E7D32] bg-[#2E7D32]/10 text-[#1d1d1f]'
+                  : isSelected && isOutOfStock
+                  ? 'border-[#DEE2E6] bg-[#F8F9FA] text-[#aeaeb2] line-through ring-1 ring-[#DEE2E6]'
                   : isOutOfStock
-                  ? 'border-[#DEE2E6] bg-[#F8F9FA] text-[#aeaeb2] opacity-50 cursor-not-allowed line-through'
+                  ? 'border-[#DEE2E6] bg-[#F8F9FA] text-[#aeaeb2] opacity-50 line-through'
                   : 'border-[#DEE2E6] bg-white text-[#1d1d1f] hover:border-[#2E7D32] hover:bg-[#2E7D32]/5',
               ].join(' ')}
             >

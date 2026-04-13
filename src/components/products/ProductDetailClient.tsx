@@ -7,7 +7,7 @@ import { formatPrice } from "@/lib/utils/formatPrice"
 import type { Product } from "@/types/product"
 
 export function ProductDetailClient({ product }: { product: Product }) {
-  const defaultVariant = product.variants[0]
+  const defaultVariant = product.variants.find((v) => v.stock > 0) ?? product.variants[0]
   const [selectedVariantId, setSelectedVariantId] = useState(defaultVariant?.id ?? "")
   const selectedVariant = product.variants.find((v) => v.id === selectedVariantId) ?? defaultVariant
 
@@ -81,6 +81,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
             variantName={selectedVariant.name}
             price={selectedVariant.price}
             imageUrl={product.imageUrls[0] ?? ""}
+            disabled={selectedVariant.stock === 0}
             className="!w-full !h-12 !rounded-xl text-sm font-semibold"
           />
         </div>
