@@ -9,25 +9,15 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/useToast"
-import { Loader2, Plus, Trash2 } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import { ProductImages } from "@/components/admin/ProductImages"
 
 interface Category { id: string; name: string }
-interface Variant {
-  id?: string
-  name: string
-  weight: string
-  price: number | string
-  stock: number
-  isDefault: boolean
-  isActive: boolean
-  _delete?: boolean
-}
 interface Product {
   id: string; name: string; slug: string; description: string | null
   categoryId: string | null; thcContent: number | null; cbdContent: number | null
   sativaPercent?: number | null; indicaPercent?: number | null
-  isActive: boolean; variants: Variant[]; imageUrls?: string[]; imageAdjustments?: string | null
+  isActive: boolean; imageUrls?: string[]; imageAdjustments?: string | null
 }
 
 function calcStrainType(sativa: number, indica: number, cbd: number): string {
@@ -72,22 +62,6 @@ export function ProductForm({ categories, product }: Props) {
   }
   const [isActive, setIsActive] = useState(product?.isActive ?? false)
 
-  const [variants, setVariants] = useState<Variant[]>(
-    product?.variants?.map((v) => ({ ...v, isDefault: v.isDefault ?? false, isActive: v.isActive ?? true })) ?? []
-  )
-
-  const addVariant = () => {
-    setVariants((prev) => [...prev, { name: "", weight: "", price: "", stock: 0, isDefault: false, isActive: true }])
-  }
-
-  const removeVariant = (index: number) => {
-    setVariants((prev) => prev.map((v, i) => i === index ? { ...v, _delete: true } : v))
-  }
-
-  const updateVariant = (index: number, field: keyof Variant, value: string | number | boolean) => {
-    setVariants((prev) => prev.map((v, i) => i === index ? { ...v, [field]: value } : v))
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -103,16 +77,6 @@ export function ProductForm({ categories, product }: Props) {
         indicaPercent: indicaPercent !== "" ? Number(indicaPercent) : null,
         strainType: autoStrainType ?? undefined,
         isActive,
-        variants: variants.map((v) => ({
-          id: v.id,
-          name: v.name,
-          weight: v.weight,
-          price: Number(v.price),
-          stock: Number(v.stock),
-          isDefault: v.isDefault,
-          isActive: v.isActive,
-          _delete: v._delete ?? false,
-        })),
       }
       const res = await fetch(product ? `/api/admin/products/${product.id}` : "/api/admin/products", {
         method: product ? "PATCH" : "POST",
@@ -129,8 +93,6 @@ export function ProductForm({ categories, product }: Props) {
       setLoading(false)
     }
   }
-
-  const visibleVariants = variants.filter((v) => !v._delete)
 
   return (
     <Card>
@@ -239,95 +201,10 @@ export function ProductForm({ categories, product }: Props) {
             </button>
           </div>
 
-          {/* Variants section */}
-          <div className="border border-[#DEE2E6] rounded-2xl p-4 space-y-3 bg-white">
-            <div className="flex items-center justify-between">
-              <Label className="text-base font-semibold">Varianty produktu</Label>
-              <Button type="button" size="sm" variant="outline" onClick={addVariant} className="border-[#2E7D32] text-[#2E7D32] hover:bg-[#f0faf0]">
-                <Plus className="h-4 w-4 mr-1" />Přidat variantu
-              </Button>
-            </div>
-
-            {visibleVariants.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-4">Žádné varianty. Přidejte variantu s cenou a skladem.</p>
-            )}
-
-            {variants.map((variant, index) => {
-              if (variant._delete) return null
-              return (
-                <div key={index} className="grid grid-cols-12 gap-2 items-end p-3 bg-[#F8F9FA] rounded-xl border border-[#DEE2E6]">
-                  <div className="col-span-3 space-y-1">
-                    <Label className="text-xs">Název</Label>
-                    <Input
-                      value={variant.name}
-                      onChange={(e) => updateVariant(index, "name", e.target.value)}
-                      placeholder="např. Standard"
-                      className="h-8 text-sm"
-                    />
-                  </div>
-                  <div className="col-span-2 space-y-1">
-                    <Label className="text-xs">Váha</Label>
-                    <Input
-                      value={variant.weight}
-                      onChange={(e) => updateVariant(index, "weight", e.target.value)}
-                      placeholder="3.5g"
-                      className="h-8 text-sm"
-                    />
-                  </div>
-                  <div className="col-span-2 space-y-1">
-                    <Label className="text-xs">Cena (CZK)</Label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={variant.price}
-                      onChange={(e) => updateVariant(index, "price", e.target.value)}
-                      placeholder="0"
-                      className="h-8 text-sm"
-                    />
-                  </div>
-                  <div className="col-span-2 space-y-1">
-                    <Label className="text-xs">Sklad</Label>
-                    <Input
-                      type="number"
-                      value={variant.stock}
-                      onChange={(e) => updateVariant(index, "stock", parseInt(e.target.value) || 0)}
-                      placeholder="0"
-                      className="h-8 text-sm"
-                    />
-                  </div>
-                  <div className="col-span-2 flex items-center gap-3 pb-1">
-                    <label className="flex items-center gap-1 cursor-pointer text-xs">
-                      <input
-                        type="checkbox"
-                        checked={variant.isDefault}
-                        onChange={(e) => updateVariant(index, "isDefault", e.target.checked)}
-                        className="accent-[#2E7D32]"
-                      />
-                      Výchozí
-                    </label>
-                    <label className="flex items-center gap-1 cursor-pointer text-xs">
-                      <input
-                        type="checkbox"
-                        checked={variant.isActive}
-                        onChange={(e) => updateVariant(index, "isActive", e.target.checked)}
-                        className="accent-[#2E7D32]"
-                      />
-                      Aktivní
-                    </label>
-                  </div>
-                  <div className="col-span-1 flex justify-end pb-1">
-                    <button
-                      type="button"
-                      onClick={() => removeVariant(index)}
-                      className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors"
-                      title="Smazat variantu"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              )
-            })}
+          <div className="border border-[#DEE2E6] rounded-2xl p-4 bg-[#F8F9FA]">
+            <p className="text-sm text-[#6e6e73]">
+              Varianty produktu jsou spravovány v <strong>ERP → Katalog zboží</strong>. Po uložení změn proveďte synchronizaci.
+            </p>
           </div>
 
           <div className="flex gap-3 pt-2">

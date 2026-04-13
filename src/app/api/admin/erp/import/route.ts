@@ -95,19 +95,53 @@ export async function POST(req: NextRequest) {
       })
 
       if (existing) {
-        // Aktualizuj jen cenu a sklad — eshop data (obrázky, popis) zůstávají
-        await db.productVariant.update({
-          where: { id: existing.id },
-          data: {
-            price: erp.priceWithVat,
-            stock: Math.max(0, Math.floor(Number(erp.stock ?? 0))),
-          },
-        })
-        // Aktualizuj i basePrice na produktu
+        // Aktualizuj základní cenu a název produktu
         await db.product.update({
           where: { id: existing.productId },
           data: { basePrice: erp.priceWithVat, name: erp.name },
         })
+
+        if (erp.eshopVariants && erp.eshopVariants.length > 0) {
+          // Synchronizace variant z ERP
+          const eshopVariantsList = await db.productVariant.findMany({
+            where: { productId: existing.productId, erpProductId: String(erp.id) },
+            select: { id: true, erpVariantId: true },
+          })
+          const eshopByErpVariantId = new Map(
+            eshopVariantsList.filter((v) => v.erpVariantId).map((v) => [v.erpVariantId!, v])
+          )
+          for (const erpVar of erp.eshopVariants) {
+            const existingVar = eshopByErpVariantId.get(erpVar.id)
+            if (existingVar) {
+              await db.productVariant.update({
+                where: { id: existingVar.id },
+                data: { name: erpVar.name, price: erpVar.price, weightGrams: erpVar.weightGrams ?? null, isDefault: erpVar.isDefault },
+              })
+            } else {
+              await db.productVariant.create({
+                data: {
+                  productId: existing.productId,
+                  name: erpVar.name,
+                  price: erpVar.price,
+                  weightGrams: erpVar.weightGrams ?? null,
+                  isDefault: erpVar.isDefault,
+                  stock: 0,
+                  erpProductId: String(erp.id),
+                  erpVariantId: erpVar.id,
+                },
+              })
+            }
+          }
+        } else {
+          // Fallback: aktualizuj cenu a sklad legacy varianty
+          await db.productVariant.update({
+            where: { id: existing.id },
+            data: {
+              price: erp.priceWithVat,
+              stock: Math.max(0, Math.floor(Number(erp.stock ?? 0))),
+            },
+          })
+        }
         updated++
         continue
       }
@@ -162,17 +196,35 @@ export async function POST(req: NextRequest) {
 
       const product = await db.product.create({ data: productData })
 
-      // Vytvoř výchozí variantu propojenou s ERP
-      await db.productVariant.create({
-        data: {
-          productId: product.id,
-          name: "Standardní",
-          price: erp.priceWithVat,
-          stock: Math.max(0, Math.floor(Number(erp.stock ?? 0))),
-          isDefault: true,
-          erpProductId: String(erp.id),
-        },
-      })
+      if (erp.eshopVariants && erp.eshopVariants.length > 0) {
+        // Vytvoř varianty dle ERP
+        for (const erpVar of erp.eshopVariants) {
+          await db.productVariant.create({
+            data: {
+              productId: product.id,
+              name: erpVar.name,
+              price: erpVar.price,
+              weightGrams: erpVar.weightGrams ?? null,
+              isDefault: erpVar.isDefault,
+              stock: 0,
+              erpProductId: String(erp.id),
+              erpVariantId: erpVar.id,
+            },
+          })
+        }
+      } else {
+        // Fallback: vytvoř jednu výchozí variantu
+        await db.productVariant.create({
+          data: {
+            productId: product.id,
+            name: "Standardní",
+            price: erp.priceWithVat,
+            stock: Math.max(0, Math.floor(Number(erp.stock ?? 0))),
+            isDefault: true,
+            erpProductId: String(erp.id),
+          },
+        })
+      }
 
       created++
     } catch (err: any) {

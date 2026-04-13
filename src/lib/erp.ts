@@ -34,6 +34,15 @@ async function erpFetch(path: string, options: RequestInit = {}): Promise<Respon
 
 // ─── Typy ────────────────────────────────────────────────────────────────────
 
+export interface ErpVariant {
+  id: string          // EshopVariant.id v ERP
+  name: string
+  price: number       // Cena s DPH (Kč)
+  weightGrams: number | null
+  isDefault: boolean
+  isActive: boolean
+}
+
 export interface ErpProduct {
   id: string
   name: string
@@ -49,6 +58,7 @@ export interface ErpProduct {
   inStock: boolean
   isFeatured: boolean
   category: { id: string; name: string; slug: string | null } | null
+  eshopVariants: ErpVariant[]  // Varianty spravované z ERP
 }
 
 export interface ErpStockItem {
