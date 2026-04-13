@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
             select: { id: true, name: true },
           })
           const eshopByName = new Map(eshopVariantsList.map((v) => [v.name, v]))
-          const erpNames = new Set(erp.eshopVariants.map((v) => v.name))
+          const erpNames = new Set((erp.eshopVariants as any[]).map((v) => v.name))
 
           // Smaž zastaralé varianty (např. "Standardní" z původního importu)
           for (const eshopVar of eshopVariantsList) {

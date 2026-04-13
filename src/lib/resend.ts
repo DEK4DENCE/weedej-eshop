@@ -1,10 +1,20 @@
 import { Resend } from 'resend'
 
-const globalForResend = globalThis as unknown as {
-  resend: Resend | undefined
+let _resend: Resend | null = null
+
+export function getResend(): Resend {
+  if (!_resend) {
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY is not configured')
+    }
+    _resend = new Resend(process.env.RESEND_API_KEY)
+  }
+  return _resend
 }
 
-export const resend =
-  globalForResend.resend ?? new Resend(process.env.RESEND_API_KEY!)
-
-if (process.env.NODE_ENV !== 'production') globalForResend.resend = resend
+// Keep backward-compatible named export for existing code
+export const resend = new Proxy({} as Resend, {
+  get(_target, prop) {
+    return (getResend() as any)[prop]
+  },
+})
