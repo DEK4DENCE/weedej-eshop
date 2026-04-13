@@ -54,7 +54,20 @@ export async function POST(req: NextRequest) {
         const eshopByName = new Map(eshopVariantsList.map((v) => [v.name, v]))
         const erpNames = new Set(erp.eshopVariants.map((v) => v.name))
 
+        // Nejdřív smaž varianty které v ERP nejsou (včetně starých "Standardní" apod.)
+        for (const eshopVar of eshopVariantsList) {
+          if (!erpNames.has(eshopVar.name)) {
+            await db.productVariant.delete({ where: { id: eshopVar.id } }).catch(() => {})
+            variantsDeleted++
+          }
+        }
+
         for (const erpVar of erp.eshopVariants) {
+          // Sklad: celkový sklad ERP produktu ÷ váha varianty = počet kusů
+          const varStock = erpVar.weightGrams && erpVar.weightGrams > 0
+            ? Math.max(0, Math.floor(erp.stock / erpVar.weightGrams))
+            : Math.max(0, Math.floor(erp.stock))
+
           const existing = eshopByName.get(erpVar.name)
           if (existing) {
             await db.productVariant.update({
@@ -63,6 +76,7 @@ export async function POST(req: NextRequest) {
                 price: erpVar.price,
                 weightGrams: erpVar.weightGrams ?? null,
                 isDefault: erpVar.isDefault,
+                stock: varStock,
               },
             })
             variantsUpdated++
@@ -74,19 +88,11 @@ export async function POST(req: NextRequest) {
                 price: erpVar.price,
                 weightGrams: erpVar.weightGrams ?? null,
                 isDefault: erpVar.isDefault,
-                stock: 0,
+                stock: varStock,
                 erpProductId: String(erp.id),
               },
             })
             variantsCreated++
-          }
-        }
-
-        // Smaž varianty které v ERP už nejsou
-        for (const eshopVar of eshopVariantsList) {
-          if (!erpNames.has(eshopVar.name)) {
-            await db.productVariant.delete({ where: { id: eshopVar.id } }).catch(() => {})
-            variantsDeleted++
           }
         }
       } else {

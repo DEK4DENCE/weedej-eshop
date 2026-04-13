@@ -108,12 +108,25 @@ export async function POST(req: NextRequest) {
             select: { id: true, name: true },
           })
           const eshopByName = new Map(eshopVariantsList.map((v) => [v.name, v]))
+          const erpNames = new Set(erp.eshopVariants.map((v) => v.name))
+
+          // Smaž zastaralé varianty (např. "Standardní" z původního importu)
+          for (const eshopVar of eshopVariantsList) {
+            if (!erpNames.has(eshopVar.name)) {
+              await db.productVariant.delete({ where: { id: eshopVar.id } }).catch(() => {})
+            }
+          }
+
           for (const erpVar of erp.eshopVariants) {
+            const varStock = erpVar.weightGrams && erpVar.weightGrams > 0
+              ? Math.max(0, Math.floor(Number(erp.stock ?? 0) / erpVar.weightGrams))
+              : Math.max(0, Math.floor(Number(erp.stock ?? 0)))
+
             const existingVar = eshopByName.get(erpVar.name)
             if (existingVar) {
               await db.productVariant.update({
                 where: { id: existingVar.id },
-                data: { price: erpVar.price, weightGrams: erpVar.weightGrams ?? null, isDefault: erpVar.isDefault },
+                data: { price: erpVar.price, weightGrams: erpVar.weightGrams ?? null, isDefault: erpVar.isDefault, stock: varStock },
               })
             } else {
               await db.productVariant.create({
@@ -123,7 +136,7 @@ export async function POST(req: NextRequest) {
                   price: erpVar.price,
                   weightGrams: erpVar.weightGrams ?? null,
                   isDefault: erpVar.isDefault,
-                  stock: 0,
+                  stock: varStock,
                   erpProductId: String(erp.id),
                 },
               })
@@ -194,8 +207,11 @@ export async function POST(req: NextRequest) {
       const product = await db.product.create({ data: productData })
 
       if (erp.eshopVariants && erp.eshopVariants.length > 0) {
-        // Vytvoř varianty dle ERP
+        // Vytvoř varianty dle ERP se správným skladem
         for (const erpVar of erp.eshopVariants) {
+          const varStock = erpVar.weightGrams && erpVar.weightGrams > 0
+            ? Math.max(0, Math.floor(Number(erp.stock ?? 0) / erpVar.weightGrams))
+            : Math.max(0, Math.floor(Number(erp.stock ?? 0)))
           await db.productVariant.create({
             data: {
               productId: product.id,
@@ -203,7 +219,7 @@ export async function POST(req: NextRequest) {
               price: erpVar.price,
               weightGrams: erpVar.weightGrams ?? null,
               isDefault: erpVar.isDefault,
-              stock: 0,
+              stock: varStock,
               erpProductId: String(erp.id),
             },
           })
