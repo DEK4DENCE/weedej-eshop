@@ -102,20 +102,18 @@ export async function POST(req: NextRequest) {
         })
 
         if (erp.eshopVariants && erp.eshopVariants.length > 0) {
-          // Synchronizace variant z ERP
+          // Synchronizace variant z ERP — match podle jména
           const eshopVariantsList = await db.productVariant.findMany({
             where: { productId: existing.productId, erpProductId: String(erp.id) },
-            select: { id: true, erpVariantId: true },
+            select: { id: true, name: true },
           })
-          const eshopByErpVariantId = new Map(
-            eshopVariantsList.filter((v) => v.erpVariantId).map((v) => [v.erpVariantId!, v])
-          )
+          const eshopByName = new Map(eshopVariantsList.map((v) => [v.name, v]))
           for (const erpVar of erp.eshopVariants) {
-            const existingVar = eshopByErpVariantId.get(erpVar.id)
+            const existingVar = eshopByName.get(erpVar.name)
             if (existingVar) {
               await db.productVariant.update({
                 where: { id: existingVar.id },
-                data: { name: erpVar.name, price: erpVar.price, weightGrams: erpVar.weightGrams ?? null, isDefault: erpVar.isDefault },
+                data: { price: erpVar.price, weightGrams: erpVar.weightGrams ?? null, isDefault: erpVar.isDefault },
               })
             } else {
               await db.productVariant.create({
@@ -127,7 +125,6 @@ export async function POST(req: NextRequest) {
                   isDefault: erpVar.isDefault,
                   stock: 0,
                   erpProductId: String(erp.id),
-                  erpVariantId: erpVar.id,
                 },
               })
             }
@@ -208,7 +205,6 @@ export async function POST(req: NextRequest) {
               isDefault: erpVar.isDefault,
               stock: 0,
               erpProductId: String(erp.id),
-              erpVariantId: erpVar.id,
             },
           })
         }

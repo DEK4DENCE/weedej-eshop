@@ -197,7 +197,6 @@ model ProductVariant {
   stock        Int     @default(0)
   isDefault    Boolean @default(false)
   erpProductId String? // ID produktu v ERP (Product.id) — pro sync skladu a ceny
-  erpVariantId String? // ID varianty v ERP (EshopVariant.id) — pro sync variant
 
   product        Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
   cartItems      CartItem[]
