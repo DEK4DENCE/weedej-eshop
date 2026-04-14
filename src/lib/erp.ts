@@ -38,7 +38,8 @@ export interface ErpVariant {
   id: string          // EshopVariant.id v ERP
   name: string
   price: number       // Cena s DPH (Kč)
-  weightGrams: number | null
+  variantValue: number | null
+  variantUnit: string | null
   isDefault: boolean
   isActive: boolean
 }

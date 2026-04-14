@@ -59,7 +59,8 @@ export default async function ProductDetailPage({ params }: Props) {
     variants: raw.variants.map((v) => ({
       ...v,
       price: Number(v.price),
-      weightGrams: v.weightGrams ?? undefined,
+      variantValue: v.variantValue ?? undefined,
+      variantUnit: v.variantUnit ?? undefined,
       sku: v.sku ?? undefined,
     })),
     category: {

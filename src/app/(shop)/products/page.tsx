@@ -80,7 +80,8 @@ async function fetchProducts(params: Awaited<Props["searchParams"]>): Promise<Pr
     variants: p.variants.map((v) => ({
       ...v,
       price: Number(v.price),
-      weightGrams: v.weightGrams ?? undefined,
+      variantValue: v.variantValue ?? undefined,
+      variantUnit: v.variantUnit ?? undefined,
       sku: v.sku ?? undefined,
     })),
     category: {

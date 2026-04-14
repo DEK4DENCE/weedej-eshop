@@ -5,7 +5,7 @@ export interface CartItem {
   variantId: string
   quantity: number
   product: { id: string; name: string; slug: string; imageUrls: string[] }
-  variant: { id: string; name: string; price: number; weightGrams?: number }
+  variant: { id: string; name: string; price: number; variantValue?: number | null; variantUnit?: string | null }
 }
 
 export interface Cart {

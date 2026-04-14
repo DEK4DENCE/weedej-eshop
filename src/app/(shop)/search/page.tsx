@@ -52,7 +52,8 @@ export default async function SearchPage({ searchParams }: Props) {
     variants: p.variants.map((v) => ({
       ...v,
       price: Number(v.price),
-      weightGrams: v.weightGrams ?? undefined,
+      variantValue: v.variantValue ?? undefined,
+      variantUnit: v.variantUnit ?? undefined,
       sku: v.sku ?? undefined,
     })),
     category: {
