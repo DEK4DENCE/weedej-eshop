@@ -86,8 +86,12 @@ export async function POST(req: NextRequest) {
       },
     })
 
+    console.log(`[Webhook] Order ${order.id} vytvořena, posílám do ERP...`)
+
     // Odešli objednávku do ERP (fire-and-forget — nepřerušíme flow při chybě)
-    if (isErpConfigured()) {
+    if (!isErpConfigured()) {
+      console.warn("[ERP] PŘESKOČENO — ERP_API_URL nebo ERP_API_KEY není nastaveno v env vars!")
+    } else {
       try {
         const user = await db.user.findUnique({
           where: { id: userId },
@@ -133,16 +137,18 @@ export async function POST(req: NextRequest) {
           }),
         })
 
+        console.log(`[ERP] Objednávka odeslána: ${erpResult.orderNumber} (id: ${erpResult.id})`)
+
         // Ulož ERP číslo objednávky na eshop order
-        await db.order.update({
-          where: { id: order.id },
-          data: {
-            erpOrderId: erpResult.id,
-            erpOrderNumber: erpResult.orderNumber,
-          },
-        })
+        try {
+          await db.order.update({
+            where: { id: order.id },
+            data: { erpOrderId: erpResult.id, erpOrderNumber: erpResult.orderNumber },
+          })
+        } catch (updateErr) {
+          console.error("[ERP] Nepodařilo se uložit erpOrderId na Order (chybí sloupce v DB?):", updateErr)
+        }
       } catch (erpError) {
-        // ERP chyba nesmí zablokovat eshop — jen zalogujeme
         console.error("[ERP] Nepodařilo se odeslat objednávku do ERP:", erpError)
       }
     }
@@ -207,28 +213,26 @@ export async function POST(req: NextRequest) {
       console.error("Failed to send order confirmation email:", emailError)
     }
 
-    // Deduct stock and log movements for each order item
-    try {
-      const createdOrder = await db.order.findUnique({ where: { id: order.id }, include: { items: true } })
-      if (createdOrder) {
-        for (const item of createdOrder.items) {
-          await db.productVariant.update({
-            where: { id: item.variantId },
-            data: { stock: { decrement: item.quantity } },
-          })
-          await db.stockMovement.create({
-            data: {
-              variantId: item.variantId,
-              type: "RESERVED",
-              quantity: item.quantity,
-              orderId: order.id,
-              reason: "Order paid",
-            },
-          })
-        }
+    // Deduct stock — use in-memory items (never re-query Order to avoid schema issues)
+    for (const item of items) {
+      try {
+        await db.productVariant.update({
+          where: { id: item.variantId },
+          data: { stock: { decrement: item.quantity } },
+        })
+        await db.stockMovement.create({
+          data: {
+            variantId: item.variantId,
+            type: "RESERVED",
+            quantity: item.quantity,
+            orderId: order.id,
+            reason: "Order paid",
+          },
+        })
+        console.log(`[Stock] Odečteno ${item.quantity}ks varianty ${item.variantId}`)
+      } catch (stockError) {
+        console.error(`[Stock] CHYBA při odečítání skladu varianty ${item.variantId}:`, stockError)
       }
-    } catch (stockError) {
-      console.error("Failed to update stock:", stockError)
     }
 
     // Clear user's cart after successful order
