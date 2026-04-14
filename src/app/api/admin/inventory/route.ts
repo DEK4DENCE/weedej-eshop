@@ -8,10 +8,27 @@ export async function GET() {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
-  const variants = await db.productVariant.findMany({
-    include: { product: { select: { name: true } } },
-    orderBy: [{ product: { name: "asc" } }, { name: "asc" }],
+  const products = await db.product.findMany({
+    where: { variants: { some: {} } },
+    select: {
+      id: true,
+      name: true,
+      erpStock: true,
+      erpUnit: true,
+      variants: {
+        select: {
+          id: true,
+          name: true,
+          sku: true,
+          stock: true,
+          variantValue: true,
+          variantUnit: true,
+        },
+        orderBy: { variantValue: "asc" },
+      },
+    },
+    orderBy: { name: "asc" },
   })
 
-  return NextResponse.json(variants)
+  return NextResponse.json(products)
 }

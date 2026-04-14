@@ -173,6 +173,8 @@ model Product {
   flavours           String[]
   terpenes           String[]
   imageAdjustments   String?
+  erpStock           Float?      @default(0)  // Sklad v ERP (zdroj pravdy, v erpUnit)
+  erpUnit            String?                  // Jednotka skladu ERP ("g" | "ml" | "ks")
   createdAt          DateTime    @default(now())
   updatedAt          DateTime    @updatedAt
 

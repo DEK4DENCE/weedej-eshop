@@ -86,6 +86,12 @@ export async function POST(req: NextRequest) {
 
       const productId = eshopVariantsList[0].productId
 
+      // Ulož ERP sklad na produkt (zdroj pravdy pro zobrazení v admin)
+      await db.product.update({
+        where: { id: productId },
+        data: { erpStock: erp.stock ?? 0, erpUnit: erp.unit ?? null },
+      })
+
       if (erp.eshopVariants && erp.eshopVariants.length > 0) {
         // Mapa: jméno varianty → eshop varianta
         const eshopByName = new Map(eshopVariantsList.map((v) => [v.name, v]))
