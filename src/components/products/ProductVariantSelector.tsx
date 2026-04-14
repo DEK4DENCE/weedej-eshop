@@ -15,7 +15,7 @@ export function ProductVariantSelector({ variants, selectedVariantId, onSelect }
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-sm font-medium text-[#515154]">Vyberte velikost / váhu</p>
+      <p className="text-sm font-medium text-[#515154]">Vyberte variantu</p>
       <div className="flex flex-wrap gap-2">
         {variants.map((variant) => {
           const isSelected = variant.id === selectedVariantId
@@ -39,8 +39,8 @@ export function ProductVariantSelector({ variants, selectedVariantId, onSelect }
               ].join(' ')}
             >
               <span>{variant.name}</span>
-              {variant.weightGrams && (
-                <span className="text-xs text-[#6e6e73]">{variant.weightGrams}g</span>
+              {variant.variantValue && variant.variantUnit && variant.variantUnit !== 'ks' && (
+                <span className="text-xs text-[#6e6e73]">{variant.variantValue}{variant.variantUnit}</span>
               )}
               <span className="text-xs font-bold text-[#8B6914] font-mono mt-0.5">
                 {formatPrice(Number(variant.price))}

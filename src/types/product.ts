@@ -30,7 +30,8 @@ export interface ProductVariant {
   name: string
   sku?: string
   price: number
-  weightGrams?: number
+  variantValue?: number | null  // Množství na variantu (100, 30, 3.5 …)
+  variantUnit?: string | null   // Jednotka: "g" | "ml" | "ks"
   stock: number
   isDefault: boolean
 }

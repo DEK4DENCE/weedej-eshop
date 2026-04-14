@@ -193,7 +193,8 @@ model ProductVariant {
   name         String
   sku          String? @unique
   price        Decimal @db.Decimal(10, 2)
-  weightGrams  Float?
+  variantValue Float?  // Množství na variantu (100, 30, 3.5 …)
+  variantUnit  String? // Jednotka varianty: "g" | "ml" | "ks"
   stock        Int     @default(0)
   isDefault    Boolean @default(false)
   erpProductId String? // ID produktu v ERP (Product.id) — pro sync skladu a ceny
