@@ -50,6 +50,10 @@ export async function POST(req: NextRequest) {
         variantLabel: variant?.name ?? "",
         quantity: i.q,
         unitPrice: Math.round(Number(variant?.price ?? 0) * 100),
+        // ERP propojení
+        erpProductId: variant?.erpProductId ?? null,
+        variantValue: variant?.variantValue ?? null,
+        variantUnit: variant?.variantUnit ?? null,
       }
     })
 
@@ -100,23 +104,42 @@ export async function POST(req: NextRequest) {
           }
         }
 
-        await createErpOrder({
+        const erpResult = await createErpOrder({
           stripeSessionId: session.id,
           stripePaymentIntent: typeof session.payment_intent === "string" ? session.payment_intent : undefined,
           eshopUserId: userId,
           eshopOrderId: order.id,
           customerName: user?.name ?? user?.email ?? "Zákazník",
           customerEmail: user?.email ?? undefined,
+          customerPhone: user?.phone ?? undefined,
           customerAddress: addressStr,
           totalAmountCents: session.amount_total ?? 0,
-          items: items.map((item) => ({
-            productName: item.productName,
-            quantity: item.quantity,
-            unit: "ks",
-            // Ceny v haléřích → Kč, dělíme 100
-            priceWithoutVat: Math.round(item.unitPrice / 1.21) / 100,
-            vatRate: 21,
-          })),
+          items: items.map((item) => {
+            // Pokud varianta má hodnotu (3ml, 100g…), pošleme správné množství do ERP
+            // aby výdejka správně odečetla ze skladu (3ml × 1ks = 3ml)
+            const erpQty = item.variantValue ? item.quantity * item.variantValue : item.quantity
+            const erpUnit = item.variantUnit ?? "ks"
+            const erpName = item.variantLabel
+              ? `${item.productName} — ${item.variantLabel}`
+              : item.productName
+            return {
+              erpProductId: item.erpProductId ?? undefined,
+              productName: erpName,
+              quantity: erpQty,
+              unit: erpUnit,
+              priceWithoutVat: Math.round(item.unitPrice / 1.21) / 100,
+              vatRate: 21,
+            }
+          }),
+        })
+
+        // Ulož ERP číslo objednávky na eshop order
+        await db.order.update({
+          where: { id: order.id },
+          data: {
+            erpOrderId: erpResult.id,
+            erpOrderNumber: erpResult.orderNumber,
+          },
         })
       } catch (erpError) {
         // ERP chyba nesmí zablokovat eshop — jen zalogujeme
