@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Fragment } from "react"
 import Link from "next/link"
 import { Package, TrendingUp, TrendingDown, RefreshCw, ChevronDown, ChevronRight } from "lucide-react"
 
@@ -205,9 +205,8 @@ export default function InventoryPage() {
                       </thead>
                       <tbody>
                         {product.variants.map((variant) => (
-                          <>
+                          <Fragment key={variant.id}>
                             <tr
-                              key={variant.id}
                               className="border-b border-[#DEE2E6] last:border-0 hover:bg-white transition-colors"
                             >
                               <td className="pl-10 pr-4 py-2.5 text-[#212121]">{variant.name}</td>
@@ -244,7 +243,7 @@ export default function InventoryPage() {
                             </tr>
 
                             {adjusting === variant.id && (
-                              <tr key={`${variant.id}-form`} className="bg-white border-b border-[#DEE2E6]">
+                              <tr className="bg-white border-b border-[#DEE2E6]">
                                 <td colSpan={5} className="pl-10 pr-4 py-3">
                                   <div className="flex flex-wrap items-end gap-3">
                                     <div className="flex flex-col gap-1">
@@ -311,7 +310,7 @@ export default function InventoryPage() {
                                 </td>
                               </tr>
                             )}
-                          </>
+                          </Fragment>
                         ))}
                       </tbody>
                     </table>
