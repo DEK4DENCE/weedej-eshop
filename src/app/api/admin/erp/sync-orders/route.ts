@@ -5,7 +5,7 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { getErpOrder, isErpConfigured } from "@/lib/erp"
+import { getErpOrder, getErpConfig } from "@/lib/erp"
 
 // ERP status → Eshop OrderStatus
 const ERP_TO_ESHOP_STATUS: Record<string, string> = {
@@ -23,8 +23,9 @@ export async function POST() {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
-  if (!isErpConfigured()) {
-    return NextResponse.json({ error: "ERP není nakonfigurováno" }, { status: 503 })
+  const erpConfig = await getErpConfig()
+  if (!erpConfig) {
+    return NextResponse.json({ error: "ERP není nakonfigurováno — nastav URL a klíč v admin Nastavení" }, { status: 503 })
   }
 
   // Najdi objednávky propojené s ERP které ještě nejsou hotové

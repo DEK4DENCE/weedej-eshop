@@ -4,7 +4,7 @@ import { db } from "@/lib/db"
 import { sendEmail } from "@/lib/email/send"
 import { OrderConfirmation } from "@/lib/email/templates/OrderConfirmation"
 import { NewOrderNotification } from "@/lib/email/templates/NewOrderNotification"
-import { createErpOrder, isErpConfigured } from "@/lib/erp"
+import { createErpOrder, getErpConfig } from "@/lib/erp"
 import type Stripe from "stripe"
 
 export async function POST(req: NextRequest) {
@@ -89,8 +89,9 @@ export async function POST(req: NextRequest) {
     console.log(`[Webhook] Order ${order.id} vytvořena, posílám do ERP...`)
 
     // Odešli objednávku do ERP (fire-and-forget — nepřerušíme flow při chybě)
-    if (!isErpConfigured()) {
-      console.warn("[ERP] PŘESKOČENO — ERP_API_URL nebo ERP_API_KEY není nastaveno v env vars!")
+    const erpConfig = await getErpConfig()
+    if (!erpConfig) {
+      console.warn("[ERP] PŘESKOČENO — ERP není nakonfigurováno (ani env vars ani admin nastavení)")
     } else {
       try {
         const user = await db.user.findUnique({

@@ -2,32 +2,62 @@
 // Klient pro komunikaci s ERP API
 // Eshop → ERP: čtení produktů, skladu, odesílání objednávek
 
-const ERP_API_URL = process.env.ERP_API_URL
-const ERP_API_KEY = process.env.ERP_API_KEY
+import { db } from '@/lib/db'
+
+export interface ErpConfig {
+  url: string
+  key: string
+}
 
 /**
- * Zkontroluje zda je ERP integrace nakonfigurována
+ * Načte ERP konfiguraci — priorita: env vars → DB settings (admin nastavení)
+ * Tím pádem není nutný přístup k Vercel env vars, stačí nastavit v admin UI.
+ */
+export async function getErpConfig(): Promise<ErpConfig | null> {
+  // 1. Zkus env vars (rychlejší, bez DB)
+  const envUrl = process.env.ERP_API_URL?.trim()
+  const envKey = process.env.ERP_API_KEY?.trim()
+  if (envUrl && envKey) return { url: envUrl, key: envKey }
+
+  // 2. Fallback: DB settings (uloženo přes admin UI → Nastavení → Propojení s ERP)
+  try {
+    const [urlRow, keyRow] = await Promise.all([
+      db.setting.findUnique({ where: { key: 'erpApiUrl' } }),
+      db.setting.findUnique({ where: { key: 'erpApiKey' } }),
+    ])
+    if (urlRow?.value?.trim() && keyRow?.value?.trim()) {
+      return { url: urlRow.value.trim(), key: keyRow.value.trim() }
+    }
+  } catch {
+    // DB nedostupná — ignoruj
+  }
+
+  return null
+}
+
+/**
+ * Synchronní check (pouze env vars) — pro místa kde async není možné
  */
 export function isErpConfigured(): boolean {
-  return Boolean(ERP_API_URL && ERP_API_KEY)
+  return Boolean(process.env.ERP_API_URL && process.env.ERP_API_KEY)
 }
 
 /**
  * Základní fetch volání na ERP API s autentizací
  */
-async function erpFetch(path: string, options: RequestInit = {}): Promise<Response> {
-  if (!ERP_API_URL || !ERP_API_KEY) {
-    throw new Error('ERP není nakonfigurováno. Nastav ERP_API_URL a ERP_API_KEY v .env')
+async function erpFetch(path: string, options: RequestInit = {}, config?: ErpConfig): Promise<Response> {
+  const cfg = config ?? await getErpConfig()
+  if (!cfg) {
+    throw new Error('ERP není nakonfigurováno. Nastav ERP URL a API klíč v admin Nastavení → Propojení s ERP.')
   }
 
-  return fetch(`${ERP_API_URL}${path}`, {
+  return fetch(`${cfg.url}${path}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      'X-API-Key': ERP_API_KEY,
+      'X-API-Key': cfg.key,
       ...options.headers,
     },
-    // Timeout 10 vteřin — ERP může být na localhostu nebo pomalejší
     signal: AbortSignal.timeout(10_000),
   })
 }

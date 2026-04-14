@@ -4,6 +4,7 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { getErpConfig } from "@/lib/erp"
 
 export async function GET() {
   const session = await auth()
@@ -11,26 +12,36 @@ export async function GET() {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
-  const erpUrl = process.env.ERP_API_URL
-  const erpKey = process.env.ERP_API_KEY
   const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 
+  // Načti ERP config (env vars nebo DB settings)
+  const erpConfig = await getErpConfig()
+  const erpUrlDb = await db.setting.findUnique({ where: { key: "erpApiUrl" } })
+  const erpKeyDb = await db.setting.findUnique({ where: { key: "erpApiKey" } })
+
   const result: Record<string, any> = {
-    env: {
-      ERP_API_URL: erpUrl ? `✅ nastaveno (${erpUrl})` : "❌ CHYBÍ — nastav v Vercel env vars",
-      ERP_API_KEY: erpKey ? "✅ nastaveno" : "❌ CHYBÍ — nastav v Vercel env vars",
-      STRIPE_WEBHOOK_SECRET: stripeWebhookSecret ? "✅ nastaveno" : "❌ CHYBÍ",
+    erpConfig: erpConfig
+      ? `✅ nakonfigurováno (URL: ${erpConfig.url})`
+      : "❌ CHYBÍ — jdi do admin Nastavení → Propojení s ERP a ulož URL + API klíč",
+    envVars: {
+      ERP_API_URL: process.env.ERP_API_URL ? `✅ env (${process.env.ERP_API_URL})` : "⚠️ není v env",
+      ERP_API_KEY: process.env.ERP_API_KEY ? "✅ env" : "⚠️ není v env",
     },
-    erpConnectivity: null,
+    dbSettings: {
+      erpApiUrl: erpUrlDb?.value ? `✅ DB: ${erpUrlDb.value}` : "❌ není v DB — ulož v admin Nastavení",
+      erpApiKey: erpKeyDb?.value ? "✅ DB: uloženo" : "❌ není v DB — ulož v admin Nastavení",
+    },
+    STRIPE_WEBHOOK_SECRET: stripeWebhookSecret ? "✅ nastaveno" : "❌ CHYBÍ v env vars",
+    erpConnectivity: null as any,
     dbColumns: {},
     orders: {},
   }
 
   // Test ERP konektivity
-  if (erpUrl && erpKey) {
+  if (erpConfig) {
     try {
-      const res = await fetch(`${erpUrl}/api/external/products`, {
-        headers: { "X-API-Key": erpKey },
+      const res = await fetch(`${erpConfig.url}/api/external/products`, {
+        headers: { "X-API-Key": erpConfig.key },
         signal: AbortSignal.timeout(5_000),
       })
       result.erpConnectivity = res.ok
@@ -40,7 +51,7 @@ export async function GET() {
       result.erpConnectivity = `❌ ERP nedostupné: ${e.message}`
     }
   } else {
-    result.erpConnectivity = "⚠️ Přeskočeno — env vars nejsou nastaveny"
+    result.erpConnectivity = "⚠️ Přeskočeno — ERP není nakonfigurováno"
   }
 
   // Test DB sloupců přes raw SQL
