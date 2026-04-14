@@ -89,11 +89,13 @@ export async function POST(req: NextRequest) {
     console.log(`[Webhook] Order ${order.id} vytvořena, posílám do ERP...`)
 
     // Odešli objednávku do ERP (fire-and-forget — nepřerušíme flow při chybě)
-    const erpConfig = await getErpConfig()
-    if (!erpConfig) {
-      console.warn("[ERP] PŘESKOČENO — ERP není nakonfigurováno (ani env vars ani admin nastavení)")
-    } else {
-      try {
+    try {
+      const erpConfig = await getErpConfig()
+      console.log(`[ERP] Config check: ${erpConfig ? `URL=${erpConfig.url}` : 'NULL — není nakonfigurováno'}`)
+
+      if (!erpConfig) {
+        console.warn("[ERP] PŘESKOČENO — ERP není nakonfigurováno (ani env vars ani admin nastavení)")
+      } else {
         const user = await db.user.findUnique({
           where: { id: userId },
           select: { id: true, name: true, email: true, phone: true },
@@ -109,7 +111,7 @@ export async function POST(req: NextRequest) {
           }
         }
 
-        const erpResult = await createErpOrder({
+        const erpPayload = {
           stripeSessionId: session.id,
           stripePaymentIntent: typeof session.payment_intent === "string" ? session.payment_intent : undefined,
           eshopUserId: userId,
@@ -120,8 +122,6 @@ export async function POST(req: NextRequest) {
           customerAddress: addressStr,
           totalAmountCents: session.amount_total ?? 0,
           items: items.map((item) => {
-            // Pokud varianta má hodnotu (3ml, 100g…), pošleme správné množství do ERP
-            // aby výdejka správně odečetla ze skladu (3ml × 1ks = 3ml)
             const erpQty = item.variantValue ? item.quantity * item.variantValue : item.quantity
             const erpUnit = item.variantUnit ?? "ks"
             const erpName = item.variantLabel
@@ -136,7 +136,11 @@ export async function POST(req: NextRequest) {
               vatRate: 21,
             }
           }),
-        })
+        }
+
+        console.log(`[ERP] Odesílám objednávku na ${erpConfig.url}/api/external/orders, položky: ${erpPayload.items.length}`)
+
+        const erpResult = await createErpOrder(erpPayload)
 
         console.log(`[ERP] Objednávka odeslána: ${erpResult.orderNumber} (id: ${erpResult.id})`)
 
@@ -146,12 +150,13 @@ export async function POST(req: NextRequest) {
             where: { id: order.id },
             data: { erpOrderId: erpResult.id, erpOrderNumber: erpResult.orderNumber },
           })
+          console.log(`[ERP] erpOrderId uloženo na Order ${order.id}`)
         } catch (updateErr) {
           console.error("[ERP] Nepodařilo se uložit erpOrderId na Order (chybí sloupce v DB?):", updateErr)
         }
-      } catch (erpError) {
-        console.error("[ERP] Nepodařilo se odeslat objednávku do ERP:", erpError)
       }
+    } catch (erpError) {
+      console.error("[ERP] Nepodařilo se odeslat objednávku do ERP:", erpError)
     }
 
     // Send order confirmation email

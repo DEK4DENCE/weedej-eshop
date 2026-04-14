@@ -51,7 +51,7 @@ async function erpFetch(path: string, options: RequestInit = {}, config?: ErpCon
     throw new Error('ERP není nakonfigurováno. Nastav ERP URL a API klíč v admin Nastavení → Propojení s ERP.')
   }
 
-  return fetch(`${cfg.url}${path}`, {
+  return fetch(`${cfg.url.replace(/\/$/, '')}${path}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
