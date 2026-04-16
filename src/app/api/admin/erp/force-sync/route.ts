@@ -58,12 +58,26 @@ export async function POST() {
         ? [addr.fullName, addr.line1, addr.line2].filter(Boolean).join(", ")
         : "Neuvedena"
 
+      // Look up variantUnit for each item so the ERP stores the correct unit
+      const variantIds = items.map((i: any) => i.variantId).filter(Boolean)
+      const variantMap = new Map<string, { variantUnit: string | null; variantValue: number | null }>()
+      if (variantIds.length > 0) {
+        const variants = await db.productVariant.findMany({
+          where:  { id: { in: variantIds } },
+          select: { id: true, variantUnit: true, variantValue: true },
+        })
+        for (const v of variants) variantMap.set(v.id, v)
+      }
+
       const erpItems = items.map((item: any) => {
         const unitPriceKc      = (item.unitPrice as number) / 100
         const unitPriceExclVat = Math.round(unitPriceKc / 1.21 * 100) / 100
+        const variant = item.variantId ? variantMap.get(item.variantId) : null
+        const erpQty  = variant?.variantValue ? item.quantity * variant.variantValue : item.quantity
         return {
           name:         `${item.productName}${item.variantLabel ? " — " + item.variantLabel : ""}`,
-          quantity:     item.quantity,
+          quantity:     erpQty,
+          unit:         variant?.variantUnit ?? 'ks',
           unitPriceCzk: unitPriceExclVat,
           vatRate:      21,
         }

@@ -144,6 +144,7 @@ export interface ErpOrderSyncInput {
     sku?:         string
     name:         string
     quantity:     number
+    unit?:        string            // ERP base unit (g, ml, ks…); defaults to 'ks' in ERP
     unitPriceCzk: number            // CZK excl. VAT
     vatRate:      number
   }>

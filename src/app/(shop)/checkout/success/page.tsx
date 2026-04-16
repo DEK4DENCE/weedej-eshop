@@ -62,6 +62,7 @@ async function processOrder(sessionId: string): Promise<{ erpOrderNumber: string
         unitPrice:    Math.round(Number(variant?.price ?? 0) * 100), // haléře
         erpProductId: variant?.erpProductId ?? null,
         variantValue: variant?.variantValue ?? null,
+        variantUnit:  variant?.variantUnit  ?? null,
       }
     })
 
@@ -142,6 +143,7 @@ async function processOrder(sessionId: string): Promise<{ erpOrderNumber: string
         sku:          item.erpProductId ?? undefined,
         name:         erpName,
         quantity:     erpQty,
+        unit:         item.variantUnit ?? 'ks',
         unitPriceCzk: unitPriceExclVat,
         vatRate:      21,
       }

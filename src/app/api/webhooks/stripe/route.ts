@@ -169,6 +169,7 @@ export async function POST(req: NextRequest) {
           sku:          item.erpProductId ?? undefined,
           name:         erpName,
           quantity:     erpQty,
+          unit:         item.variantUnit ?? 'ks',
           unitPriceCzk: unitPriceExclVat,
           vatRate:      21,
         }
