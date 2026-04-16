@@ -74,8 +74,8 @@ export async function GET() {
   try {
     const [total, withErp, withoutErp] = await Promise.all([
       db.order.count(),
-      db.order.count({ where: { erpOrderId: { not: null } } }).catch(() => -1),
-      db.order.count({ where: { erpOrderId: null } }).catch(() => -1),
+      db.order.count({ where: { erpOrderNumber: { not: null } } }).catch(() => -1),
+      db.order.count({ where: { erpOrderNumber: null } }).catch(() => -1),
     ])
     result.orders = { total, withErpId: withErp, withoutErpId: withoutErp }
   } catch (e: any) {

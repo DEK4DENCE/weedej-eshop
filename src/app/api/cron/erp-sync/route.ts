@@ -4,7 +4,7 @@
  * Background retry job — syncs orders stuck in pending_erp_sync.
  * Protected by CRON_SECRET.
  *
- * Schedule (vercel.json): { "path": "/api/cron/erp-sync", "schedule": "*/5 * * * *" }
+ * Schedule (vercel.json): { "path": "/api/cron/erp-sync", "schedule": "* /5 * * * *" }
  *
  * Retry logic (exponential backoff):
  *   Attempt 1: immediate (Stripe webhook)
