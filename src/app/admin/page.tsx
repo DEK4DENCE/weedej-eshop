@@ -7,6 +7,16 @@ import { formatPrice } from "@/lib/utils/formatPrice"
 
 export const metadata = { title: "Admin Dashboard — Weedej" }
 
+const STATUS_DISPLAY: Record<string, { label: string; classes: string }> = {
+  PENDING:    { label: "Zaplaceno", classes: "bg-cyan-100 text-cyan-700" },
+  PAID:       { label: "Zaplaceno", classes: "bg-cyan-100 text-cyan-700" },
+  PROCESSING: { label: "Zpracovává se", classes: "bg-cyan-100 text-cyan-700" },
+  SHIPPED:    { label: "Odesláno",  classes: "bg-purple-100 text-purple-700" },
+  DELIVERED:  { label: "Doručeno",  classes: "bg-green-100 text-green-700" },
+  CANCELLED:  { label: "Zrušeno",   classes: "bg-red-100 text-red-700" },
+  REFUNDED:   { label: "Vráceno",   classes: "bg-gray-100 text-gray-600" },
+}
+
 export default async function AdminDashboard() {
   const [productCount, orderCount, userCount, revenueData] = await Promise.all([
     db.product.count(),
@@ -56,7 +66,9 @@ export default async function AdminDashboard() {
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-medium">{formatPrice(order.totalAmount / 100)}</p>
-                  <p className="text-xs text-muted-foreground">{order.status}</p>
+                  <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${(STATUS_DISPLAY[order.status] ?? { classes: 'bg-gray-100 text-gray-600' }).classes}`}>
+                    {(STATUS_DISPLAY[order.status] ?? { label: order.status }).label}
+                  </span>
                 </div>
               </div>
             ))}
