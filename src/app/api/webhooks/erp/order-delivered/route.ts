@@ -9,7 +9,10 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
+import React from 'react'
 import { db } from '@/lib/db'
+import { sendEmail } from '@/lib/email/send'
+import { OrderDelivered } from '@/lib/email/templates/OrderDelivered'
 
 export const dynamic = 'force-dynamic'
 
@@ -38,7 +41,15 @@ export async function POST(req: NextRequest) {
   const { eshopOrderId, deliveredAt } = payload
   if (!eshopOrderId) return NextResponse.json({ error: 'Missing eshopOrderId' }, { status: 400 })
 
-  const order = await db.order.findUnique({ where: { id: eshopOrderId }, select: { id: true, status: true } })
+  const order = await db.order.findUnique({
+    where: { id: eshopOrderId },
+    select: {
+      id: true, status: true, totalAmount: true,
+      erpOrderNumber: true,
+      items: { select: { productName: true, variantLabel: true, quantity: true } },
+      user: { select: { email: true, name: true } },
+    },
+  })
   if (!order) {
     console.warn(`[OrderDelivered] Order not found eshopOrderId=${eshopOrderId}`)
     return NextResponse.json({ received: true, warning: 'Order not found' })
@@ -57,5 +68,33 @@ export async function POST(req: NextRequest) {
   })
 
   console.log(`[OrderDelivered] Order marked delivered eshopOrderId=${eshopOrderId}`)
+
+  // Send delivery confirmation email
+  try {
+    const customerEmail = order.user?.email
+    const customerName  = order.user?.name ?? customerEmail?.split('@')[0] ?? 'Zákazníku'
+    const orderNumber   = order.erpOrderNumber ?? order.id
+    const displayNumber = order.erpOrderNumber ?? `#${order.id.slice(-8).toUpperCase()}`
+
+    if (customerEmail) {
+      await sendEmail({
+        to: customerEmail,
+        subject: `Vaše objednávka ${displayNumber} byla doručena`,
+        react: React.createElement(OrderDelivered, {
+          name: customerName,
+          orderNumber,
+          items: order.items.map((i) => ({
+            productName:  i.productName,
+            variantLabel: i.variantLabel,
+            quantity:     i.quantity,
+          })),
+          totalAmount: order.totalAmount,
+        }),
+      })
+    }
+  } catch (emailError) {
+    console.error('[OrderDelivered] Failed to send email:', emailError)
+  }
+
   return NextResponse.json({ received: true })
 }
