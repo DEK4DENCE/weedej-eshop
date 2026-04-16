@@ -27,9 +27,13 @@ function formatDateTime(dateStr: string): string {
 export function OrderTimeline({ createdAt, paidAt, shippedAt, deliveredAt, status }: OrderTimelineProps) {
   const isCancelled = status === 'CANCELLED' || status === 'REFUNDED'
 
+  // Order is only created after successful payment — so if paidAt is missing
+  // (legacy orders before the column was added), createdAt == paid time.
+  const resolvedPaidAt = paidAt ?? (status !== 'PENDING' ? createdAt : null)
+
   const steps: TimelineStep[] = [
     { key: 'ordered',   label: 'Objednáno',  timestamp: createdAt },
-    { key: 'paid',      label: 'Zaplaceno',  timestamp: paidAt },
+    { key: 'paid',      label: 'Zaplaceno',  timestamp: resolvedPaidAt },
     { key: 'shipped',   label: 'Odesláno',   timestamp: shippedAt },
     { key: 'delivered', label: 'Doručeno',   timestamp: deliveredAt },
   ]
