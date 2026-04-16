@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Save, Star, Link2, RefreshCw, CheckCircle, XCircle, Download } from 'lucide-react'
+import { Save, Star, Link2, RefreshCw, CheckCircle, XCircle, Download, Trash2 } from 'lucide-react'
 
 interface Product { id: string; name: string }
 
@@ -26,6 +26,11 @@ export function AdminSettingsForm({ settings, products }: Props) {
   const [importing, setImporting] = useState(false)
   const [importResult, setImportResult] = useState<{ created: number; updated: number; skipped: number } | null>(null)
   const [importError, setImportError] = useState<string | null>(null)
+
+  // Reset database state
+  const [resetting, setResetting] = useState(false)
+  const [resetResult, setResetResult] = useState<string | null>(null)
+  const [resetError, setResetError] = useState<string | null>(null)
 
   function toggleBestseller(id: string) {
     setBestsellers((prev) => {
@@ -67,10 +72,7 @@ export function AdminSettingsForm({ settings, products }: Props) {
     try {
       const res = await fetch('/api/admin/erp/import', {
         method: 'GET',
-        headers: {
-          'x-erp-url': erpUrl,
-          'x-erp-key': erpKey,
-        },
+        headers: { 'x-erp-url': erpUrl, 'x-erp-key': erpKey },
       })
       const data = await res.json()
       if (res.ok && data.ok) {
@@ -112,8 +114,33 @@ export function AdminSettingsForm({ settings, products }: Props) {
     }
   }
 
+  async function handleResetDatabase() {
+    const confirmed = window.confirm(
+      '⚠️ POZOR: Tato akce je nevratná!\n\nBudou smazány:\n- Všechny objednávky\n- Všechny produkty a varianty\n- Skladové pohyby\n- Košíky\n- ERP sync záznamy\n\nZachováno:\n- Uživatelé\n- Kategorie\n- Nastavení\n\nOpravdu chcete pokračovat?'
+    )
+    if (!confirmed) return
+
+    setResetting(true)
+    setResetResult(null)
+    setResetError(null)
+    try {
+      const res = await fetch('/api/admin/settings/reset-database', { method: 'POST' })
+      const data = await res.json()
+      if (res.ok) {
+        setResetResult(data.message)
+      } else {
+        setResetError(data.error ?? 'Reset selhal.')
+      }
+    } catch {
+      setResetError('Chyba sítě při resetování.')
+    } finally {
+      setResetting(false)
+    }
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+
       {/* Email notifications */}
       <div className="bg-card border border-border/40 rounded-xl p-6 space-y-4">
         <h2 className="text-base font-semibold text-foreground">Email oznámení</h2>
@@ -190,9 +217,7 @@ export function AdminSettingsForm({ settings, products }: Props) {
 
         <div className="space-y-3">
           <div>
-            <label className="block text-sm font-medium text-muted-foreground mb-1.5">
-              ERP API URL
-            </label>
+            <label className="block text-sm font-medium text-muted-foreground mb-1.5">ERP API URL</label>
             <input
               type="url"
               value={erpUrl}
@@ -202,9 +227,7 @@ export function AdminSettingsForm({ settings, products }: Props) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-muted-foreground mb-1.5">
-              ERP API klíč
-            </label>
+            <label className="block text-sm font-medium text-muted-foreground mb-1.5">ERP API klíč</label>
             <input
               type="password"
               value={erpKey}
@@ -218,7 +241,6 @@ export function AdminSettingsForm({ settings, products }: Props) {
           </div>
         </div>
 
-        {/* Test connection */}
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -237,19 +259,16 @@ export function AdminSettingsForm({ settings, products }: Props) {
           )}
         </div>
 
-        {/* Import */}
         <div className="border-t border-border/40 pt-4 space-y-3">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              disabled={importing || !erpUrl || !erpKey}
-              onClick={handleImportFromErp}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors"
-            >
-              <Download className={`h-3.5 w-3.5 ${importing ? 'animate-bounce' : ''}`} />
-              {importing ? 'Importuji…' : 'Importovat produkty z ERP'}
-            </button>
-          </div>
+          <button
+            type="button"
+            disabled={importing || !erpUrl || !erpKey}
+            onClick={handleImportFromErp}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors"
+          >
+            <Download className={`h-3.5 w-3.5 ${importing ? 'animate-bounce' : ''}`} />
+            {importing ? 'Importuji…' : 'Importovat produkty z ERP'}
+          </button>
           <p className="text-xs text-muted-foreground">
             Nové produkty se vytvoří jako skryté — aktivujete je ručně po doplnění obrázků. Již propojené produkty se aktualizují (cena, sklad).
           </p>
@@ -270,6 +289,38 @@ export function AdminSettingsForm({ settings, products }: Props) {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Danger zone */}
+      <div className="bg-card border border-red-200 rounded-xl p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <Trash2 className="h-4 w-4 text-red-500" />
+          <h2 className="text-base font-semibold text-red-600">Nebezpečná zóna</h2>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Smaže všechny objednávky, produkty, varianty, skladové pohyby a košíky. Zachová uživatele, kategorie a nastavení. Po resetu importujte produkty znovu z ERP.
+        </p>
+        <button
+          type="button"
+          disabled={resetting}
+          onClick={handleResetDatabase}
+          className="flex items-center gap-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors"
+        >
+          <Trash2 className={`h-3.5 w-3.5 ${resetting ? 'animate-pulse' : ''}`} />
+          {resetting ? 'Resetuji…' : 'Resetovat databázi'}
+        </button>
+        {resetResult && (
+          <div className="flex items-start gap-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2.5 text-sm text-green-800 whitespace-pre-line">
+            <CheckCircle className="h-4 w-4 mt-0.5 shrink-0" />
+            <span>{resetResult}</span>
+          </div>
+        )}
+        {resetError && (
+          <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-lg px-3 py-2.5 text-sm text-red-700">
+            <XCircle className="h-4 w-4 shrink-0" />
+            {resetError}
+          </div>
+        )}
       </div>
 
       <button
