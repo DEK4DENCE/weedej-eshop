@@ -16,7 +16,7 @@ interface SendEmailOptions {
 }
 
 export async function sendEmail({ to, subject, react, attachments }: SendEmailOptions) {
-  const from = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
+  const from = process.env.RESEND_FROM_EMAIL || 'noreply@weedej.cz'
   try {
     const { data, error } = await resend.emails.send({
       from,
