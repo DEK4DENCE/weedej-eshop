@@ -28,10 +28,12 @@ function formatDate(dateStr: string): string {
 
 export function OrderCard({ order }: OrderCardProps) {
   const itemCount = order.items.reduce((sum, item) => sum + item.quantity, 0)
-
-  // Collect unique product image URLs from items (items don't carry images directly,
-  // so we use a placeholder strip based on item count)
   const thumbnailItems = order.items.slice(0, 3)
+
+  const erpNum = (order as any).erpOrderNumber as string | null | undefined
+  const displayNumber = erpNum
+    ? erpNum.replace(/^ESH/i, '')
+    : order.id.slice(-8).toUpperCase()
 
   return (
     <div className="bg-white border border-[#DEE2E6] rounded-2xl p-6 hover:border-[#2E7D32]/50 transition-colors duration-200 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
@@ -40,13 +42,13 @@ export function OrderCard({ order }: OrderCardProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3 mb-2">
             <span className="font-mono text-sm font-semibold text-[#1d1d1f]">
-              #{order.id.slice(-8).toUpperCase()}
+              #{displayNumber}
             </span>
             <OrderStatusBadge status={order.status} />
           </div>
 
           <p className="text-xs text-[#6e6e73] mb-4">
-            Placed on {formatDate(order.createdAt)}
+            Zadáno {formatDate(order.createdAt)}
           </p>
 
           {/* Thumbnail strip */}
@@ -70,7 +72,7 @@ export function OrderCard({ order }: OrderCardProps) {
           </div>
 
           <p className="text-xs text-[#6e6e73]">
-            {itemCount} {itemCount === 1 ? 'item' : 'items'}
+            {itemCount} {itemCount === 1 ? 'položka' : itemCount < 5 ? 'položky' : 'položek'}
           </p>
         </div>
 
@@ -83,7 +85,7 @@ export function OrderCard({ order }: OrderCardProps) {
             href={`/account/orders/${order.id}`}
             className="inline-flex items-center gap-1.5 bg-transparent border border-[#2E7D32] text-[#2E7D32] hover:bg-[#2E7D32]/10 rounded-xl px-4 py-2 text-sm font-semibold transition-colors duration-200"
           >
-            View Order
+            Zobrazit
           </Link>
         </div>
       </div>

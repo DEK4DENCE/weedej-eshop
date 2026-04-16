@@ -41,6 +41,12 @@ function formatDate(dateStr: string): string {
 }
 
 export function OrderDetail({ order }: OrderDetailProps) {
+  const erpNum = (order as any).erpOrderNumber as string | null | undefined
+  // Customer sees e.g. "20260010" (strip ESH prefix); fallback to internal short ID
+  const displayNumber = erpNum
+    ? erpNum.replace(/^ESH/i, '')
+    : order.id.slice(-8).toUpperCase()
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -48,7 +54,7 @@ export function OrderDetail({ order }: OrderDetailProps) {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h2 className="text-xl font-semibold text-[#1d1d1f] mb-1">
-              Order #{order.id.slice(-8).toUpperCase()}
+              Objednávka #{displayNumber}
             </h2>
             <p className="text-sm text-[#6e6e73]">
               Zadáno {formatDate(order.createdAt)}

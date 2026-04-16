@@ -8,6 +8,8 @@ import { ProductDetailClient } from "@/components/products/ProductDetailClient"
 import type { Metadata } from "next"
 import type { Product } from "@/types/product"
 import { BASE_URL } from "@/lib/config"
+import Link from "next/link"
+import { ArrowLeft } from "lucide-react"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -132,6 +134,13 @@ export default async function ProductDetailPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
       <div className="container mx-auto px-4 py-8">
+        <Link
+          href="/products"
+          className="inline-flex items-center gap-1.5 text-sm text-[#6e6e73] hover:text-[#1d1d1f] transition-colors mb-6"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Zpět na produkty
+        </Link>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <ProductImages images={product.imageUrls} productName={product.name} adjustments={raw.imageAdjustments} />
           <ProductDetailClient product={product} />
