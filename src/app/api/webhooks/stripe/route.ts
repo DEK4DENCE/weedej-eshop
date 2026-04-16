@@ -67,10 +67,11 @@ export async function POST(req: NextRequest) {
       productName:  variant?.product?.name ?? 'Product',
       variantLabel: variant?.name ?? '',
       quantity:     i.q,
-      unitPrice:    Math.round(Number(variant?.price ?? 0) * 100), // haléře
+      unitPrice:    Math.round(Number(variant?.price ?? 0) * 100), // haléře — price WITH VAT per variant pack
       erpProductId: variant?.erpProductId ?? null,
-      variantValue: variant?.variantValue ?? null,
+      variantValue: Number(variant?.variantValue ?? null),   // e.g. 3 for a "3g" variant
       variantUnit:  variant?.variantUnit ?? null,
+      vatRate:      Number(variant?.product?.vatRate ?? 21),
     }
   })
 
@@ -160,18 +161,32 @@ export async function POST(req: NextRequest) {
       const subtotalCzk = subtotalAmount / 100
 
       const erpItems = items.map(item => {
-        // Convert e-shop unitPrice (haléře) to CZK excl. VAT
-        const unitPriceKc = item.unitPrice / 100                    // Kč with VAT
-        const unitPriceExclVat = Math.round(unitPriceKc / 1.21 * 100) / 100
-        const erpQty   = item.variantValue ? item.quantity * item.variantValue : item.quantity
-        const erpName  = item.variantLabel ? `${item.productName} — ${item.variantLabel}` : item.productName
+        // item.unitPrice is in haléře, represents the price WITH VAT for the whole variant pack
+        // (e.g. a "3g" pack priced at 300 Kč → unitPrice = 30000 haléře)
+        const unitPriceKc      = item.unitPrice / 100                           // Kč WITH VAT, per variant pack
+        const vatRate          = item.vatRate                                   // actual product VAT rate
+        const unitPriceExclVat = Math.round(unitPriceKc / (1 + vatRate / 100) * 100) / 100  // excl. VAT, per variant pack
+
+        // ERP quantity is in base units (g, ml, ks), not in variant packs
+        const erpQty = (item.variantValue && item.variantValue > 0)
+          ? item.quantity * item.variantValue
+          : item.quantity
+
+        // ERP stores price per BASE UNIT — divide by variantValue to convert from pack price to per-unit price
+        // e.g.: 3g pack at 247.93 Kč excl. VAT → 82.64 Kč/g
+        // ERP then correctly computes: 3g × 82.64 Kč/g × 1.21 = 300 Kč
+        const unitPriceCzkPerUnit = (item.variantValue && item.variantValue > 0)
+          ? Math.round(unitPriceExclVat / item.variantValue * 100) / 100
+          : unitPriceExclVat
+
+        const erpName = item.variantLabel ? `${item.productName} — ${item.variantLabel}` : item.productName
         return {
           sku:          item.erpProductId ?? undefined,
           name:         erpName,
           quantity:     erpQty,
           unit:         item.variantUnit ?? 'ks',
-          unitPriceCzk: unitPriceExclVat,
-          vatRate:      21,
+          unitPriceCzk: unitPriceCzkPerUnit,
+          vatRate,
         }
       })
 
