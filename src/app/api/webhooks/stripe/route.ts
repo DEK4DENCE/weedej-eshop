@@ -78,45 +78,54 @@ export async function POST(req: NextRequest) {
   const shippingAmount = session.shipping_cost?.amount_total ?? 0
   const subtotalAmount = totalAmount - shippingAmount
 
-  // ── Idempotency: skip if order already exists ──────────────────────────────
-  // The success page creates the order as PAID (fallback) if the webhook is slow.
-  // If the order already exists (any sync status), skip creation entirely.
-  // Unsynced orders are handled by force-sync / daily cron.
-  const existingOrder = await db.order.findUnique({ where: { stripeSessionId: session.id } })
-  if (existingOrder) {
-    console.log(`[Stripe] Order already exists (erpSyncStatus=${existingOrder.erpSyncStatus}) — skipping creation, orderId=${existingOrder.id}`)
-    return NextResponse.json({ received: true })
-  }
-
-  // ── Create Order with status PAID ───────────────────────────────────────────
-  let order = await db.order.create({
-    data: {
-      userId,
-      addressId: addressId || null,
-      stripeSessionId:       session.id,
-      stripePaymentIntentId: typeof session.payment_intent === 'string' ? session.payment_intent : null,
-      status:          'PAID',
-      erpSyncStatus:   'pending_erp_sync',
-      deliveryType,
-      currency:        (session.currency ?? 'czk').toUpperCase(),
-      totalAmount,
-      subtotalAmount,
-      shippingAmount,
-      items: {
-        create: items.map(item => ({
-          productId:    item.productId,
-          variantId:    item.variantId,
-          productName:  item.productName,
-          variantLabel: item.variantLabel,
-          quantity:     item.quantity,
-          unitPrice:    item.unitPrice,
-        })),
-      },
-    },
+  // ── Idempotency check ──────────────────────────────────────────────────────
+  // The success page may have created the order first (as PAID, pending_erp_sync).
+  // If fully synced → nothing to do. If not yet synced → use the existing order
+  // and proceed with ERP sync (skip creation).
+  const existingOrder = await db.order.findUnique({
+    where:   { stripeSessionId: session.id },
     include: { items: true, address: true },
   })
 
-  console.log(`[Stripe] Order created orderId=${order.id}`)
+  if (existingOrder?.erpSyncStatus === 'synced') {
+    console.log(`[Stripe] Already fully processed — skipping, orderId=${existingOrder.id}`)
+    return NextResponse.json({ received: true })
+  }
+
+  // ── Create order (or reuse existing from success-page fallback) ─────────────
+  let order: any
+  if (existingOrder) {
+    console.log(`[Stripe] Order created by success page, proceeding with ERP sync, orderId=${existingOrder.id}`)
+    order = existingOrder
+  } else {
+    order = await db.order.create({
+      data: {
+        userId,
+        addressId: addressId || null,
+        stripeSessionId:       session.id,
+        stripePaymentIntentId: typeof session.payment_intent === 'string' ? session.payment_intent : null,
+        status:          'PAID',
+        erpSyncStatus:   'pending_erp_sync',
+        deliveryType,
+        currency:        (session.currency ?? 'czk').toUpperCase(),
+        totalAmount,
+        subtotalAmount,
+        shippingAmount,
+        items: {
+          create: items.map(item => ({
+            productId:    item.productId,
+            variantId:    item.variantId,
+            productName:  item.productName,
+            variantLabel: item.variantLabel,
+            quantity:     item.quantity,
+            unitPrice:    item.unitPrice,
+          })),
+        },
+      },
+      include: { items: true, address: true },
+    })
+    console.log(`[Stripe] Order created orderId=${order.id}`)
+  }
 
   // ── Load user for email + ERP sync ──────────────────────────────────────────
   const user = await db.user.findUnique({
@@ -124,8 +133,10 @@ export async function POST(req: NextRequest) {
     select: { id: true, name: true, email: true, phone: true },
   })
 
-  let addr: { fullName: string; line1: string; line2?: string | null; city: string; postalCode: string; country: string } | null = null
-  if (addressId) {
+  // Prefer address already loaded with the order; fallback to DB lookup
+  let addr: { fullName: string; line1: string; line2?: string | null; city: string; postalCode: string; country: string } | null =
+    order.address ?? null
+  if (!addr && addressId) {
     addr = await db.address.findUnique({ where: { id: addressId } })
   }
 
