@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Package } from 'lucide-react'
+import { Package, CheckCircle2, Circle } from 'lucide-react'
 import { Order } from '@/types/order'
 import { OrderStatusBadge } from './OrderStatusBadge'
 
@@ -19,11 +19,74 @@ function formatPrice(cents: number, currency: string = 'CZK'): string {
 }
 
 function formatDate(dateStr: string): string {
-  return new Intl.DateTimeFormat('en-GB', {
+  return new Intl.DateTimeFormat('cs-CZ', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Europe/Prague',
   }).format(new Date(dateStr))
+}
+
+function formatTime(dateStr: string): string {
+  return new Intl.DateTimeFormat('cs-CZ', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Europe/Prague',
+  }).format(new Date(dateStr))
+}
+
+interface TimelineStep {
+  label: string
+  timestamp: string | null | undefined
+}
+
+function CompactTimeline({ createdAt, paidAt, shippedAt, deliveredAt, status }: {
+  createdAt: string
+  paidAt?: string | null
+  shippedAt?: string | null
+  deliveredAt?: string | null
+  status: string
+}) {
+  const resolvedPaidAt = paidAt ?? (status !== 'PENDING' ? createdAt : null)
+
+  const steps: TimelineStep[] = [
+    { label: 'Objednáno', timestamp: createdAt },
+    { label: 'Zaplaceno', timestamp: resolvedPaidAt },
+    { label: 'Odesláno',  timestamp: shippedAt },
+    { label: 'Doručeno',  timestamp: deliveredAt },
+  ]
+
+  return (
+    <div className="flex items-start gap-0 mt-4">
+      {steps.map((step, i) => {
+        const done = !!step.timestamp
+        const isLast = i === steps.length - 1
+        return (
+          <div key={step.label} className="flex items-center flex-1 min-w-0">
+            {/* Step */}
+            <div className="flex flex-col items-center flex-shrink-0">
+              {done
+                ? <CheckCircle2 className="w-4 h-4 text-[#2E7D32]" />
+                : <Circle className="w-4 h-4 text-[#DEE2E6]" />
+              }
+              <p className={`text-[10px] mt-1 font-medium whitespace-nowrap ${done ? 'text-[#1d1d1f]' : 'text-[#aeaeb2]'}`}>
+                {step.label}
+              </p>
+              {done && step.timestamp && (
+                <p className="text-[9px] text-[#6e6e73] whitespace-nowrap">{formatTime(step.timestamp)}</p>
+              )}
+            </div>
+            {/* Connector */}
+            {!isLast && (
+              <div className={`h-px flex-1 mx-1 mb-5 ${done ? 'bg-[#2E7D32]/40' : 'bg-[#DEE2E6]'}`} />
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
 }
 
 export function OrderCard({ order }: OrderCardProps) {
@@ -47,12 +110,21 @@ export function OrderCard({ order }: OrderCardProps) {
             <OrderStatusBadge status={order.status} />
           </div>
 
-          <p className="text-xs text-[#6e6e73] mb-4">
+          <p className="text-xs text-[#6e6e73] mb-2">
             Zadáno {formatDate(order.createdAt)}
           </p>
 
+          {/* Compact timeline */}
+          <CompactTimeline
+            createdAt={order.createdAt}
+            paidAt={(order as any).paidAt}
+            shippedAt={(order as any).shippedAt}
+            deliveredAt={(order as any).deliveredAt}
+            status={order.status}
+          />
+
           {/* Thumbnail strip */}
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex items-center gap-2 mt-4 mb-2">
             {thumbnailItems.map((item) => (
               <div
                 key={item.id}
