@@ -45,7 +45,11 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     orderBy: { createdAt: "desc" },
   })
 
-  const products: Product[] = rawProducts.map((p) => ({
+  const inStock = rawProducts.filter((p) => p.variants.some((v) => v.stock > 0))
+  const outOfStock = rawProducts.filter((p) => p.variants.every((v) => v.stock === 0))
+  const sortedProducts = [...inStock, ...outOfStock]
+
+  const products: Product[] = sortedProducts.map((p) => ({
     ...p,
     basePrice: Number(p.basePrice),
     thcContent: p.thcContent ? Number(p.thcContent) : undefined,

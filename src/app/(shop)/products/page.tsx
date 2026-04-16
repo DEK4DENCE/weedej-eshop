@@ -66,6 +66,10 @@ async function fetchProducts(params: Awaited<Props["searchParams"]>): Promise<Pr
     where.activeSubstance = { in: substances }
   }
 
+  if (params.inStock === 'true') {
+    where.variants = { some: { stock: { gt: 0 } } }
+  }
+
   const products = await db.product.findMany({
     where,
     include: {
@@ -76,7 +80,12 @@ async function fetchProducts(params: Awaited<Props["searchParams"]>): Promise<Pr
     take: 48,
   })
 
-  return products.map((p) => ({
+  // Always show in-stock products first
+  const inStock = products.filter((p) => p.variants.some((v) => v.stock > 0))
+  const outOfStock = products.filter((p) => p.variants.every((v) => v.stock === 0))
+  const sorted = [...inStock, ...outOfStock]
+
+  return sorted.map((p) => ({
     ...p,
     basePrice: Number(p.basePrice),
     thcContent: p.thcContent ? Number(p.thcContent) : undefined,
