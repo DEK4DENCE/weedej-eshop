@@ -80,6 +80,7 @@ export async function POST(req: NextRequest) {
       await sendEmail({
         to: customerEmail,
         subject: `Vaše objednávka ${displayNumber} byla doručena`,
+        emailType: 'orderDelivered',
         react: React.createElement(OrderDelivered, {
           name: customerName,
           orderNumber,

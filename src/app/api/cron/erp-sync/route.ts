@@ -173,9 +173,10 @@ export async function GET(req: NextRequest) {
             : undefined
 
           await sendEmail({
-            to:      user.email,
-            subject: `Potvrzení objednávky ${syncResult.erpOrderNumber} — Weedej`,
-            react:   OrderConfirmationWithInvoice({
+            to:        user.email,
+            subject:   `Potvrzení objednávky ${syncResult.erpOrderNumber} — Weedej`,
+            emailType: 'orderConfirmation',
+            react:     OrderConfirmationWithInvoice({
               name:            firstName,
               orderNumber:     syncResult.erpOrderNumber,
               items:           items.map((i: any) => ({ productName: i.productName, variantLabel: i.variantLabel, quantity: i.quantity, unitPrice: i.unitPrice })),

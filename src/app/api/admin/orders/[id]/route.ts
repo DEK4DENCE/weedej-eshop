@@ -107,6 +107,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       await sendEmail({
         to: customerEmail,
         subject: `Vaše objednávka ${displayNumber} byla odeslána`,
+        emailType: 'orderShipped',
         react: React.createElement(OrderShippedWithTracking, {
           name: customerName,
           orderNumber,
@@ -128,6 +129,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       await sendEmail({
         to: customerEmail,
         subject: `Vaše objednávka ${displayNumber} byla doručena`,
+        emailType: 'orderDelivered',
         react: React.createElement(OrderDelivered, {
           name: customerName,
           orderNumber,
@@ -143,6 +145,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       await sendEmail({
         to: customerEmail,
         subject: `Vaše objednávka ${displayNumber} byla zrušena`,
+        emailType: 'orderCancelled',
         react: React.createElement(OrderCancelled, {
           name: customerName,
           orderNumber,

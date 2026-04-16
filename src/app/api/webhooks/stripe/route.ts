@@ -262,6 +262,7 @@ export async function POST(req: NextRequest) {
         await sendEmail({
           to:          user.email,
           subject:     `Potvrzení objednávky ${order.erpOrderNumber} — Weedej`,
+          emailType:   'orderConfirmation',
           react:       OrderConfirmationWithInvoice({
             name:             firstName,
             orderNumber:      order.erpOrderNumber!,
@@ -287,9 +288,10 @@ export async function POST(req: NextRequest) {
       } else {
         // ERP unavailable — send acknowledgement without ERP number/invoice
         await sendEmail({
-          to:      user.email,
-          subject: 'Přijali jsme vaši objednávku — Weedej',
-          react:   OrderConfirmationAck({
+          to:        user.email,
+          subject:   'Přijali jsme vaši objednávku — Weedej',
+          emailType: 'orderConfirmation',
+          react:     OrderConfirmationAck({
             name:            firstName,
             internalOrderId: order.id,
             items:           items.map(i => ({ productName: i.productName, variantLabel: i.variantLabel, quantity: i.quantity, unitPrice: i.unitPrice })),

@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
       await sendEmail({
         to: user.email,
         subject: 'Reset your Weedej password',
+        emailType: 'forgotPassword',
         react: PasswordReset({ name: firstName, resetUrl }),
       })
     }

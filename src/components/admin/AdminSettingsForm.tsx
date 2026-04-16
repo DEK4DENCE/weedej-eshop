@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Save, Star, Link2, RefreshCw, CheckCircle, XCircle, Download, Trash2 } from 'lucide-react'
+import { Save, Star, Link2, RefreshCw, CheckCircle, XCircle, Download, Trash2, Mail } from 'lucide-react'
 
 interface Product { id: string; name: string }
 
@@ -12,6 +12,28 @@ interface Props {
 
 export function AdminSettingsForm({ settings, products }: Props) {
   const [orderEmail, setOrderEmail] = useState(settings.orderNotificationEmail ?? '')
+
+  // Email config
+  const [emailFrom, setEmailFrom] = useState(settings.emailFromAddress ?? '')
+  const [emailReplyTo, setEmailReplyTo] = useState(settings.emailReplyTo ?? '')
+  const EMAIL_TYPES = [
+    { key: 'registration',      label: 'Registrace',              desc: 'Uvítací email + ověření emailu po registraci' },
+    { key: 'orderConfirmation', label: 'Potvrzení objednávky',     desc: 'Email zákazníkovi po úspěšné platbě' },
+    { key: 'orderShipped',      label: 'Objednávka odeslána',      desc: 'Email při změně stavu na Odesláno' },
+    { key: 'orderDelivered',    label: 'Objednávka doručena',      desc: 'Email při potvrzení doručení' },
+    { key: 'orderCancelled',    label: 'Objednávka zrušena',       desc: 'Email při zrušení objednávky' },
+    { key: 'forgotPassword',    label: 'Zapomenuté heslo',         desc: 'Email s odkazem pro reset hesla' },
+    { key: 'contactForm',       label: 'Kontaktní formulář',       desc: 'Interní oznámení o nové zprávě z kontaktního formuláře' },
+  ] as const
+  const [emailToggles, setEmailToggles] = useState<Record<string, boolean>>(() => {
+    const result: Record<string, boolean> = {}
+    for (const t of EMAIL_TYPES) {
+      // Default enabled unless explicitly 'false'
+      result[t.key] = settings[`emailEnabled_${t.key}`] !== 'false'
+    }
+    return result
+  })
+
   const [bestsellers, setBestsellers] = useState<string[]>(() => {
     try { return JSON.parse(settings.bestsellers ?? '[]') } catch { return [] }
   })
@@ -49,6 +71,10 @@ export function AdminSettingsForm({ settings, products }: Props) {
     setSaving(true)
     setSaved(false)
     try {
+      const emailTogglePayload: Record<string, string> = {}
+      for (const t of EMAIL_TYPES) {
+        emailTogglePayload[`emailEnabled_${t.key}`] = emailToggles[t.key] ? 'true' : 'false'
+      }
       await fetch('/api/admin/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -57,6 +83,9 @@ export function AdminSettingsForm({ settings, products }: Props) {
           bestsellers: JSON.stringify(bestsellers),
           erpApiUrl: erpUrl,
           erpApiKey: erpKey,
+          emailFromAddress: emailFrom,
+          emailReplyTo,
+          ...emailTogglePayload,
         }),
       })
       setSaved(true)
@@ -220,6 +249,68 @@ export function AdminSettingsForm({ settings, products }: Props) {
             )
           })}
           {products.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">Žádné aktivní produkty</p>}
+        </div>
+      </div>
+
+      {/* Email configuration */}
+      <div className="bg-card border border-border/40 rounded-xl p-6 space-y-5">
+        <div className="flex items-center gap-2">
+          <Mail className="h-4 w-4 text-green-500" />
+          <h2 className="text-base font-semibold text-foreground">Nastavení emailů</h2>
+        </div>
+
+        {/* Addresses */}
+        <div className="space-y-3">
+          <div>
+            <label className="block text-sm font-medium text-muted-foreground mb-1.5">
+              Odesílatel (From)
+            </label>
+            <input
+              type="text"
+              value={emailFrom}
+              onChange={(e) => setEmailFrom(e.target.value)}
+              placeholder="Weedej <noreply@weedej.cz>"
+              className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Formát: <code className="bg-muted px-1 rounded">Weedej &lt;noreply@weedej.cz&gt;</code> nebo jen <code className="bg-muted px-1 rounded">noreply@weedej.cz</code>
+            </p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-muted-foreground mb-1.5">
+              Odpovědní adresa (Reply-To) — nepovinné
+            </label>
+            <input
+              type="email"
+              value={emailReplyTo}
+              onChange={(e) => setEmailReplyTo(e.target.value)}
+              placeholder="info@weedej.cz"
+              className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500"
+            />
+          </div>
+        </div>
+
+        {/* Per-type toggles */}
+        <div className="border-t border-border/40 pt-4 space-y-1">
+          <p className="text-sm font-medium text-muted-foreground mb-3">Kdy posílat emaily zákazníkům</p>
+          {EMAIL_TYPES.map((t) => (
+            <label key={t.key} className="flex items-center justify-between gap-3 py-2.5 px-3 rounded-lg hover:bg-muted/40 cursor-pointer group">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground">{t.label}</p>
+                <p className="text-xs text-muted-foreground">{t.desc}</p>
+              </div>
+              <div className="relative shrink-0">
+                <input
+                  type="checkbox"
+                  checked={emailToggles[t.key] ?? true}
+                  onChange={(e) => setEmailToggles((prev) => ({ ...prev, [t.key]: e.target.checked }))}
+                  className="sr-only peer"
+                />
+                <div className="w-10 h-6 bg-[#DEE2E6] rounded-full peer-checked:bg-[#2E7D32] transition-colors" />
+                <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4" />
+              </div>
+            </label>
+          ))}
         </div>
       </div>
 

@@ -46,12 +46,14 @@ export async function POST(req: NextRequest) {
       to: email,
       subject: 'Verify your Weedej account',
       react: EmailVerification({ name: firstName, verifyUrl }),
+      emailType: 'registration',
     })
 
     await sendEmail({
       to: email,
       subject: 'Welcome to Weedej — Your First Order Awaits',
       react: WelcomeEmail({ name: firstName }),
+      emailType: 'registration',
     })
 
     return NextResponse.json(

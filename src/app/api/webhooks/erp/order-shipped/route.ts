@@ -172,9 +172,10 @@ async function sendShippingEmail(
     : 'faktura.pdf'
 
   await sendEmail({
-    to:      user.email,
-    subject: `Vaše objednávka ${updatedOrder.erpOrderNumber} je na cestě! — Weedej`,
-    react:   OrderShippedWithTracking({
+    to:        user.email,
+    subject:   `Vaše objednávka ${updatedOrder.erpOrderNumber} je na cestě! — Weedej`,
+    emailType: 'orderShipped',
+    react:     OrderShippedWithTracking({
       name:          firstName,
       orderNumber:   updatedOrder.erpOrderNumber ?? order.id,
       items:         order.items.map((i: any) => ({

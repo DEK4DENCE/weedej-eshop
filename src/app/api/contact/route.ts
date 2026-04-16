@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
     await sendEmail({
       to: adminEmail,
       subject: `Nová zpráva z kontaktního formuláře — ${name}`,
+      emailType: 'contactForm',
       react: React.createElement('div', null,
         React.createElement('h2', null, `Zpráva od: ${name}`),
         React.createElement('p', null, `Email: ${email}`),
