@@ -159,9 +159,16 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
           )}
 
           <div className="flex items-center justify-between mt-1">
-            <span className="text-xl font-bold text-[#8B6914] font-mono">
-              {formatPrice(Number(price))}
-            </span>
+            <div>
+              <span className="text-xl font-bold text-[#8B6914] font-mono">
+                {formatPrice(Number(price))}
+              </span>
+              {defaultVariant?.variantValue != null && defaultVariant?.variantUnit && (
+                <span className="ml-1.5 text-xs text-[#6e6e73]">
+                  / {defaultVariant.variantValue}{defaultVariant.variantUnit}
+                </span>
+              )}
+            </div>
 
             <motion.button
               whileTap={{ scale: 0.85 }}

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { getErpConfig } from '@/lib/erp'
 
 export async function GET(
   _req: NextRequest,
@@ -41,19 +42,26 @@ export async function GET(
     })
   }
 
-  // Fetch from ERP and cache for future requests
+  // Fetch from ERP and cache
   if (order.invoiceUrl) {
-    const apiKey = process.env.ERP_API_KEY
-    if (!apiKey) {
-      return NextResponse.json({ error: 'Invoice not available' }, { status: 404 })
+    const erpConfig = await getErpConfig()
+    if (!erpConfig) {
+      return NextResponse.json({ error: 'ERP not configured' }, { status: 503 })
     }
+
+    // invoiceUrl may be a relative path — prepend ERP base URL if needed
+    const fullUrl = order.invoiceUrl.startsWith('http')
+      ? order.invoiceUrl
+      : `${erpConfig.url.replace(/\/$/, '')}${order.invoiceUrl.startsWith('/') ? '' : '/'}${order.invoiceUrl}`
+
     try {
-      const res = await fetch(order.invoiceUrl, {
-        headers: { 'X-API-Key': apiKey },
+      const res = await fetch(fullUrl, {
+        headers: { 'X-API-Key': erpConfig.key },
         signal: AbortSignal.timeout(10_000),
       })
       if (!res.ok) {
-        return NextResponse.json({ error: 'Invoice fetch failed' }, { status: 502 })
+        console.error(`[Invoice] ERP returned ${res.status} for url=${fullUrl}`)
+        return NextResponse.json({ error: `Invoice fetch failed (ERP ${res.status})` }, { status: 502 })
       }
       const arrayBuf = await res.arrayBuffer()
       const base64 = Buffer.from(arrayBuf).toString('base64')
@@ -75,7 +83,8 @@ export async function GET(
           'Content-Length': String(buf.length),
         },
       })
-    } catch {
+    } catch (err: any) {
+      console.error(`[Invoice] Fetch error:`, err?.message)
       return NextResponse.json({ error: 'Invoice unavailable' }, { status: 502 })
     }
   }
