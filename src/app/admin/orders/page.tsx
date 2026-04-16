@@ -77,7 +77,6 @@ function ErpSyncBadge({ order }: { order: Order }) {
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
-  const [syncing, setSyncing] = useState(false)
   const [forceSyncing, setForceSyncing] = useState(false)
   const [syncMsg, setSyncMsg] = useState("")
   const [syncMsgType, setSyncMsgType] = useState<"info" | "error">("info")
@@ -87,23 +86,6 @@ export default function AdminOrdersPage() {
     const res = await fetch("/api/admin/orders")
     if (res.ok) setOrders(await res.json())
     setLoading(false)
-  }
-
-  async function handleSyncErp() {
-    setSyncing(true)
-    setSyncMsg("")
-    try {
-      const res = await fetch("/api/admin/erp/sync-orders", { method: "POST" })
-      const data = await res.json()
-      setSyncMsg(data.message ?? "Sync dokončen")
-      setSyncMsgType("info")
-      await fetchOrders()
-    } catch {
-      setSyncMsg("Chyba při synchronizaci")
-      setSyncMsgType("error")
-    } finally {
-      setSyncing(false)
-    }
   }
 
   async function handleForceSyncPending() {
@@ -149,16 +131,6 @@ export default function AdminOrdersPage() {
               {forceSyncing ? "Synchronizuji..." : `Sync do ERP (${pendingCount})`}
             </Button>
           )}
-          <Button
-            onClick={handleSyncErp}
-            disabled={syncing}
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-2"
-          >
-            <RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
-            {syncing ? "..." : "Sync ze ERP"}
-          </Button>
         </div>
       </div>
 
