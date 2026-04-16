@@ -70,14 +70,42 @@ export async function GET() {
     result.dbColumns = { error: e.message }
   }
 
-  // Statistiky objednávek
+  // Stripe webhook test — ověřit že secret je nastaven
+  result.stripeWebhook = {
+    secretSet: !!stripeWebhookSecret,
+    diagnosis: stripeWebhookSecret
+      ? "✅ STRIPE_WEBHOOK_SECRET je nastaveno v env vars"
+      : "❌ STRIPE_WEBHOOK_SECRET chybí v Vercel env vars — webhook vždy vrátí 400, ERP sync se nespustí",
+    action: stripeWebhookSecret
+      ? "Zkontroluj v Stripe Dashboard → Developers → Webhooks že secret sedí s tímto env varem"
+      : "1. Jdi na Stripe Dashboard → Developers → Webhooks\n2. Klikni na endpoint nebo vytvoř nový pro URL: https://tvoje-domena/api/webhooks/stripe\n3. Zkopíruj 'Signing secret' (whsec_...)\n4. Přidej do Vercel env vars jako STRIPE_WEBHOOK_SECRET",
+  }
+
+  // Statistiky objednávek + poslední chyby
   try {
-    const [total, withErp, withoutErp] = await Promise.all([
+    const [total, withErp, pendingSync, syncFailed, recentErrors] = await Promise.all([
       db.order.count(),
       db.order.count({ where: { erpOrderNumber: { not: null } } }).catch(() => -1),
-      db.order.count({ where: { erpOrderNumber: null } }).catch(() => -1),
+      db.order.count({ where: { erpSyncStatus: "pending_erp_sync" } }).catch(() => -1),
+      db.order.count({ where: { erpSyncStatus: "sync_failed" } }).catch(() => -1),
+      db.order.findMany({
+        where: { erpSyncLastError: { not: null } },
+        select: { id: true, erpSyncLastError: true, erpSyncAttempts: true, createdAt: true },
+        orderBy: { createdAt: "desc" },
+        take: 3,
+      }).catch(() => []),
     ])
-    result.orders = { total, withErpId: withErp, withoutErpId: withoutErp }
+    result.orders = {
+      total,
+      synced: withErp,
+      pendingSync,
+      syncFailed,
+      recentErrors: recentErrors.map((o: any) => ({
+        orderId: o.id.slice(-8).toUpperCase(),
+        attempts: o.erpSyncAttempts,
+        error: o.erpSyncLastError,
+      })),
+    }
   } catch (e: any) {
     result.orders = { error: `Nelze načíst — pravděpodobně chybí sloupce v DB: ${e.message}` }
   }
