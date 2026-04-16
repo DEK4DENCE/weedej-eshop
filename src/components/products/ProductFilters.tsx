@@ -47,25 +47,23 @@ export function ProductFilters() {
       .catch(console.error)
   }, [])
 
-  function toggleCategory(slug: string) {
-    setSelectedCategories((prev) =>
-      prev.includes(slug) ? prev.filter((c) => c !== slug) : [...prev, slug]
-    )
-  }
+  // applyFilters accepts explicit values so callers can pass updated values
+  // before React re-renders the state
+  function applyFilters(overrides: {
+    categories?: string[]
+    strains?: StrainType[]
+    substances?: ActiveSubstance[]
+    inStock?: boolean
+    minPrice?: string
+    maxPrice?: string
+  } = {}) {
+    const cats       = overrides.categories  ?? selectedCategories
+    const strains    = overrides.strains     ?? selectedStrains
+    const substances = overrides.substances  ?? selectedSubstances
+    const stock      = overrides.inStock     ?? inStock
+    const min        = overrides.minPrice    ?? minPrice
+    const max        = overrides.maxPrice    ?? maxPrice
 
-  function toggleStrain(strain: StrainType) {
-    setSelectedStrains((prev) =>
-      prev.includes(strain) ? prev.filter((s) => s !== strain) : [...prev, strain]
-    )
-  }
-
-  function toggleSubstance(sub: ActiveSubstance) {
-    setSelectedSubstances((prev) =>
-      prev.includes(sub) ? prev.filter((s) => s !== sub) : [...prev, sub]
-    )
-  }
-
-  function applyFilters() {
     const params = new URLSearchParams(searchParams.toString())
     params.delete('category')
     params.delete('strainType')
@@ -74,13 +72,42 @@ export function ProductFilters() {
     params.delete('maxPrice')
     params.delete('inStock')
     params.delete('page')
-    selectedCategories.forEach((c) => params.append('category', c))
-    selectedStrains.forEach((s) => params.append('strainType', s))
-    selectedSubstances.forEach((s) => params.append('substance', s))
-    if (minPrice) params.set('minPrice', minPrice)
-    if (maxPrice) params.set('maxPrice', maxPrice)
-    if (inStock) params.set('inStock', 'true')
+    cats.forEach((c) => params.append('category', c))
+    strains.forEach((s) => params.append('strainType', s))
+    substances.forEach((s) => params.append('substance', s))
+    if (min) params.set('minPrice', min)
+    if (max) params.set('maxPrice', max)
+    if (stock) params.set('inStock', 'true')
     router.push(`${pathname}?${params.toString()}`)
+  }
+
+  function toggleCategory(slug: string) {
+    const next = selectedCategories.includes(slug)
+      ? selectedCategories.filter((c) => c !== slug)
+      : [...selectedCategories, slug]
+    setSelectedCategories(next)
+    applyFilters({ categories: next })
+  }
+
+  function toggleStrain(strain: StrainType) {
+    const next = selectedStrains.includes(strain)
+      ? selectedStrains.filter((s) => s !== strain)
+      : [...selectedStrains, strain]
+    setSelectedStrains(next)
+    applyFilters({ strains: next })
+  }
+
+  function toggleSubstance(sub: ActiveSubstance) {
+    const next = selectedSubstances.includes(sub)
+      ? selectedSubstances.filter((s) => s !== sub)
+      : [...selectedSubstances, sub]
+    setSelectedSubstances(next)
+    applyFilters({ substances: next })
+  }
+
+  function handleInStockChange(checked: boolean) {
+    setInStock(checked)
+    applyFilters({ inStock: checked })
   }
 
   function resetFilters() {
@@ -172,7 +199,7 @@ export function ProductFilters() {
           </div>
         )}
 
-        {/* Price Range */}
+        {/* Price Range — applies on blur */}
         <div>
           <p className="text-sm font-medium text-[#515154] mb-3">Cenové rozmezí</p>
           <div className="flex items-center gap-2">
@@ -180,6 +207,7 @@ export function ProductFilters() {
               type="number"
               value={minPrice}
               onChange={(e) => setMinPrice(e.target.value)}
+              onBlur={() => applyFilters({ minPrice })}
               placeholder="Min Kč"
               min={0}
               className="w-full bg-[#fafafa] border border-[#DEE2E6] rounded-xl px-3 py-2 text-sm text-[#1d1d1f] placeholder:text-[#aeaeb2] focus:outline-none focus:border-[#2E7D32] focus:ring-1 focus:ring-[#2E7D32]/30"
@@ -189,6 +217,7 @@ export function ProductFilters() {
               type="number"
               value={maxPrice}
               onChange={(e) => setMaxPrice(e.target.value)}
+              onBlur={() => applyFilters({ maxPrice })}
               placeholder="Max Kč"
               min={0}
               className="w-full bg-[#fafafa] border border-[#DEE2E6] rounded-xl px-3 py-2 text-sm text-[#1d1d1f] placeholder:text-[#aeaeb2] focus:outline-none focus:border-[#2E7D32] focus:ring-1 focus:ring-[#2E7D32]/30"
@@ -201,7 +230,7 @@ export function ProductFilters() {
           <input
             type="checkbox"
             checked={inStock}
-            onChange={(e) => setInStock(e.target.checked)}
+            onChange={(e) => handleInStockChange(e.target.checked)}
             className="w-4 h-4 rounded border border-[#DEE2E6] accent-[#2E7D32] cursor-pointer"
           />
           <span className="text-sm text-[#6e6e73] group-hover:text-[#1d1d1f] transition-colors">
@@ -250,14 +279,6 @@ export function ProductFilters() {
             ))}
           </div>
         </div>
-
-        {/* Apply */}
-        <button
-          onClick={() => { applyFilters(); setMobileOpen(false) }}
-          className="w-full bg-[#2E7D32] hover:bg-[#1a9020] text-white font-semibold py-2.5 rounded-xl text-sm transition-all duration-200 hover:shadow-[0_4px_16px_rgba(34,168,41,0.3)]"
-        >
-          Použít filtry
-        </button>
       </div>
     </aside>
   )
