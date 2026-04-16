@@ -59,7 +59,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
             alt={`${product.name}${product.strainType ? ` — ${product.strainType}` : ''}${product.cbdContent ? `, CBD ${product.cbdContent}%` : ''}`}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            className="object-contain"
+            className="object-cover"
             style={{
               objectPosition: `${mainAdj.x}% ${mainAdj.y}%`,
               transform: mainAdj.zoom !== 1 ? `scale(${mainAdj.zoom})` : undefined,
