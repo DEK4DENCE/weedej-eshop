@@ -1,3 +1,9 @@
 {
-  "alias": ["weedej-cannabis-eshop-dek4dences-projects.vercel.app"]
+  "alias": ["weedej-cannabis-eshop-dek4dences-projects.vercel.app"],
+  "crons": [
+    {
+      "path": "/api/cron/erp-sync",
+      "schedule": "*/5 * * * *"
+    }
+  ]
 }
