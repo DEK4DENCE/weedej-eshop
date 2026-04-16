@@ -4,6 +4,7 @@ import { db } from "@/lib/db"
 import { sendEmail } from "@/lib/email/send"
 import { OrderShippedWithTracking } from "@/lib/email/templates/OrderShipped"
 import { OrderCancelled } from "@/lib/email/templates/OrderCancelled"
+import { OrderDelivered } from "@/lib/email/templates/OrderDelivered"
 import React from "react"
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -122,6 +123,21 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         attachments: invoicePdfBase64
           ? [{ filename: invoiceFilename, content: invoicePdfBase64, contentType: "application/pdf", encoding: "base64" }]
           : [],
+      })
+    } else if (status === "DELIVERED") {
+      await sendEmail({
+        to: customerEmail,
+        subject: `Vaše objednávka ${displayNumber} byla doručena`,
+        react: React.createElement(OrderDelivered, {
+          name: customerName,
+          orderNumber,
+          items: order.items.map((i) => ({
+            productName: i.productName,
+            variantLabel: i.variantLabel,
+            quantity: i.quantity,
+          })),
+          totalAmount: order.totalAmount,
+        }),
       })
     } else if (status === "CANCELLED") {
       await sendEmail({
