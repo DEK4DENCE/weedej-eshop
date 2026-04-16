@@ -1,51 +1,30 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
-import { useToast } from "@/hooks/useToast"
-import { Loader2 } from "lucide-react"
+// Status is driven exclusively by ERP — no manual changes from e-shop admin.
+// Zaplaceno → Odesláno (ERP ships) → Doručeno (ERP confirms delivery)
 
-const STATUSES = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"]
+const STATUS_MAP: Record<string, { label: string; classes: string }> = {
+  PENDING:    { label: "Čeká na platbu",  classes: "bg-gray-100 text-gray-600 border-gray-200" },
+  PAID:       { label: "Zaplaceno",        classes: "bg-cyan-100 text-cyan-700 border-cyan-200" },
+  PROCESSING: { label: "Zaplaceno",        classes: "bg-cyan-100 text-cyan-700 border-cyan-200" },
+  SHIPPED:    { label: "Odesláno",         classes: "bg-purple-100 text-purple-700 border-purple-200" },
+  DELIVERED:  { label: "Doručeno",         classes: "bg-green-100 text-green-700 border-green-200" },
+  CANCELLED:  { label: "Zrušeno",          classes: "bg-red-100 text-red-700 border-red-200" },
+  REFUNDED:   { label: "Vráceno",          classes: "bg-gray-100 text-gray-600 border-gray-200" },
+}
 
-interface Props { orderId: string; currentStatus: string }
+interface Props { currentStatus: string }
 
-export function AdminOrderStatusClient({ orderId, currentStatus }: Props) {
-  const [status, setStatus] = useState(currentStatus)
-  const [loading, setLoading] = useState(false)
-  const { toast } = useToast()
-  const router = useRouter()
-
-  const handleUpdate = async () => {
-    setLoading(true)
-    try {
-      const res = await fetch(`/api/admin/orders/${orderId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      })
-      if (!res.ok) throw new Error("Failed to update status")
-      toast({ title: "Order status updated" })
-      router.refresh()
-    } catch (err: any) {
-      toast({ title: err.message, variant: "destructive" })
-    } finally {
-      setLoading(false)
-    }
-  }
-
+export function AdminOrderStatusClient({ currentStatus }: Props) {
+  const s = STATUS_MAP[currentStatus] ?? { label: currentStatus, classes: "bg-gray-100 text-gray-600 border-gray-200" }
   return (
-    <div className="flex gap-2">
-      <Select value={status} onValueChange={(value) => { if (value) setStatus(value) }}>
-        <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
-        <SelectContent>
-          {STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-        </SelectContent>
-      </Select>
-      <Button size="sm" onClick={handleUpdate} disabled={loading || status === currentStatus}>
-        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
-      </Button>
+    <div className="space-y-2">
+      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border ${s.classes}`}>
+        {s.label}
+      </span>
+      <p className="text-xs text-muted-foreground">
+        Status řídí ERP — mění se automaticky při expedici a doručení.
+      </p>
     </div>
   )
 }

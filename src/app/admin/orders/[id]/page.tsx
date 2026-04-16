@@ -39,7 +39,7 @@ export default async function AdminOrderDetailPage({ params }: Props) {
         <Card>
           <CardHeader><CardTitle>Status &amp; ERP</CardTitle></CardHeader>
           <CardContent className="space-y-3">
-            <Badge>{order.status}</Badge>
+            <AdminOrderStatusClient currentStatus={order.status} />
             {order.erpOrderNumber && (
               <p className="text-sm">
                 <span className="text-muted-foreground">ERP číslo: </span>
@@ -52,7 +52,6 @@ export default async function AdminOrderDetailPage({ params }: Props) {
                 <span className="font-mono">{order.invoiceNumber}</span>
               </p>
             )}
-            <AdminOrderStatusClient orderId={order.id} currentStatus={order.status} />
           </CardContent>
         </Card>
       </div>

@@ -22,16 +22,15 @@ interface Order {
   user: { name: string | null; email: string }
 }
 
-const statusColors: Record<string, string> = {
-  PENDING:          "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
-  PAID:             "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
-  PROCESSING:       "bg-blue-500/20 text-blue-400 border-blue-500/30",
-  PACKED:           "bg-orange-500/20 text-orange-400 border-orange-500/30",
-  SHIPPED:          "bg-purple-500/20 text-purple-400 border-purple-500/30",
-  OUT_FOR_DELIVERY: "bg-indigo-500/20 text-indigo-400 border-indigo-500/30",
-  DELIVERED:        "bg-green-500/20 text-green-400 border-green-500/30",
-  CANCELLED:        "bg-red-500/20 text-red-400 border-red-500/30",
-  REFUNDED:         "bg-gray-500/20 text-gray-400 border-gray-500/30",
+// Status is driven by ERP. Map all variants to the 3 user-facing states.
+const STATUS_DISPLAY: Record<string, { label: string; classes: string }> = {
+  PENDING:    { label: "Zaplaceno", classes: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30" },
+  PAID:       { label: "Zaplaceno", classes: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30" },
+  PROCESSING: { label: "Zaplaceno", classes: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30" },
+  SHIPPED:    { label: "Odesláno",  classes: "bg-purple-500/20 text-purple-400 border-purple-500/30" },
+  DELIVERED:  { label: "Doručeno",  classes: "bg-green-500/20 text-green-400 border-green-500/30" },
+  CANCELLED:  { label: "Zrušeno",   classes: "bg-red-500/20 text-red-400 border-red-500/30" },
+  REFUNDED:   { label: "Vráceno",   classes: "bg-gray-500/20 text-gray-400 border-gray-500/30" },
 }
 
 function ErpSyncBadge({ order }: { order: Order }) {
@@ -196,7 +195,7 @@ export default function AdminOrdersPage() {
                   </TableCell>
                   <TableCell>{order.user.name ?? order.user.email}</TableCell>
                   <TableCell>
-                    <Badge className={statusColors[order.status] ?? ""}>{order.status}</Badge>
+                    <Badge className={STATUS_DISPLAY[order.status]?.classes ?? ""}>{STATUS_DISPLAY[order.status]?.label ?? order.status}</Badge>
                   </TableCell>
                   <TableCell>{formatPrice(order.totalAmount / 100)}</TableCell>
                   <TableCell className="text-muted-foreground text-xs">
