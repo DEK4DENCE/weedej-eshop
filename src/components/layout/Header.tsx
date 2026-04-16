@@ -16,17 +16,22 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useRouter, usePathname } from "next/navigation"
 
-const navLinks = [
-  { href: "/products", label: "Vše" },
-  { href: "/products?category=kvety", label: "Květy" },
-  { href: "/products?category=extrakty", label: "Extrakty" },
-  { href: "/products?category=edibles", label: "Edibles" },
+const staticLinks = [
   { href: "/doprava", label: "Doprava" },
   { href: "/contact", label: "Kontakt" },
   { href: "/blog", label: "Blog" },
 ]
 
-export function Header() {
+interface CategoryLink {
+  href: string
+  label: string
+}
+
+interface HeaderProps {
+  categories?: CategoryLink[]
+}
+
+export function Header({ categories = [] }: HeaderProps) {
   const { data: session } = useSession()
   const { totalItems, toggleSidebar } = useCart()
   const router = useRouter()
@@ -51,7 +56,26 @@ export function Header() {
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-6">
-          {navLinks.map(({ href, label }) => (
+          <Link
+            href="/products"
+            className={`text-sm font-medium transition-colors ${isActive("/products") ? "text-[#2E7D32] font-semibold border-b-2 border-[#2E7D32] pb-0.5" : "text-[#6e6e73] hover:text-[#1d1d1f]"}`}
+          >
+            Vše
+          </Link>
+          {categories.map(({ href, label }) => (
+            <Link
+              key={href}
+              href={href}
+              className={`text-sm font-medium transition-colors ${
+                isActive(href)
+                  ? "text-[#2E7D32] font-semibold border-b-2 border-[#2E7D32] pb-0.5"
+                  : "text-[#6e6e73] hover:text-[#1d1d1f]"
+              }`}
+            >
+              {label}
+            </Link>
+          ))}
+          {staticLinks.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
@@ -157,7 +181,7 @@ export function Header() {
           className="md:hidden border-t border-[#DEE2E6] bg-white/98 backdrop-blur overflow-hidden"
         >
           <nav className="container mx-auto px-4 py-4 flex flex-col gap-1">
-            {navLinks.map(({ href, label }) => (
+            {[{ href: "/products", label: "Vše" }, ...categories, ...staticLinks].map(({ href, label }) => (
               <Link
                 key={href}
                 href={href}
