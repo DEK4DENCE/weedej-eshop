@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { formatPrice } from "@/lib/utils/formatPrice"
-import { Plus, Pencil } from "lucide-react"
+import { Pencil } from "lucide-react"
 
 export const metadata = { title: "Products — Admin" }
 
@@ -20,9 +20,6 @@ export default async function AdminProductsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold font-playfair">Products</h1>
-        <Button asChild className="bg-green-500 hover:bg-green-600 text-white">
-          <Link href="/admin/products/new"><Plus className="mr-2 h-4 w-4" />New Product</Link>
-        </Button>
       </div>
       <div className="rounded-md border border-border/40">
         <Table>
