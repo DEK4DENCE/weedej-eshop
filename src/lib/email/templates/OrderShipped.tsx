@@ -2,18 +2,125 @@ import {
   Html, Head, Body, Container, Text, Button, Link, Hr, Preview, Row, Column, Section,
 } from '@react-email/components'
 
+// ─── Extended props with tracking + invoice ───────────────────────────────────
+
+interface OrderShippedWithTrackingProps {
+  name:           string
+  orderNumber:    string
+  items:          { productName: string; variantLabel: string; quantity: number }[]
+  totalAmount:    number   // haléře
+  deliveryType:   'COURIER' | 'PICKUP_IN_STORE'
+  trackingNumber?: string
+  carrier?:        string
+  invoiceNumber?:  string
+}
+
+/**
+ * Mail #2 — shipping confirmation with tracking + invoice attachment note.
+ * Invoice PDF is attached separately in sendEmail() call (§ 28 ZDPH).
+ */
+export function OrderShippedWithTracking({
+  name,
+  orderNumber,
+  items,
+  totalAmount,
+  deliveryType,
+  trackingNumber,
+  carrier,
+  invoiceNumber,
+}: OrderShippedWithTrackingProps) {
+  return (
+    <Html lang="cs">
+      <Head />
+      <Preview>Vaše objednávka {orderNumber} byla odeslána — na cestě k vám!</Preview>
+      <Body style={body}>
+        <Container style={container}>
+          <Text style={logo}>Weedej</Text>
+
+          <Text style={heading}>Vaše objednávka je na cestě</Text>
+          <Text style={paragraph}>Dobrý den, {name},</Text>
+          <Text style={paragraph}>
+            Skvělá zpráva! Vaše objednávka {orderNumber} byla právě odeslána.
+            {deliveryType === 'COURIER'
+              ? ' Doručení kurýrem proběhne zpravidla do 1–2 pracovních dnů.'
+              : ' Objednávka je připravena k osobnímu vyzvednutí.'}
+          </Text>
+
+          <Section style={orderBox}>
+            <Text style={orderLabel}>Číslo objednávky</Text>
+            <Text style={orderNumberStyle}>{orderNumber}</Text>
+          </Section>
+
+          {trackingNumber && (
+            <Section style={trackingBox}>
+              <Text style={trackingLabel}>Číslo zásilky</Text>
+              <Text style={trackingNumberStyle}>{trackingNumber}</Text>
+              {carrier && <Text style={carrierText}>Přepravce: {carrier}</Text>}
+            </Section>
+          )}
+
+          {invoiceNumber && (
+            <Text style={{ ...paragraph, fontSize: '13px', color: '#475569' }}>
+              📎 Faktura č. {invoiceNumber} je přiložena k tomuto e-mailu (PDF).
+            </Text>
+          )}
+
+          <Text style={sectionTitle}>Odesílané položky</Text>
+          {items.map((item, i) => (
+            <Row key={i} style={itemRow}>
+              <Column>
+                <Text style={itemName}>{item.productName}</Text>
+                <Text style={itemVariant}>{item.variantLabel} × {item.quantity}</Text>
+              </Column>
+            </Row>
+          ))}
+
+          <Hr style={divider} />
+
+          <Row>
+            <Column><Text style={grandTotalLabel}>Celkem</Text></Column>
+            <Column><Text style={grandTotalValue}>{formatPrice(totalAmount)}</Text></Column>
+          </Row>
+
+          <Hr style={divider} />
+
+          <Button style={button} href={`${APP_URL}/account/orders`}>
+            Sledovat objednávku
+          </Button>
+
+          <Text style={paragraph}>
+            Máte otázky?{' '}
+            <Link href="mailto:support@weedej.cz" style={link}>support@weedej.cz</Link>
+          </Text>
+
+          <Text style={paragraph}>S pozdravem,<br />Tým Weedej</Text>
+
+          <Hr style={divider} />
+          <Text style={footer}>
+            Faktura je vystavena dle § 28 zákona č. 235/2004 Sb.
+          </Text>
+        </Container>
+      </Body>
+    </Html>
+  )
+}
+
+// ─── Shared constants (must appear before new template above uses them) ────────
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://weedej.cz'
+
+function formatPrice(cents: number) {
+  return `${Math.round(cents / 100).toLocaleString('cs-CZ')} Kč`
+}
+
+// ─── Original interface (kept for any existing callers) ───────────────────────
+
 interface OrderShippedProps {
   name: string
   orderNumber: string
   items: { productName: string; variantLabel: string; quantity: number }[]
   totalAmount: number
   deliveryType: 'COURIER' | 'PICKUP_IN_STORE'
-}
-
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://weedej.cz'
-
-function formatPrice(cents: number) {
-  return `${Math.round(cents / 100).toLocaleString('cs-CZ')} Kč`
 }
 
 export function OrderShipped({ name, orderNumber, items, totalAmount, deliveryType }: OrderShippedProps) {
@@ -99,3 +206,7 @@ const button = { backgroundColor: '#2E7D32', borderRadius: '8px', color: '#fffff
 const divider = { borderColor: '#DEE2E6', marginTop: '16px', marginBottom: '16px' }
 const link = { color: '#2E7D32' }
 const footer = { color: '#aeaeb2', fontSize: '11px', lineHeight: '1.5' }
+const trackingBox = { backgroundColor: '#ECFDF5', border: '1px solid #6EE7B7', borderRadius: '10px', padding: '14px 20px', marginBottom: '20px' }
+const trackingLabel = { color: '#065F46', fontSize: '11px', textTransform: 'uppercase' as const, letterSpacing: '0.05em', margin: '0 0 4px 0' }
+const trackingNumberStyle = { color: '#064E3B', fontSize: '16px', fontWeight: '700', fontFamily: 'monospace', margin: '0 0 4px 0' }
+const carrierText = { color: '#065F46', fontSize: '13px', margin: '0' }

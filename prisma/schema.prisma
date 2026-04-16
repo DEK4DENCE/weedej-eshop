@@ -263,20 +263,47 @@ model Order {
   totalAmount           Int
   currency              String       @default("CZK")
   notes                 String?
-  erpOrderId            String?     // ERP CustomerOrder.id (po odeslání do ERP)
-  erpOrderNumber        String?     // ERP číslo objednávky (ESH20260001)
+  erpOrderId            String?      // ERP CustomerOrder.id
+  erpOrderNumber        String?      // ESH{YYYY}{XXXX}
+  invoiceNumber         String?      // VF{YYYY}{XXXX}
+  invoiceUrl            String?      // URL to fetch invoice PDF from ERP
+  invoicePdfBase64      String?      // Base64 PDF — stored for email retries (@db.Text)
+  // ERP sync state
+  erpSyncStatus         String       @default("pending_erp_sync")
+  // pending_erp_sync | synced | sync_failed
+  erpSyncAttempts       Int          @default(0)
+  erpSyncLastError      String?
+  // Shipping
+  trackingNumber        String?
+  carrier               String?
+  shippedAt             DateTime?
   createdAt             DateTime    @default(now())
   updatedAt             DateTime    @updatedAt
 
-  user    User        @relation(fields: [userId], references: [id])
-  address Address?    @relation(fields: [addressId], references: [id])
-  items   OrderItem[]
+  user         User             @relation(fields: [userId], references: [id])
+  address      Address?         @relation(fields: [addressId], references: [id])
+  items        OrderItem[]
+  syncAttempts ErpSyncAttempt[]
 
   @@index([userId])
   @@index([status])
   @@index([stripeSessionId])
+  @@index([erpSyncStatus])
   @@index([createdAt(sort: Desc)])
   @@index([userId, createdAt(sort: Desc)])
+}
+
+// ERP sync attempt log — used for retry queue and audit
+model ErpSyncAttempt {
+  id        String   @id @default(cuid())
+  orderId   String
+  attemptAt DateTime @default(now())
+  success   Boolean
+  error     String?
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
 }
 
 model Setting {

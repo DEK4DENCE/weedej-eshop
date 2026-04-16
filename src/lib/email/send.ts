@@ -1,18 +1,33 @@
 import { resend } from '@/lib/resend'
 import { ReactElement } from 'react'
 
-interface SendEmailOptions {
-  to: string
-  subject: string
-  react: ReactElement
+interface EmailAttachment {
+  filename:    string
+  content:     string   // base64-encoded
+  contentType: string
+  encoding:    'base64'
 }
 
-export async function sendEmail({ to, subject, react }: SendEmailOptions) {
-  // Resend requires a verified domain. Until your domain is verified,
-  // use onboarding@resend.dev (only sends to the Resend account owner's email).
+interface SendEmailOptions {
+  to:          string
+  subject:     string
+  react:       ReactElement
+  attachments?: EmailAttachment[]
+}
+
+export async function sendEmail({ to, subject, react, attachments }: SendEmailOptions) {
   const from = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
   try {
-    const { data, error } = await resend.emails.send({ from, to, subject, react })
+    const { data, error } = await resend.emails.send({
+      from,
+      to,
+      subject,
+      react,
+      attachments: attachments?.map(a => ({
+        filename: a.filename,
+        content:  a.content,   // Resend accepts base64 string
+      })),
+    })
     if (error) {
       console.error('Email send error:', JSON.stringify(error))
     } else {

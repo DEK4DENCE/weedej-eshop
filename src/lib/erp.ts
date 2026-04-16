@@ -136,6 +136,39 @@ export interface ErpOrderResult {
   duplicate?: boolean
 }
 
+// ─── New contract (POST /api/orders) ─────────────────────────────────────────
+
+export interface ErpOrderSyncInput {
+  eshopOrderId:     string          // UUID v4 — idempotency key
+  items: Array<{
+    sku?:         string
+    name:         string
+    quantity:     number
+    unitPriceCzk: number            // CZK excl. VAT
+    vatRate:      number
+  }>
+  customer: {
+    name:    string
+    email:   string
+    address: {
+      street:  string
+      city:    string
+      zip:     string
+      country: string
+    }
+  }
+  totalCzk:         number          // CZK incl. VAT
+  paymentReference: string          // Stripe paymentIntent or session ID
+  paidAt:           string          // ISO 8601
+}
+
+export interface ErpOrderSyncResult {
+  erpOrderNumber:   string          // ESH{YYYY}{XXXX}
+  invoiceNumber:    string | null
+  invoicePdfBase64: string | null
+  invoicePdfUrl:    string | null
+}
+
 // ─── API volání ───────────────────────────────────────────────────────────────
 
 /**
@@ -187,4 +220,29 @@ export async function getErpOrder(
   if (res.status === 404) return null
   if (!res.ok) throw new Error(`ERP order status error: ${res.status}`)
   return res.json()
+}
+
+/**
+ * Syncs an e-shop order to the ERP using the new /api/orders contract.
+ * Uses eshopOrderId (UUID) for idempotency — safe to retry.
+ * Returns ERP order number + invoice data for email attachment.
+ *
+ * Throws on network/5xx error — caller is responsible for retry queue.
+ */
+export async function syncOrderToErp(
+  input: ErpOrderSyncInput,
+  config?: ErpConfig,
+): Promise<ErpOrderSyncResult> {
+  const res = await erpFetch('/api/orders', {
+    method: 'POST',
+    body:   JSON.stringify(input),
+  }, config)
+
+  if (!res.ok) {
+    let detail = ''
+    try { detail = await res.text() } catch {}
+    throw new Error(`ERP sync error ${res.status}: ${detail}`)
+  }
+
+  return res.json() as Promise<ErpOrderSyncResult>
 }
