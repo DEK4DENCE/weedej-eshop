@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react'
 
 interface ProductImagesProps {
   images: string[]
@@ -17,6 +17,8 @@ export function ProductImages({ images, productName, adjustments }: ProductImage
 
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [direction, setDirection] = useState(0)
+  const [isZooming, setIsZooming] = useState(false)
+  const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 })
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
@@ -32,19 +34,29 @@ export function ProductImages({ images, productName, adjustments }: ProductImage
   function selectImage(index: number) {
     setDirection(index > selectedIndex ? 1 : -1)
     setSelectedIndex(index)
+    setIsZooming(false)
   }
 
   function prev() {
     const newIndex = (selectedIndex - 1 + displayImages.length) % displayImages.length
     setDirection(-1)
     setSelectedIndex(newIndex)
+    setIsZooming(false)
   }
 
   function next() {
     const newIndex = (selectedIndex + 1) % displayImages.length
     setDirection(1)
     setSelectedIndex(newIndex)
+    setIsZooming(false)
   }
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = Math.round(((e.clientX - rect.left) / rect.width) * 100)
+    const y = Math.round(((e.clientY - rect.top) / rect.height) * 100)
+    setZoomPos({ x, y })
+  }, [])
 
   function getBgStyle(url: string): React.CSSProperties {
     const saved = adjMap[url]
@@ -61,7 +73,13 @@ export function ProductImages({ images, productName, adjustments }: ProductImage
   return (
     <div className="flex flex-col gap-4">
       {/* Main image */}
-      <div className="relative aspect-square rounded-2xl overflow-hidden border border-[#DEE2E6] group">
+      <div
+        className="relative aspect-square rounded-2xl overflow-hidden border border-[#DEE2E6] group"
+        onMouseMove={handleMouseMove}
+        onMouseEnter={() => setIsZooming(true)}
+        onMouseLeave={() => setIsZooming(false)}
+        style={{ cursor: isZooming ? 'crosshair' : 'zoom-in' }}
+      >
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={selectedIndex}
@@ -70,12 +88,28 @@ export function ProductImages({ images, productName, adjustments }: ProductImage
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: direction * -60 }}
             transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="absolute inset-0"
-            style={getBgStyle(displayImages[selectedIndex])}
+            className="absolute inset-0 overflow-hidden"
             aria-label={`${productName} — image ${selectedIndex + 1}`}
-          />
+          >
+            {/* Inner div handles zoom independently from Framer Motion slide */}
+            <div
+              className="w-full h-full will-change-transform"
+              style={{
+                ...getBgStyle(displayImages[selectedIndex]),
+                transform: isZooming ? 'scale(2.5)' : 'scale(1)',
+                transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
+                transition: isZooming ? 'none' : 'transform 0.35s ease',
+              }}
+            />
+          </motion.div>
         </AnimatePresence>
 
+        {/* Zoom hint icon — visible before first hover */}
+        <div className="absolute bottom-3 right-3 z-10 bg-white/80 backdrop-blur-sm rounded-full p-1.5 text-[#6e6e73] shadow-sm pointer-events-none transition-opacity duration-200 group-hover:opacity-0">
+          <ZoomIn size={14} />
+        </div>
+
+        {/* Category badge */}
         {displayImages.length > 1 && (
           <>
             <button
