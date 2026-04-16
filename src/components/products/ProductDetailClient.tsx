@@ -15,7 +15,14 @@ const SUBSTANCE_STYLES: Record<string, string> = {
 const SUBSTANCE_LABELS: Record<string, string> = { THC_X: 'THC-X', THC: 'THC', CBD: 'CBD', HHC: 'HHC' }
 
 export function ProductDetailClient({ product }: { product: Product }) {
-  const defaultVariant = product.variants.find((v) => v.stock > 0) ?? product.variants[0]
+  // Default to the smallest in-stock variant; fall back to smallest overall
+  const inStockVariants = product.variants.filter((v) => v.stock > 0)
+  const pickSmallest = (arr: typeof product.variants) =>
+    arr.length === 0 ? undefined :
+    arr.reduce((a, b) =>
+      (a.variantValue ?? Infinity) <= (b.variantValue ?? Infinity) ? a : b
+    )
+  const defaultVariant = pickSmallest(inStockVariants) ?? pickSmallest(product.variants) ?? product.variants[0]
   const [selectedVariantId, setSelectedVariantId] = useState(defaultVariant?.id ?? "")
   const selectedVariant = product.variants.find((v) => v.id === selectedVariantId) ?? defaultVariant
 

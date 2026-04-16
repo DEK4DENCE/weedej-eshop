@@ -31,7 +31,14 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onAddToCart }: ProductCardProps) {
-  const defaultVariant = product.variants.find((v) => v.isDefault) ?? product.variants[0]
+  // Show the smallest in-stock variant by variantValue; fall back to smallest overall
+  const inStockVariants = product.variants.filter((v) => v.stock > 0)
+  const pickSmallest = (arr: typeof product.variants) =>
+    arr.length === 0 ? undefined :
+    arr.reduce((a, b) =>
+      (a.variantValue ?? Infinity) <= (b.variantValue ?? Infinity) ? a : b
+    )
+  const defaultVariant = pickSmallest(inStockVariants) ?? pickSmallest(product.variants) ?? product.variants[0]
   const price = defaultVariant?.price ?? product.basePrice
   const isOutOfStock = defaultVariant ? defaultVariant.stock === 0 : false
   const isLowStock = defaultVariant ? defaultVariant.stock > 0 && defaultVariant.stock <= 5 : false
