@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
       // Ulož ERP sklad na produkt (zdroj pravdy pro zobrazení v admin)
       await db.product.update({
         where: { id: productId },
-        data: { erpStock: erp.stock ?? 0, erpUnit: erp.unit ?? null },
+        data: { vatRate: erp.vatRate ?? 21, erpStock: erp.stock ?? 0, erpUnit: erp.unit ?? null },
       })
 
       if (erp.eshopVariants && erp.eshopVariants.length > 0) {

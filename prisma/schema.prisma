@@ -173,6 +173,7 @@ model Product {
   flavours           String[]
   terpenes           String[]
   imageAdjustments   String?
+  vatRate            Float       @default(21) // DPH sazba: 0, 12, nebo 21
   erpStock           Float?      @default(0)  // Sklad v ERP (zdroj pravdy, v erpUnit)
   erpUnit            String?                  // Jednotka skladu ERP ("g" | "ml" | "ks")
   createdAt          DateTime    @default(now())

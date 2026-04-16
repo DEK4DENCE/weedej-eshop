@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
         // Aktualizuj základní cenu, název a ERP sklad produktu
         await db.product.update({
           where: { id: existing.productId },
-          data: { basePrice: erp.priceWithVat, name: erp.name, erpStock: erp.stock ?? 0, erpUnit: erp.unit ?? null },
+          data: { basePrice: erp.priceWithVat, name: erp.name, vatRate: erp.vatRate ?? 21, erpStock: erp.stock ?? 0, erpUnit: erp.unit ?? null },
         })
 
         if (erp.eshopVariants && erp.eshopVariants.length > 0) {
@@ -209,6 +209,7 @@ export async function POST(req: NextRequest) {
         isActive: false,
         isFeatured: false,
         basePrice: erp.priceWithVat,
+        vatRate: erp.vatRate ?? 21,
         erpStock: erp.stock ?? 0,
         erpUnit: erp.unit ?? null,
         effects: [],
