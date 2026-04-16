@@ -60,12 +60,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   try {
     const customerEmail = order.user.email
     const customerName = order.user.name ?? customerEmail.split("@")[0]
-    const orderNumber = order.id
+    // Use ESH number if available, otherwise short internal ID
+    const orderNumber = (order as any).erpOrderNumber ?? order.id
+    const displayNumber = (order as any).erpOrderNumber ?? `#${order.id.slice(-8).toUpperCase()}`
 
     if (status === "SHIPPED") {
       await sendEmail({
         to: customerEmail,
-        subject: `Vaše objednávka #${orderNumber.slice(-8).toUpperCase()} byla odeslána`,
+        subject: `Vaše objednávka ${displayNumber} byla odeslána`,
         react: React.createElement(OrderShipped, {
           name: customerName,
           orderNumber,
@@ -81,7 +83,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     } else if (status === "CANCELLED") {
       await sendEmail({
         to: customerEmail,
-        subject: `Vaše objednávka #${orderNumber.slice(-8).toUpperCase()} byla zrušena`,
+        subject: `Vaše objednávka ${displayNumber} byla zrušena`,
         react: React.createElement(OrderCancelled, {
           name: customerName,
           orderNumber,

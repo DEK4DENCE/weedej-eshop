@@ -89,8 +89,7 @@ export default function AdminOrdersPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Order</TableHead>
-                <TableHead>ERP číslo</TableHead>
+                <TableHead>Číslo objednávky</TableHead>
                 <TableHead>Zákazník</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Celkem</TableHead>
@@ -101,14 +100,15 @@ export default function AdminOrdersPage() {
             <TableBody>
               {orders.map((order) => (
                 <TableRow key={order.id}>
-                  <TableCell className="font-mono text-xs">{order.id.slice(-8).toUpperCase()}</TableCell>
                   <TableCell>
                     {order.erpOrderNumber ? (
-                      <span className="font-mono text-xs font-semibold text-emerald-600">
+                      <span className="font-mono text-sm font-semibold text-emerald-600">
                         {order.erpOrderNumber}
                       </span>
                     ) : (
-                      <span className="text-xs text-muted-foreground">—</span>
+                      <span className="font-mono text-xs text-muted-foreground">
+                        #{order.id.slice(-8).toUpperCase()}
+                      </span>
                     )}
                   </TableCell>
                   <TableCell>{order.user.name ?? order.user.email}</TableCell>

@@ -22,9 +22,11 @@ export default async function AdminOrderDetailPage({ params }: Props) {
   })
   if (!order) notFound()
 
+  const orderHeading = order.erpOrderNumber ?? `#${order.id.slice(-8).toUpperCase()}`
+
   return (
     <div className="space-y-6 max-w-2xl">
-      <h1 className="text-3xl font-bold font-playfair">Order #{order.id.slice(-8).toUpperCase()}</h1>
+      <h1 className="text-3xl font-bold font-playfair">Objednávka {orderHeading}</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <CardHeader><CardTitle>Customer</CardTitle></CardHeader>
@@ -35,9 +37,21 @@ export default async function AdminOrderDetailPage({ params }: Props) {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader><CardTitle>Status</CardTitle></CardHeader>
+          <CardHeader><CardTitle>Status &amp; ERP</CardTitle></CardHeader>
           <CardContent className="space-y-3">
             <Badge>{order.status}</Badge>
+            {order.erpOrderNumber && (
+              <p className="text-sm">
+                <span className="text-muted-foreground">ERP číslo: </span>
+                <span className="font-mono font-semibold text-emerald-600">{order.erpOrderNumber}</span>
+              </p>
+            )}
+            {order.invoiceNumber && (
+              <p className="text-sm">
+                <span className="text-muted-foreground">Faktura: </span>
+                <span className="font-mono">{order.invoiceNumber}</span>
+              </p>
+            )}
             <AdminOrderStatusClient orderId={order.id} currentStatus={order.status} />
           </CardContent>
         </Card>

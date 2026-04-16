@@ -78,11 +78,18 @@ export async function POST(req: NextRequest) {
   const shippingAmount = session.shipping_cost?.amount_total ?? 0
   const subtotalAmount = totalAmount - shippingAmount
 
-  // ── Idempotency: skip if already processed ──────────────────────────────────
+  // ── Idempotency: skip if already fully synced to ERP ──────────────────────
   const existingOrder = await db.order.findUnique({ where: { stripeSessionId: session.id } })
   if (existingOrder) {
-    console.log(`[Stripe] Duplicate session ${session.id} — skipping, orderId=${existingOrder.id}`)
-    return NextResponse.json({ received: true })
+    if (existingOrder.erpSyncStatus === 'synced') {
+      console.log(`[Stripe] Already synced — skipping, orderId=${existingOrder.id}`)
+      return NextResponse.json({ received: true })
+    }
+    // Order exists but ERP sync never completed (created by old success-page fallback
+    // or a previous webhook attempt that failed mid-way). Delete it so we can re-create
+    // it correctly with full ERP sync below.
+    console.log(`[Stripe] Order exists but not synced (status=${existingOrder.erpSyncStatus}) — re-processing orderId=${existingOrder.id}`)
+    await db.order.delete({ where: { id: existingOrder.id } })
   }
 
   // ── Create Order with status PAID ───────────────────────────────────────────
