@@ -1,10 +1,18 @@
 "use client"
 import Link from "next/link"
-import { ShoppingBag, User, LogOut, Package, Settings } from "lucide-react"
+import { ShoppingBag, User, LogOut, Package, Settings, Menu, X } from "lucide-react"
 import { useCart } from "@/hooks/useCart"
 import { Logo } from "@/components/ui/Logo"
 import { useSession, signOut } from "next-auth/react"
 import { useState, useRef, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+
+const navLinks: [string, string][] = [
+  ["Produkty", "/products"],
+  ["Doprava", "/doprava"],
+  ["Blog", "/blog"],
+  ["Kontakt", "/contact"],
+]
 
 const InstagramIcon = () => (
   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -18,12 +26,11 @@ const FacebookIcon = () => (
   </svg>
 )
 
-function UserMenu() {
+function UserMenu({ onClose }: { onClose?: () => void }) {
   const { data: session } = useSession()
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
-  // Close on outside click
   useEffect(() => {
     function handler(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
@@ -69,13 +76,13 @@ function UserMenu() {
       </button>
 
       {open && (
-        <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl border border-[#DEE2E6] shadow-lg py-1 z-50">
+        <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl border border-[#DEE2E6] shadow-lg py-1 z-50">
           <div className="px-3 py-2 border-b border-[#DEE2E6]">
-            <p className="text-xs text-[#6e6e73] truncate">{session.user?.email}</p>
+            <p className="text-xs text-[#6e6e73] break-all">{session.user?.email}</p>
           </div>
           <Link
             href="/account"
-            onClick={() => setOpen(false)}
+            onClick={() => { setOpen(false); onClose?.() }}
             className="flex items-center gap-2 px-3 py-2 text-sm text-[#1d1d1f] hover:bg-[#F8F9FA] transition-colors"
           >
             <User className="w-4 h-4 text-[#6e6e73]" />
@@ -83,7 +90,7 @@ function UserMenu() {
           </Link>
           <Link
             href="/account/orders"
-            onClick={() => setOpen(false)}
+            onClick={() => { setOpen(false); onClose?.() }}
             className="flex items-center gap-2 px-3 py-2 text-sm text-[#1d1d1f] hover:bg-[#F8F9FA] transition-colors"
           >
             <Package className="w-4 h-4 text-[#6e6e73]" />
@@ -92,7 +99,7 @@ function UserMenu() {
           {isAdmin && (
             <Link
               href="/admin"
-              onClick={() => setOpen(false)}
+              onClick={() => { setOpen(false); onClose?.() }}
               className="flex items-center gap-2 px-3 py-2 text-sm text-[#1d1d1f] hover:bg-[#F8F9FA] transition-colors"
             >
               <Settings className="w-4 h-4 text-[#6e6e73]" />
@@ -101,7 +108,7 @@ function UserMenu() {
           )}
           <div className="border-t border-[#DEE2E6] mt-1 pt-1">
             <button
-              onClick={() => { setOpen(false); signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL ?? "/" }) }}
+              onClick={() => { setOpen(false); onClose?.(); signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL ?? "/" }) }}
               className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[#6e6e73] hover:text-red-600 hover:bg-red-50 transition-colors"
             >
               <LogOut className="w-4 h-4" />
@@ -116,55 +123,153 @@ function UserMenu() {
 
 export function HomeNavbar() {
   const { totalItems, toggleSidebar } = useCart()
+  const { data: session } = useSession()
+  const [mobileOpen, setMobileOpen] = useState(false)
+
+  const displayName = session?.user?.name ?? session?.user?.email?.split("@")[0] ?? "Účet"
+  const isAdmin = (session?.user as any)?.role === "ADMIN"
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-16 py-4 bg-white/95 backdrop-blur border-b border-[#DEE2E6]">
-      {/* Logo */}
-      <Logo variant="dark" size="md" />
+    <>
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-16 py-4 bg-white/95 backdrop-blur border-b border-[#DEE2E6]">
+        {/* Logo */}
+        <Logo variant="dark" size="md" />
 
-      {/* Center nav */}
-      <div className="hidden md:flex items-center gap-3 text-sm">
-        {([["Produkty", "/products"], ["Doprava", "/doprava"], ["Blog", "/blog"], ["Kontakt", "/contact"]] as [string, string][]).map(([label, href], i) => (
-          <span key={href} className="flex items-center gap-3">
-            {i > 0 && <span className="text-[#DEE2E6]">•</span>}
-            <Link href={href} className="text-[#6e6e73] hover:text-[#1d1d1f] transition-colors duration-200">{label}</Link>
-          </span>
-        ))}
-      </div>
-
-      {/* Right actions */}
-      <div className="flex items-center gap-2">
-        {/* Auth — shows login/register OR user menu depending on session */}
-        <UserMenu />
-
-        <a
-          href="https://www.instagram.com/weedej.cz"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-10 h-10 rounded-full border border-[#DEE2E6] flex items-center justify-center text-[#6e6e73] hover:text-[#1d1d1f] hover:border-[#1d1d1f] transition-colors"
-        >
-          <InstagramIcon />
-        </a>
-        <a
-          href="https://www.facebook.com/weedej.cz"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-10 h-10 rounded-full border border-[#DEE2E6] flex items-center justify-center text-[#6e6e73] hover:text-[#1d1d1f] hover:border-[#1d1d1f] transition-colors"
-        >
-          <FacebookIcon />
-        </a>
-        <button
-          onClick={toggleSidebar}
-          className="w-10 h-10 rounded-full border border-[#DEE2E6] flex items-center justify-center text-[#6e6e73] hover:text-[#1d1d1f] hover:border-[#1d1d1f] transition-colors relative"
-        >
-          <ShoppingBag className="w-4 h-4" />
-          {totalItems > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#2E7D32] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-              {totalItems}
+        {/* Center nav — desktop only */}
+        <div className="hidden md:flex items-center gap-3 text-sm">
+          {navLinks.map(([label, href], i) => (
+            <span key={href} className="flex items-center gap-3">
+              {i > 0 && <span className="text-[#DEE2E6]">•</span>}
+              <Link href={href} className="text-[#6e6e73] hover:text-[#1d1d1f] transition-colors duration-200">{label}</Link>
             </span>
-          )}
-        </button>
-      </div>
-    </nav>
+          ))}
+        </div>
+
+        {/* Right actions */}
+        <div className="flex items-center gap-2">
+          {/* User pill — desktop only */}
+          <UserMenu />
+
+          {/* Social icons — desktop only */}
+          <a
+            href="https://www.instagram.com/weedej.cz"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden md:flex w-10 h-10 rounded-full border border-[#DEE2E6] items-center justify-center text-[#6e6e73] hover:text-[#1d1d1f] hover:border-[#1d1d1f] transition-colors"
+          >
+            <InstagramIcon />
+          </a>
+          <a
+            href="https://www.facebook.com/weedej.cz"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden md:flex w-10 h-10 rounded-full border border-[#DEE2E6] items-center justify-center text-[#6e6e73] hover:text-[#1d1d1f] hover:border-[#1d1d1f] transition-colors"
+          >
+            <FacebookIcon />
+          </a>
+
+          {/* Cart */}
+          <button
+            onClick={toggleSidebar}
+            className="w-10 h-10 rounded-full border border-[#DEE2E6] flex items-center justify-center text-[#6e6e73] hover:text-[#1d1d1f] hover:border-[#1d1d1f] transition-colors relative"
+          >
+            <ShoppingBag className="w-4 h-4" />
+            {totalItems > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#2E7D32] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                {totalItems}
+              </span>
+            )}
+          </button>
+
+          {/* Hamburger — mobile only */}
+          <motion.button
+            className="md:hidden w-10 h-10 rounded-full border border-[#DEE2E6] flex items-center justify-center text-[#6e6e73] hover:text-[#1d1d1f] hover:border-[#1d1d1f] transition-colors"
+            onClick={() => setMobileOpen((o) => !o)}
+            aria-label={mobileOpen ? "Zavřít menu" : "Otevřít menu"}
+            animate={{ rotate: mobileOpen ? 90 : 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+          </motion.button>
+        </div>
+      </nav>
+
+      {/* Mobile drawer */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1, transition: { duration: 0.22, ease: "easeOut" } }}
+            exit={{ height: 0, opacity: 0, transition: { duration: 0.18, ease: "easeIn" } }}
+            className="fixed top-[65px] left-0 right-0 z-40 border-b border-[#DEE2E6] bg-white/98 backdrop-blur overflow-hidden md:hidden"
+          >
+            <div className="px-6 py-4 flex flex-col gap-1">
+              {navLinks.map(([label, href]) => (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={() => setMobileOpen(false)}
+                  className="text-sm font-medium text-[#1d1d1f] hover:text-[#2E7D32] hover:bg-[#E8F5E9] px-3 py-2.5 rounded-xl transition-colors"
+                >
+                  {label}
+                </Link>
+              ))}
+
+              <div className="border-t border-[#DEE2E6] mt-2 pt-3 flex flex-col gap-1">
+                {session ? (
+                  <>
+                    <div className="flex items-center gap-2 px-3 pb-2">
+                      <div className="w-7 h-7 rounded-full bg-[#2E7D32] flex items-center justify-center shrink-0">
+                        <span className="text-white text-[11px] font-bold uppercase">{displayName.charAt(0)}</span>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-[#1d1d1f] truncate">{displayName}</p>
+                        <p className="text-xs text-[#6e6e73] break-all">{session.user?.email}</p>
+                      </div>
+                    </div>
+                    <Link href="/account" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 text-sm font-medium text-[#1d1d1f] hover:text-[#2E7D32] hover:bg-[#E8F5E9] px-3 py-2.5 rounded-xl transition-colors">
+                      <User className="h-4 w-4 text-[#6e6e73]" />Můj účet
+                    </Link>
+                    <Link href="/account/orders" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 text-sm font-medium text-[#1d1d1f] hover:text-[#2E7D32] hover:bg-[#E8F5E9] px-3 py-2.5 rounded-xl transition-colors">
+                      <Package className="h-4 w-4 text-[#6e6e73]" />Objednávky
+                    </Link>
+                    {isAdmin && (
+                      <Link href="/admin" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 text-sm font-medium text-[#1d1d1f] hover:text-[#2E7D32] hover:bg-[#E8F5E9] px-3 py-2.5 rounded-xl transition-colors">
+                        <Settings className="h-4 w-4 text-[#6e6e73]" />Admin
+                      </Link>
+                    )}
+                    <button
+                      onClick={() => { setMobileOpen(false); signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL ?? "/" }) }}
+                      className="flex items-center gap-2 w-full text-sm font-medium text-[#6e6e73] hover:text-red-600 hover:bg-red-50 px-3 py-2.5 rounded-xl transition-colors mt-1"
+                    >
+                      <LogOut className="h-4 w-4" />Odhlásit se
+                    </button>
+                  </>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    <Link href="/login" onClick={() => setMobileOpen(false)} className="flex items-center justify-center text-sm font-medium text-[#2E7D32] border-2 border-[#2E7D32] hover:bg-[#2E7D32]/5 px-4 py-2.5 rounded-xl transition-colors">
+                      Přihlásit se
+                    </Link>
+                    <Link href="/register" onClick={() => setMobileOpen(false)} className="flex items-center justify-center text-sm font-semibold text-white bg-[#2E7D32] hover:bg-[#1a9020] px-4 py-2.5 rounded-xl transition-colors">
+                      Registrovat
+                    </Link>
+                  </div>
+                )}
+
+                {/* Social links in mobile menu */}
+                <div className="flex items-center gap-3 px-3 pt-3">
+                  <a href="https://www.instagram.com/weedej.cz" target="_blank" rel="noopener noreferrer" className="text-[#6e6e73] hover:text-[#1d1d1f] transition-colors">
+                    <InstagramIcon />
+                  </a>
+                  <a href="https://www.facebook.com/weedej.cz" target="_blank" rel="noopener noreferrer" className="text-[#6e6e73] hover:text-[#1d1d1f] transition-colors">
+                    <FacebookIcon />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   )
 }
