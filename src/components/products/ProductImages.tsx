@@ -52,7 +52,7 @@ export function ProductImages({ images, productName, adjustments }: ProductImage
     return {
       backgroundImage: `url(${url})`,
       backgroundRepeat: 'no-repeat',
-      backgroundSize: saved ? `${adj.zoom * 100}%` : 'contain',
+      backgroundSize: saved ? `${adj.zoom * 100}%` : 'cover',
       backgroundPosition: `${adj.x}% ${adj.y}%`,
       backgroundColor: '#ffffff',
     }
