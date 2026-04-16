@@ -27,6 +27,10 @@ export function AdminSettingsForm({ settings, products }: Props) {
   const [importResult, setImportResult] = useState<{ created: number; updated: number; skipped: number } | null>(null)
   const [importError, setImportError] = useState<string | null>(null)
 
+  // Cleanup substances state
+  const [cleaning, setCleaning] = useState(false)
+  const [cleanResult, setCleanResult] = useState<string | null>(null)
+
   // Reset database state
   const [resetting, setResetting] = useState(false)
   const [resetResult, setResetResult] = useState<string | null>(null)
@@ -111,6 +115,20 @@ export function AdminSettingsForm({ settings, products }: Props) {
       setImportError('Chyba sítě při importu.')
     } finally {
       setImporting(false)
+    }
+  }
+
+  async function handleCleanupSubstances() {
+    setCleaning(true)
+    setCleanResult(null)
+    try {
+      const res = await fetch('/api/admin/erp/cleanup-substances', { method: 'POST' })
+      const data = await res.json()
+      setCleanResult(data.message ?? 'Hotovo.')
+    } catch {
+      setCleanResult('Chyba sítě.')
+    } finally {
+      setCleaning(false)
     }
   }
 
@@ -286,6 +304,27 @@ export function AdminSettingsForm({ settings, products }: Props) {
             <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-lg px-3 py-2.5 text-sm text-red-700">
               <XCircle className="h-4 w-4 shrink-0" />
               {importError}
+            </div>
+          )}
+        </div>
+
+        <div className="border-t border-border/40 pt-4 space-y-3">
+          <button
+            type="button"
+            disabled={cleaning}
+            onClick={handleCleanupSubstances}
+            className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${cleaning ? 'animate-spin' : ''}`} />
+            {cleaning ? 'Opravuji…' : 'Opravit názvy + přiřadit účinné látky'}
+          </button>
+          <p className="text-xs text-muted-foreground">
+            Jednorázově odstraní "(THC-X)", "(HHC)" atd. z názvů produktů v eshopu a přiřadí pole Účinná látka. Na ERP nemá vliv.
+          </p>
+          {cleanResult && (
+            <div className="flex items-start gap-2 bg-purple-50 border border-purple-200 rounded-lg px-3 py-2.5 text-sm text-purple-800">
+              <CheckCircle className="h-4 w-4 mt-0.5 shrink-0" />
+              {cleanResult}
             </div>
           )}
         </div>

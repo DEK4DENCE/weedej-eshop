@@ -5,6 +5,21 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 
+// Patterns like "(THC-X)", "(HHC)", "(CBD)", "(THC)" in product names
+const SUBSTANCE_PATTERN = /\s*\((THC-X|THC_X|THC|CBD|HHC)\)\s*/gi
+
+function extractSubstance(name: string): string | null {
+  const m = name.match(/\((THC-X|THC_X|THC|CBD|HHC)\)/i)
+  if (!m) return null
+  const val = m[1].toUpperCase().replace('-', '_')
+  // Normalise THC-X → THC_X
+  return val === 'THC-X' ? 'THC_X' : val
+}
+
+function cleanName(name: string): string {
+  return name.replace(SUBSTANCE_PATTERN, ' ').replace(/\s{2,}/g, ' ').trim()
+}
+
 function calcVariantStock(
   erpStock: number,
   erpProductUnit: string,
@@ -108,9 +123,14 @@ export async function POST(req: NextRequest) {
 
       if (existing) {
         // Aktualizuj základní cenu, název a ERP sklad produktu
+        const substance = extractSubstance(erp.name)
+        const cleanedName = cleanName(erp.name)
+        const substanceData = substance && !existing.product.activeSubstance
+          ? { activeSubstance: substance as any }
+          : {}
         await db.product.update({
           where: { id: existing.productId },
-          data: { basePrice: erp.priceWithVat, name: erp.name, vatRate: erp.vatRate ?? 21, erpStock: erp.stock ?? 0, erpUnit: erp.unit ?? null },
+          data: { basePrice: erp.priceWithVat, name: cleanedName, vatRate: erp.vatRate ?? 21, erpStock: erp.stock ?? 0, erpUnit: erp.unit ?? null, ...substanceData },
         })
 
         if (erp.eshopVariants && erp.eshopVariants.length > 0) {
@@ -188,8 +208,12 @@ export async function POST(req: NextRequest) {
         categoryId = cat.id
       }
 
+      // Extrakt účinné látky a vyčisti název
+      const substance = extractSubstance(erp.name)
+      const cleanedName = cleanName(erp.name)
+
       // Slug pro nový produkt
-      const baseSlug = (erp.slug ?? erp.name)
+      const baseSlug = (erp.slug ?? cleanedName)
         .toLowerCase()
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
@@ -201,7 +225,7 @@ export async function POST(req: NextRequest) {
 
       // Vytvoř produkt — isActive: false, admin ho aktivuje po doplnění obrázků
       const productData: any = {
-        name: erp.name,
+        name: cleanedName,
         slug,
         description: erp.description ?? erp.name,
         shortDescription: erp.shortDescription ?? undefined,
@@ -212,6 +236,7 @@ export async function POST(req: NextRequest) {
         vatRate: erp.vatRate ?? 21,
         erpStock: erp.stock ?? 0,
         erpUnit: erp.unit ?? null,
+        activeSubstance: substance ? (substance as any) : undefined,
         effects: [],
         flavours: [],
         terpenes: [],
