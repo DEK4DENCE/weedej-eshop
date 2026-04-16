@@ -31,15 +31,16 @@ interface ShippingAddress {
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface OrderConfirmationWithInvoiceProps {
-  name:             string
-  orderNumber:      string   // ESH{YYYY}{XXXX}
-  items:            OrderItem[]
-  subtotalAmount:   number   // haléře
-  shippingAmount:   number   // haléře
-  totalAmount:      number   // haléře
-  deliveryType:     'COURIER' | 'PICKUP_IN_STORE'
-  shippingAddress?: ShippingAddress
-  invoiceNumber?:   string   // VF{YYYY}{XXXX} — shown in email body
+  name:              string
+  orderNumber:       string   // ESH{YYYY}{XXXX}
+  items:             OrderItem[]
+  subtotalAmount:    number   // haléře
+  shippingAmount:    number   // haléře
+  totalAmount:       number   // haléře
+  deliveryType:      'COURIER' | 'PICKUP_IN_STORE'
+  shippingAddress?:  ShippingAddress
+  invoiceNumber?:    string   // VF{YYYY}{XXXX} — shown in email body
+  invoiceAttached?:  boolean  // true = PDF is actually attached; false = available in account
 }
 
 interface OrderConfirmationAckProps {
@@ -148,6 +149,7 @@ export function OrderConfirmationWithInvoice({
   deliveryType,
   shippingAddress,
   invoiceNumber,
+  invoiceAttached,
 }: OrderConfirmationWithInvoiceProps) {
   return (
     <Html lang="cs">
@@ -175,10 +177,15 @@ export function OrderConfirmationWithInvoice({
             )}
           </Section>
 
-          {invoiceNumber && (
+          {invoiceNumber && invoiceAttached && (
             <Text style={{ ...paragraph, fontSize: '13px', color: '#475569' }}>
               📎 Faktura č. {invoiceNumber} je přiložena k tomuto e-mailu (PDF).
               Uschovejte ji pro případnou reklamaci nebo daňové účely.
+            </Text>
+          )}
+          {invoiceNumber && !invoiceAttached && (
+            <Text style={{ ...paragraph, fontSize: '13px', color: '#475569' }}>
+              🧾 Faktura č. {invoiceNumber} bude dostupná ke stažení ve vašem účtu po odeslání zásilky.
             </Text>
           )}
 

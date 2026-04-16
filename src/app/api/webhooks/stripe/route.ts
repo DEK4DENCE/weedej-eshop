@@ -252,15 +252,16 @@ export async function POST(req: NextRequest) {
           to:          user.email,
           subject:     `Potvrzení objednávky ${order.erpOrderNumber} — Weedej`,
           react:       OrderConfirmationWithInvoice({
-            name:           firstName,
-            orderNumber:    order.erpOrderNumber!,
-            items:          items.map(i => ({ productName: i.productName, variantLabel: i.variantLabel, quantity: i.quantity, unitPrice: i.unitPrice })),
+            name:             firstName,
+            orderNumber:      order.erpOrderNumber!,
+            items:            items.map(i => ({ productName: i.productName, variantLabel: i.variantLabel, quantity: i.quantity, unitPrice: i.unitPrice })),
             subtotalAmount,
             shippingAmount,
             totalAmount,
             deliveryType,
             shippingAddress:  shippingAddr,
             invoiceNumber:    order.invoiceNumber ?? undefined,
+            invoiceAttached:  !!order.invoicePdfBase64,
           }),
           // Attach invoice PDF if available (§ 28 ZDPH — required in mail #1)
           attachments: order.invoicePdfBase64

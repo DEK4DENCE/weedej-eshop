@@ -1,4 +1,7 @@
-import { MapPin, CreditCard, User, Package, Download } from 'lucide-react'
+'use client'
+
+import { useState } from 'react'
+import { MapPin, CreditCard, User, Package, Download, Loader2 } from 'lucide-react'
 import { Order } from '@/types/order'
 import { OrderStatusBadge } from './OrderStatusBadge'
 import { OrderTimeline } from './OrderTimeline'
@@ -43,10 +46,38 @@ function formatDate(dateStr: string): string {
 
 export function OrderDetail({ order }: OrderDetailProps) {
   const erpNum = (order as any).erpOrderNumber as string | null | undefined
-  // Customer sees e.g. "20260010" (strip ESH prefix); fallback to internal short ID
   const displayNumber = erpNum
     ? erpNum.replace(/^ESH/i, '')
     : order.id.slice(-8).toUpperCase()
+
+  const [invoiceLoading, setInvoiceLoading] = useState(false)
+  const [invoiceError, setInvoiceError] = useState<string | null>(null)
+
+  async function handleInvoiceDownload() {
+    setInvoiceLoading(true)
+    setInvoiceError(null)
+    try {
+      const res = await fetch(`/api/account/orders/${order.id}/invoice`)
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        setInvoiceError(data.error ?? 'Fakturu se nepodařilo stáhnout. Zkuste to prosím znovu nebo kontaktujte podporu.')
+        return
+      }
+      const blob = await res.blob()
+      const invoiceNumber = (order as any).invoiceNumber as string | null
+      const filename = invoiceNumber ? `faktura-${invoiceNumber}.pdf` : 'faktura.pdf'
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch {
+      setInvoiceError('Fakturu se nepodařilo stáhnout. Zkuste to prosím znovu.')
+    } finally {
+      setInvoiceLoading(false)
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -61,17 +92,25 @@ export function OrderDetail({ order }: OrderDetailProps) {
               Zadáno {formatDate(order.createdAt)}
             </p>
           </div>
-          <div className="flex items-center gap-3 flex-wrap">
-            <OrderStatusBadge status={order.status} />
-            {((order as any).invoiceUrl || (order as any).invoicePdfBase64) && (
-              <a
-                href={`/api/account/orders/${order.id}/invoice`}
-                download
-                className="inline-flex items-center gap-1.5 bg-transparent border border-[#6e6e73]/40 text-[#6e6e73] hover:border-[#2E7D32] hover:text-[#2E7D32] rounded-xl px-3 py-1.5 text-xs font-medium transition-colors duration-200"
-              >
-                <Download className="w-3.5 h-3.5" />
-                Faktura PDF
-              </a>
+          <div className="flex flex-col gap-1.5 items-end">
+            <div className="flex items-center gap-3 flex-wrap">
+              <OrderStatusBadge status={order.status} />
+              {((order as any).invoiceUrl || (order as any).invoicePdfBase64) && (
+                <button
+                  onClick={handleInvoiceDownload}
+                  disabled={invoiceLoading}
+                  className="inline-flex items-center gap-1.5 bg-transparent border border-[#6e6e73]/40 text-[#6e6e73] hover:border-[#2E7D32] hover:text-[#2E7D32] disabled:opacity-50 rounded-xl px-3 py-1.5 text-xs font-medium transition-colors duration-200 cursor-pointer"
+                >
+                  {invoiceLoading
+                    ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    : <Download className="w-3.5 h-3.5" />
+                  }
+                  Faktura PDF
+                </button>
+              )}
+            </div>
+            {invoiceError && (
+              <p className="text-xs text-red-500 max-w-xs text-right">{invoiceError}</p>
             )}
           </div>
         </div>
