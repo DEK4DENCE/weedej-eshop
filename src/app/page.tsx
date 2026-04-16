@@ -47,14 +47,14 @@ const CATEGORY_DESCS: Record<string, string> = {
 
 async function getHomepageCategories(): Promise<HomeCategoryData[]> {
   try {
-    // Find the 3 categories by name (case-insensitive): Květy, Hašiš, Syringe
+    // Find the 3 categories by slug (slugs are ASCII-normalized, no diacritics)
     const cats = await db.category.findMany({
       where: {
         isActive: true,
         OR: [
-          { name: { contains: "kvet", mode: "insensitive" } },
-          { name: { contains: "hasi", mode: "insensitive" } },
-          { name: { contains: "syring", mode: "insensitive" } },
+          { slug: { contains: "kvet", mode: "insensitive" } },
+          { slug: { contains: "hasi", mode: "insensitive" } },
+          { slug: { contains: "syring", mode: "insensitive" } },
         ],
       },
       select: { name: true, slug: true },

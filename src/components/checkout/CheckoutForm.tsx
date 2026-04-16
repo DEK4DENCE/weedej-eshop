@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { formatPrice } from "@/lib/utils/formatPrice"
-import { Loader2, Truck, Store, MapPin, Plus, Shield, Lock } from "lucide-react"
+import { Loader2, Truck, Store, MapPin, Plus, Shield, Lock, Phone } from "lucide-react"
 import { motion } from "framer-motion"
 import Link from "next/link"
 
@@ -55,6 +55,7 @@ export function CheckoutForm({ user, addresses }: Props) {
   const [selectedShippingId, setSelectedShippingId] = useState<string | null>(null)
   const defaultAddr = addresses.find((a) => a.isDefault) ?? addresses[0] ?? null
   const [selectedAddressId, setSelectedAddressId] = useState<string>(defaultAddr?.id ?? "new")
+  const [phone, setPhone] = useState(user?.phone ?? "")
   const [newAddress, setNewAddress] = useState({
     fullName: user?.name ?? "",
     line1: "",
@@ -92,10 +93,10 @@ export function CheckoutForm({ user, addresses }: Props) {
 
     const addressPayload =
       deliveryType === "PICKUP_IN_STORE"
-        ? null
+        ? { pickupName: newAddress.fullName || user?.name || "" }
         : selectedAddressId === "new"
-        ? { ...newAddress, saveAddress: true }
-        : { existingAddressId: selectedAddressId }
+        ? { ...newAddress, phone: newAddress.phone || phone, saveAddress: true }
+        : { existingAddressId: selectedAddressId, phone }
 
     try {
       const res = await fetch("/api/checkout", {
@@ -105,6 +106,7 @@ export function CheckoutForm({ user, addresses }: Props) {
           items,
           deliveryType,
           address: addressPayload,
+          phone,
           shippingMethodId: deliveryType === "COURIER" ? selectedShippingId : null,
         }),
       })
@@ -132,6 +134,38 @@ export function CheckoutForm({ user, addresses }: Props) {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
         {/* Left: form */}
         <div className="lg:col-span-3 space-y-6">
+
+          {/* Contact info — always shown */}
+          <Card>
+            <CardHeader><CardTitle className="flex items-center gap-2"><Phone className="h-5 w-5 text-green-400" />Kontaktní údaje</CardTitle></CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1 col-span-2">
+                  <Label>Jméno a příjmení *</Label>
+                  <Input
+                    value={newAddress.fullName || user?.name || ""}
+                    onChange={(e) => setNewAddress((p) => ({ ...p, fullName: e.target.value }))}
+                    placeholder="Jan Novák"
+                    required
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label>Telefon *</Label>
+                  <Input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => { setPhone(e.target.value); setNewAddress((p) => ({ ...p, phone: e.target.value })) }}
+                    placeholder="+420 ..."
+                    required
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label>E-mail</Label>
+                  <Input value={user?.email ?? ""} readOnly className="opacity-60 cursor-not-allowed" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Delivery type */}
           <Card>
@@ -231,14 +265,6 @@ export function CheckoutForm({ user, addresses }: Props) {
                 {(selectedAddressId === "new" || addresses.length === 0) && (
                   <div className="space-y-3 pt-2">
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1 col-span-2">
-                        <Label>Celé jméno</Label>
-                        <Input value={newAddress.fullName} onChange={(e) => setNewAddress((p) => ({ ...p, fullName: e.target.value }))} required />
-                      </div>
-                      <div className="space-y-1 col-span-2">
-                        <Label>Telefon</Label>
-                        <Input value={newAddress.phone} onChange={(e) => setNewAddress((p) => ({ ...p, phone: e.target.value }))} placeholder="+420 ..." />
-                      </div>
                       <div className="space-y-1 col-span-2">
                         <Label>Ulice a číslo domu</Label>
                         <Input value={newAddress.line1} onChange={(e) => setNewAddress((p) => ({ ...p, line1: e.target.value }))} required placeholder="Ulice a číslo domu" />

@@ -5,6 +5,7 @@ import { z } from "zod"
 
 const schema = z.object({
   name: z.string().min(1).max(100).optional(),
+  phone: z.string().max(20).optional().nullable(),
   newsletter: z.boolean().optional(),
 })
 
@@ -13,7 +14,7 @@ export async function GET() {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   const user = await db.user.findUnique({
     where: { id: (session.user as any).id },
-    select: { id: true, name: true, email: true, newsletter: true },
+    select: { id: true, name: true, email: true, phone: true, newsletter: true },
   })
   return NextResponse.json(user)
 }
@@ -27,7 +28,7 @@ export async function PATCH(req: NextRequest) {
   const user = await db.user.update({
     where: { id: (session.user as any).id },
     data: parsed.data,
-    select: { id: true, name: true, email: true, newsletter: true },
+    select: { id: true, name: true, email: true, phone: true, newsletter: true },
   })
   return NextResponse.json(user)
 }

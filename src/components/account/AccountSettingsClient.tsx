@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/useToast"
-import { Loader2, Plus, Trash2, Star, MapPin, Mail } from "lucide-react"
+import { Loader2, Plus, Trash2, Star, MapPin, Mail, Phone } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { PasswordChangeForm } from "@/components/account/PasswordChangeForm"
 
@@ -34,8 +34,10 @@ export function AccountSettingsClient() {
   const { data: session, update } = useSession()
   const { toast } = useToast()
   const [nameLoading, setNameLoading] = useState(false)
+  const [phoneLoading, setPhoneLoading] = useState(false)
   const [newsletterLoading, setNewsletterLoading] = useState(false)
   const [name, setName] = useState((session?.user as any)?.name ?? "")
+  const [phone, setPhone] = useState("")
   const [newsletter, setNewsletter] = useState(false)
 
   // Address state
@@ -59,6 +61,7 @@ export function AccountSettingsClient() {
   useEffect(() => {
     fetch("/api/account/profile").then((r) => r.json()).then((d) => {
       if (typeof d.newsletter === "boolean") setNewsletter(d.newsletter)
+      if (d.phone) setPhone(d.phone)
     })
   }, [])
 
@@ -77,6 +80,23 @@ export function AccountSettingsClient() {
       toast({ title: err.message, variant: "destructive" })
     } finally {
       setNameLoading(false)
+    }
+  }
+
+  const handlePhoneSave = async () => {
+    setPhoneLoading(true)
+    try {
+      const res = await fetch("/api/account/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: phone || null }),
+      })
+      if (!res.ok) throw new Error("Nepodařilo se uložit")
+      toast({ title: "Telefonní číslo bylo aktualizováno" })
+    } catch (err: any) {
+      toast({ title: err.message, variant: "destructive" })
+    } finally {
+      setPhoneLoading(false)
     }
   }
 
@@ -161,6 +181,32 @@ export function AccountSettingsClient() {
           </div>
           <Button onClick={handleNameSave} disabled={nameLoading}>
             {nameLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Ukládání...</> : "Uložit jméno"}
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Phone */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Phone size={18} />
+            Telefonní číslo
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="phone">Telefon</Label>
+            <Input
+              id="phone"
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+420 ..."
+              className={inputClass}
+            />
+          </div>
+          <Button onClick={handlePhoneSave} disabled={phoneLoading}>
+            {phoneLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Ukládání...</> : "Uložit telefon"}
           </Button>
         </CardContent>
       </Card>

@@ -30,9 +30,14 @@ export async function POST(req: NextRequest) {
     if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const userId = (session.user as any).id
-    const { items, deliveryType, address } = await req.json()
+    const { items, deliveryType, address, phone: contactPhone } = await req.json()
 
     if (!items?.length) return NextResponse.json({ error: "Cart is empty" }, { status: 400 })
+
+    // Save phone to user profile if provided (works for all delivery types)
+    if (contactPhone) {
+      await db.user.update({ where: { id: userId }, data: { phone: contactPhone } }).catch(() => {})
+    }
 
     // Stock validation — batch fetch all variants in one query
     const variantIds = items.map((i: any) => i.variantId ?? i.variant?.id).filter(Boolean)
@@ -56,6 +61,10 @@ export async function POST(req: NextRequest) {
     if (deliveryType === "COURIER" && address) {
       if (address.existingAddressId) {
         resolvedAddressId = address.existingAddressId
+        // Save phone to user even when using existing address
+        if (address.phone) {
+          await db.user.update({ where: { id: userId }, data: { phone: address.phone } }).catch(() => {})
+        }
       } else {
         // Create new address and optionally save
         const newAddr = await db.address.create({
