@@ -84,14 +84,27 @@ export async function GET(req: NextRequest) {
         ? [addr.fullName, addr.line1, addr.line2].filter(Boolean).join(', ')
         : 'Neuvedena'
 
+      // Look up actual VAT rate per product
+      const variantIds = items.map((i: any) => i.variantId).filter(Boolean)
+      const vatRateMap = new Map<string, number>()
+      if (variantIds.length > 0) {
+        const variants = await db.productVariant.findMany({
+          where:  { id: { in: variantIds } },
+          select: { id: true, product: { select: { vatRate: true } } },
+        })
+        for (const v of variants) vatRateMap.set(v.id, Number(v.product?.vatRate ?? 21))
+      }
+
       const erpItems = items.map((item: any) => {
+        const vatRate          = item.variantId ? (vatRateMap.get(item.variantId) ?? 21) : 21
         const unitPriceKc      = (item.unitPrice as number) / 100
-        const unitPriceExclVat = Math.round(unitPriceKc / 1.21 * 100) / 100
+        const unitPriceExclVat = Math.round(unitPriceKc / (1 + vatRate / 100) * 100) / 100
         return {
           name:         `${item.productName}${item.variantLabel ? ' — ' + item.variantLabel : ''}`,
-          quantity:     item.quantity,
+          quantity:     item.quantity,   // number of packs ordered
+          unit:         'ks',            // per pack
           unitPriceCzk: unitPriceExclVat,
-          vatRate:      21,
+          vatRate,
         }
       })
 

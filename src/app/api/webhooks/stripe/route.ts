@@ -161,31 +161,19 @@ export async function POST(req: NextRequest) {
       const subtotalCzk = subtotalAmount / 100
 
       const erpItems = items.map(item => {
-        // item.unitPrice is in haléře, represents the price WITH VAT for the whole variant pack
-        // (e.g. a "3g" pack priced at 300 Kč → unitPrice = 30000 haléře)
-        const unitPriceKc      = item.unitPrice / 100                           // Kč WITH VAT, per variant pack
-        const vatRate          = item.vatRate                                   // actual product VAT rate
-        const unitPriceExclVat = Math.round(unitPriceKc / (1 + vatRate / 100) * 100) / 100  // excl. VAT, per variant pack
-
-        // ERP quantity is in base units (g, ml, ks), not in variant packs
-        const erpQty = (item.variantValue && item.variantValue > 0)
-          ? item.quantity * item.variantValue
-          : item.quantity
-
-        // ERP stores price per BASE UNIT — divide by variantValue to convert from pack price to per-unit price
-        // e.g.: 3g pack at 247.93 Kč excl. VAT → 82.64 Kč/g
-        // ERP then correctly computes: 3g × 82.64 Kč/g × 1.21 = 300 Kč
-        const unitPriceCzkPerUnit = (item.variantValue && item.variantValue > 0)
-          ? Math.round(unitPriceExclVat / item.variantValue * 100) / 100
-          : unitPriceExclVat
+        // item.unitPrice is in haléře (price WITH VAT per pack)
+        const unitPriceKc      = item.unitPrice / 100
+        const vatRate          = item.vatRate
+        // Price excl. VAT per pack — matches what the eshop charges per line item
+        const unitPriceExclVat = Math.round(unitPriceKc / (1 + vatRate / 100) * 100) / 100
 
         const erpName = item.variantLabel ? `${item.productName} — ${item.variantLabel}` : item.productName
         return {
           sku:          item.erpProductId ?? undefined,
           name:         erpName,
-          quantity:     erpQty,
-          unit:         item.variantUnit ?? 'ks',
-          unitPriceCzk: unitPriceCzkPerUnit,
+          quantity:     item.quantity,   // number of packs ordered
+          unit:         'ks',            // per pack (ks = piece)
+          unitPriceCzk: unitPriceExclVat,
           vatRate,
         }
       })
