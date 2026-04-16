@@ -307,10 +307,10 @@ export function CheckoutForm({ user, addresses }: Props) {
             <CardHeader><CardTitle>Shrnutí objednávky</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               {items.map((item: any) => {
-                const productName = item.variant?.product?.name ?? item.productName ?? ""
+                const productName = item.product?.name ?? item.productName ?? ""
                 const variantName = item.variant?.name ?? item.variantName ?? ""
                 const price = item.variant?.price ?? item.price ?? 0
-                const image = item.variant?.product?.imageUrls?.[0] ?? item.imageUrl
+                const image = item.product?.imageUrls?.[0] ?? item.imageUrl
                 const displayName = productName
                   ? variantName
                     ? `${productName} — ${variantName}`
