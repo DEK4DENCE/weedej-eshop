@@ -137,9 +137,9 @@ export async function POST(req: NextRequest) {
       const streetLine = addr
         ? [addr.fullName, addr.line1, addr.line2].filter(Boolean).join(', ')
         : 'Neuvedena'
-      const cityLine   = addr ? addr.city    : ''
-      const zipLine    = addr ? addr.postalCode : ''
-      const country    = addr ? addr.country  : 'CZ'
+      const cityLine   = addr?.city       || 'Neuvedeno'
+      const zipLine    = addr?.postalCode || '00000'
+      const country    = addr?.country   || 'CZ'
 
       // Convert haléře → Kč (CZK integer from Stripe / 100 = Kč)
       const totalCzk    = totalAmount / 100

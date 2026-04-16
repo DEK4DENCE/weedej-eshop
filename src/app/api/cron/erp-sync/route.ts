@@ -103,9 +103,9 @@ export async function GET(req: NextRequest) {
           email: user?.email || '',
           address: {
             street:  streetLine,
-            city:    addr?.city    ?? '',
-            zip:     addr?.postalCode ?? '',
-            country: addr?.country ?? 'CZ',
+            city:    addr?.city       || 'Neuvedeno',
+            zip:     addr?.postalCode || '00000',
+            country: addr?.country   || 'CZ',
           },
         },
         totalCzk:         order.totalAmount / 100,
