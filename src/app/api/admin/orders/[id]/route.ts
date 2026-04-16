@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { sendEmail } from "@/lib/email/send"
-import { OrderShipped } from "@/lib/email/templates/OrderShipped"
+import { OrderShippedWithTracking } from "@/lib/email/templates/OrderShipped"
 import { OrderCancelled } from "@/lib/email/templates/OrderCancelled"
 import React from "react"
 
@@ -12,9 +12,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const { id } = await params
   const { status } = await req.json()
 
+  // Set timestamp fields on status transitions
+  const extraData: Record<string, unknown> = {}
+  if (status === "SHIPPED" && !extraData.shippedAt) extraData.shippedAt = new Date()
+  if (status === "DELIVERED") extraData.deliveredAt = new Date()
+
   const order = await db.order.update({
     where: { id },
-    data: { status },
+    data: { status, ...extraData },
     include: {
       items: true,
       user: { select: { email: true, name: true } },
@@ -60,15 +65,48 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   try {
     const customerEmail = order.user.email
     const customerName = order.user.name ?? customerEmail.split("@")[0]
-    // Use ESH number if available, otherwise short internal ID
     const orderNumber = (order as any).erpOrderNumber ?? order.id
     const displayNumber = (order as any).erpOrderNumber ?? `#${order.id.slice(-8).toUpperCase()}`
 
     if (status === "SHIPPED") {
+      // Fetch shipping method estimatedDays from DB
+      let estimatedDays: string | undefined
+      try {
+        const sm = await db.shippingMethod.findFirst({
+          where: { isActive: true, price: { gt: 0 } },
+          orderBy: { sortOrder: "asc" },
+          select: { estimatedDays: true },
+        })
+        estimatedDays = sm?.estimatedDays ?? undefined
+      } catch { /* non-fatal */ }
+
+      // Fetch invoice PDF for attachment
+      let invoicePdfBase64: string | null = (order as any).invoicePdfBase64 ?? null
+      const invoiceUrl = (order as any).invoiceUrl as string | null
+      if (!invoicePdfBase64 && invoiceUrl) {
+        try {
+          const apiKey = process.env.ERP_API_KEY
+          if (apiKey) {
+            const pdfRes = await fetch(invoiceUrl, {
+              headers: { "X-API-Key": apiKey },
+              signal: AbortSignal.timeout(8_000),
+            })
+            if (pdfRes.ok) {
+              invoicePdfBase64 = Buffer.from(await pdfRes.arrayBuffer()).toString("base64")
+              await db.order.update({ where: { id }, data: { invoicePdfBase64 } }).catch(() => {})
+            }
+          }
+        } catch { /* non-fatal */ }
+      }
+
+      const invoiceFilename = (order as any).invoiceNumber
+        ? `faktura-${(order as any).invoiceNumber}.pdf`
+        : "faktura.pdf"
+
       await sendEmail({
         to: customerEmail,
         subject: `Vaše objednávka ${displayNumber} byla odeslána`,
-        react: React.createElement(OrderShipped, {
+        react: React.createElement(OrderShippedWithTracking, {
           name: customerName,
           orderNumber,
           items: order.items.map((i) => ({
@@ -78,7 +116,12 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
           })),
           totalAmount: order.totalAmount,
           deliveryType: order.deliveryType,
+          invoiceNumber: (order as any).invoiceNumber ?? undefined,
+          estimatedDays,
         }),
+        attachments: invoicePdfBase64
+          ? [{ filename: invoiceFilename, content: invoicePdfBase64, contentType: "application/pdf", encoding: "base64" }]
+          : [],
       })
     } else if (status === "CANCELLED") {
       await sendEmail({

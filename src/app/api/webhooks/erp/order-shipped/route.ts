@@ -129,6 +129,17 @@ async function sendShippingEmail(
 
   const firstName = user.name?.split(' ')[0] ?? 'there'
 
+  // Fetch shipping method estimatedDays from DB
+  let estimatedDays: string | undefined
+  try {
+    const shippingMethod = await db.shippingMethod.findFirst({
+      where: { isActive: true, price: { gt: 0 } },
+      orderBy: { sortOrder: 'asc' },
+      select: { estimatedDays: true },
+    })
+    estimatedDays = shippingMethod?.estimatedDays ?? undefined
+  } catch { /* non-fatal */ }
+
   // Fetch invoice PDF if we have a URL and stored base64 (for attachment)
   let invoicePdfBase64: string | null = updatedOrder.invoicePdfBase64 ?? null
 
@@ -144,6 +155,11 @@ async function sendShippingEmail(
         if (pdfRes.ok) {
           const buf = await pdfRes.arrayBuffer()
           invoicePdfBase64 = Buffer.from(buf).toString('base64')
+          // Cache for future use
+          await db.order.update({
+            where: { id: updatedOrder.id },
+            data: { invoicePdfBase64 },
+          }).catch(() => {})
         }
       }
     } catch {
@@ -166,11 +182,12 @@ async function sendShippingEmail(
         variantLabel: i.variantLabel,
         quantity:     i.quantity,
       })),
-      totalAmount:   updatedOrder.totalAmount,
-      deliveryType:  updatedOrder.deliveryType,
+      totalAmount:    updatedOrder.totalAmount,
+      deliveryType:   updatedOrder.deliveryType,
       trackingNumber: trackingNumber ?? undefined,
       carrier:        carrier        ?? undefined,
       invoiceNumber:  updatedOrder.invoiceNumber ?? undefined,
+      estimatedDays,
     }),
     attachments: invoicePdfBase64
       ? [{

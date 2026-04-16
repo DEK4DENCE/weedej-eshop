@@ -5,14 +5,15 @@ import {
 // ─── Extended props with tracking + invoice ───────────────────────────────────
 
 interface OrderShippedWithTrackingProps {
-  name:           string
-  orderNumber:    string
-  items:          { productName: string; variantLabel: string; quantity: number }[]
-  totalAmount:    number   // haléře
-  deliveryType:   'COURIER' | 'PICKUP_IN_STORE'
+  name:            string
+  orderNumber:     string
+  items:           { productName: string; variantLabel: string; quantity: number }[]
+  totalAmount:     number   // haléře
+  deliveryType:    'COURIER' | 'PICKUP_IN_STORE'
   trackingNumber?: string
   carrier?:        string
   invoiceNumber?:  string
+  estimatedDays?:  string  // e.g. "2-3 pracovní dny" from DB
 }
 
 /**
@@ -28,6 +29,7 @@ export function OrderShippedWithTracking({
   trackingNumber,
   carrier,
   invoiceNumber,
+  estimatedDays,
 }: OrderShippedWithTrackingProps) {
   return (
     <Html lang="cs">
@@ -42,7 +44,7 @@ export function OrderShippedWithTracking({
           <Text style={paragraph}>
             Skvělá zpráva! Vaše objednávka {orderNumber} byla právě odeslána.
             {deliveryType === 'COURIER'
-              ? ' Doručení kurýrem proběhne zpravidla do 1–2 pracovních dnů.'
+              ? ` Doručení kurýrem proběhne zpravidla do ${estimatedDays ?? '2–3 pracovních dnů'}.`
               : ' Objednávka je připravena k osobnímu vyzvednutí.'}
           </Text>
 

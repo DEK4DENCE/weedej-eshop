@@ -2,6 +2,7 @@ import React from 'react'
 import { MapPin, CreditCard, User, Package } from 'lucide-react'
 import { Order } from '@/types/order'
 import { OrderStatusBadge } from './OrderStatusBadge'
+import { OrderTimeline } from './OrderTimeline'
 
 interface OrderDetailProps {
   order: Order & {
@@ -63,6 +64,15 @@ export function OrderDetail({ order }: OrderDetailProps) {
           <OrderStatusBadge status={order.status} />
         </div>
       </div>
+
+      {/* Timeline */}
+      <OrderTimeline
+        createdAt={order.createdAt}
+        paidAt={(order as any).paidAt}
+        shippedAt={(order as any).shippedAt}
+        deliveredAt={(order as any).deliveredAt}
+        status={order.status}
+      />
 
       {/* Items table */}
       <div className="bg-white border border-[#DEE2E6] rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
