@@ -3,8 +3,7 @@
 export const dynamic = "force-dynamic"
 
 import { useEffect, useState } from "react"
-import Link from "next/link"
-import { Eye, RefreshCw, AlertTriangle, CheckCircle2, Clock } from "lucide-react"
+import { RefreshCw, AlertTriangle, CheckCircle2, Clock, Circle } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -15,11 +14,70 @@ interface Order {
   status: string
   totalAmount: number
   createdAt: string
+  paidAt: string | null
+  shippedAt: string | null
+  deliveredAt: string | null
   erpOrderNumber: string | null
   erpSyncStatus: string
   erpSyncLastError: string | null
   erpSyncAttempts: number
   user: { name: string | null; email: string }
+}
+
+function formatDateTime(dateStr: string): string {
+  return new Intl.DateTimeFormat('cs-CZ', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Europe/Prague',
+  }).format(new Date(dateStr))
+}
+
+function formatTime(dateStr: string): string {
+  return new Intl.DateTimeFormat('cs-CZ', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Europe/Prague',
+  }).format(new Date(dateStr))
+}
+
+function AdminCompactTimeline({ order }: { order: Order }) {
+  const resolvedPaidAt = order.paidAt ?? (order.status !== 'PENDING' ? order.createdAt : null)
+  const steps = [
+    { label: 'Objednáno', ts: order.createdAt },
+    { label: 'Zaplaceno', ts: resolvedPaidAt },
+    { label: 'Odesláno',  ts: order.shippedAt },
+    { label: 'Doručeno',  ts: order.deliveredAt },
+  ]
+  return (
+    <div className="flex items-start gap-0 mt-2">
+      {steps.map((step, i) => {
+        const done = !!step.ts
+        const isLast = i === steps.length - 1
+        return (
+          <div key={step.label} className="flex items-center flex-1 min-w-0">
+            <div className="flex flex-col items-center flex-shrink-0">
+              {done
+                ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                : <Circle className="w-3.5 h-3.5 text-muted-foreground/30" />
+              }
+              <p className={`text-[9px] mt-0.5 font-medium whitespace-nowrap ${done ? 'text-foreground' : 'text-muted-foreground/40'}`}>
+                {step.label}
+              </p>
+              {done && step.ts && (
+                <p className="text-[8px] text-muted-foreground whitespace-nowrap">{formatTime(step.ts)}</p>
+              )}
+            </div>
+            {!isLast && (
+              <div className={`h-px flex-1 mx-0.5 mb-5 ${done ? 'bg-emerald-500/40' : 'bg-border/40'}`} />
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
 }
 
 // Status is driven by ERP. Map all variants to the 3 user-facing states.
@@ -156,27 +214,26 @@ export default function AdminOrdersPage() {
                 <TableHead>Status</TableHead>
                 <TableHead>Celkem</TableHead>
                 <TableHead>Datum</TableHead>
-                <TableHead className="text-right">Akce</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {orders.map((order) => (
-                <TableRow key={order.id}>
+                <TableRow
+                  key={order.id}
+                  className="cursor-pointer hover:bg-muted/60 transition-colors"
+                  onClick={() => window.location.href = `/admin/orders/${order.id}`}
+                >
                   <TableCell>
                     <ErpSyncBadge order={order} />
                   </TableCell>
                   <TableCell>{order.user.name ?? order.user.email}</TableCell>
                   <TableCell>
                     <Badge className={STATUS_DISPLAY[order.status]?.classes ?? ""}>{STATUS_DISPLAY[order.status]?.label ?? order.status}</Badge>
+                    <AdminCompactTimeline order={order} />
                   </TableCell>
                   <TableCell>{formatPrice(order.totalAmount / 100)}</TableCell>
                   <TableCell className="text-muted-foreground text-xs">
-                    {new Date(order.createdAt).toLocaleDateString("cs-CZ")}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button asChild variant="ghost" size="sm">
-                      <Link href={`/admin/orders/${order.id}`}><Eye className="h-4 w-4" /></Link>
-                    </Button>
+                    {formatDateTime(order.createdAt)}
                   </TableCell>
                 </TableRow>
               ))}

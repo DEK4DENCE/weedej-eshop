@@ -1,6 +1,4 @@
-import React from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { Package, CheckCircle2, Circle } from 'lucide-react'
 import { Order } from '@/types/order'
 import { OrderStatusBadge } from './OrderStatusBadge'
@@ -99,7 +97,10 @@ export function OrderCard({ order }: OrderCardProps) {
     : order.id.slice(-8).toUpperCase()
 
   return (
-    <div className="bg-white border border-[#DEE2E6] rounded-2xl p-6 hover:border-[#2E7D32]/50 transition-colors duration-200 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
+    <Link
+      href={`/account/orders/${order.id}`}
+      className="block bg-white border border-[#DEE2E6] rounded-2xl p-6 hover:border-[#2E7D32]/50 hover:shadow-[0_4px_20px_rgba(46,125,50,0.10)] transition-all duration-200 shadow-[0_2px_12px_rgba(0,0,0,0.06)]"
+    >
       <div className="flex items-start justify-between gap-4">
         {/* Left: order info */}
         <div className="flex-1 min-w-0">
@@ -148,19 +149,13 @@ export function OrderCard({ order }: OrderCardProps) {
           </p>
         </div>
 
-        {/* Right: total + CTA */}
+        {/* Right: total */}
         <div className="flex flex-col items-end gap-3 flex-shrink-0">
           <span className="font-mono text-lg font-bold text-[#1d1d1f]">
             {formatPrice(order.totalAmount, order.currency)}
           </span>
-          <Link
-            href={`/account/orders/${order.id}`}
-            className="inline-flex items-center gap-1.5 bg-transparent border border-[#2E7D32] text-[#2E7D32] hover:bg-[#2E7D32]/10 rounded-xl px-4 py-2 text-sm font-semibold transition-colors duration-200"
-          >
-            Zobrazit
-          </Link>
         </div>
       </div>
-    </div>
+    </Link>
   )
 }
