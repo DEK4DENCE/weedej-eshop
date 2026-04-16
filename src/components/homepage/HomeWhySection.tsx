@@ -1,6 +1,7 @@
 "use client"
 import { motion } from "framer-motion"
 import Link from "next/link"
+import type { HomeCategoryData } from "@/app/page"
 
 const fadeUp = (delay: number) => ({
   initial: { opacity: 0, y: 20 },
@@ -9,32 +10,13 @@ const fadeUp = (delay: number) => ({
   transition: { duration: 0.6, delay, ease: "easeOut" as const },
 })
 
-const categories = [
-  {
-    name: "Květy CBD",
-    href: "/products?category=kvety",
-    slug: "kvety",
-    desc: "Prémiové sušené CBD květy z certifikovaných evropských pěstíren. Bohaté terpény, bez THC.",
-  },
-  {
-    name: "Extrakty",
-    href: "/products?category=extrakty",
-    slug: "extrakty",
-    desc: "CBD oleje, vosky a koncentráty. Přesné dávkování, maximální čistota, laboratorně ověřeno.",
-  },
-  {
-    name: "Edibles",
-    href: "/products?category=edibles",
-    slug: "edibles",
-    desc: "CBD gumičky, čokolády a nápoje. Diskrétní, chutné a pohodlné použití kdykoliv.",
-  },
-]
-
 interface Props {
+  categories?: HomeCategoryData[]
+  /** @deprecated use categories */
   categoryImages?: Record<string, string>
 }
 
-export function HomeWhySection({ categoryImages = {} }: Props) {
+export function HomeWhySection({ categories = [] }: Props) {
   return (
     <section className="bg-black pt-32 pb-16 px-6 text-center">
       <div className="max-w-5xl mx-auto">
@@ -58,31 +40,28 @@ export function HomeWhySection({ categoryImages = {} }: Props) {
 
         {/* Category cards */}
         <div className="grid md:grid-cols-3 gap-8 mb-16">
-          {categories.map(({ name, href, slug, desc }, i) => {
-            const img = categoryImages[slug]
-            return (
-              <motion.div key={name} {...fadeUp(i * 0.1)}>
-                <Link
-                  href={href}
-                  className="group flex flex-col items-center gap-4 p-6 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors border border-white/10"
-                >
-                  <div className="w-44 h-44 rounded-xl overflow-hidden bg-white/5 flex items-center justify-center">
-                    {img ? (
-                      <img
-                        src={img}
-                        alt={name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-white/5" />
-                    )}
-                  </div>
-                  <p className="font-semibold text-white text-base">{name}</p>
-                  <p className="text-white/50 text-sm leading-relaxed">{desc}</p>
-                </Link>
-              </motion.div>
-            )
-          })}
+          {categories.map(({ name, slug, image, desc }, i) => (
+            <motion.div key={slug} {...fadeUp(i * 0.1)}>
+              <Link
+                href={`/categories/${slug}`}
+                className="group flex flex-col items-center gap-4 p-6 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors border border-white/10"
+              >
+                <div className="w-44 h-44 rounded-xl overflow-hidden bg-white/5 flex items-center justify-center">
+                  {image ? (
+                    <img
+                      src={image}
+                      alt={name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-white/5" />
+                  )}
+                </div>
+                <p className="font-semibold text-white text-base">{name}</p>
+                <p className="text-white/50 text-sm leading-relaxed">{desc}</p>
+              </Link>
+            </motion.div>
+          ))}
         </div>
 
         <motion.p {...fadeUp(0.4)} className="text-white/30 text-sm">

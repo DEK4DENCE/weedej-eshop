@@ -30,20 +30,61 @@ export const metadata: Metadata = {
   },
 }
 
-async function getCategoryImages(): Promise<Record<string, string>> {
+export interface HomeCategoryData {
+  name: string
+  slug: string
+  image?: string
+  desc: string
+}
+
+const CATEGORY_DESCS: Record<string, string> = {
+  kvety:   "Prémiové sušené CBD květy z certifikovaných evropských pěstíren. Bohaté terpény, bez THC.",
+  hasise:  "Prémiový konopný hašiš. Tradiční zpracování, vysoká čistota, intenzivní aroma.",
+  hasis:   "Prémiový konopný hašiš. Tradiční zpracování, vysoká čistota, intenzivní aroma.",
+  syringe: "Přesně dávkované extrakty v injekční stříkačce. Maximální čistota a snadné použití.",
+  default: "Prémiové konopné produkty laboratořemi testované a certifikované.",
+}
+
+async function getHomepageCategories(): Promise<HomeCategoryData[]> {
   try {
-    const slugs = ["kvety", "extrakty", "edibles"]
-    const result: Record<string, string> = {}
-    for (const slug of slugs) {
+    // Find the 3 categories by name (case-insensitive): Květy, Hašiš, Syringe
+    const cats = await db.category.findMany({
+      where: {
+        isActive: true,
+        OR: [
+          { name: { contains: "kvet", mode: "insensitive" } },
+          { name: { contains: "hasi", mode: "insensitive" } },
+          { name: { contains: "syring", mode: "insensitive" } },
+        ],
+      },
+      select: { name: true, slug: true },
+      take: 3,
+    })
+
+    const result: HomeCategoryData[] = []
+    for (const cat of cats) {
       const product = await db.product.findFirst({
-        where: { category: { slug }, isActive: true, imageUrls: { isEmpty: false } },
+        where: { category: { slug: cat.slug }, isActive: true, imageUrls: { isEmpty: false } },
         select: { imageUrls: true },
       })
-      if (product?.imageUrls?.[0]) result[slug] = product.imageUrls[0]
+      result.push({
+        name: cat.name,
+        slug: cat.slug,
+        image: product?.imageUrls?.[0],
+        desc: CATEGORY_DESCS[cat.slug] ?? CATEGORY_DESCS.default,
+      })
     }
+
+    // Ensure Květy is first
+    result.sort((a, b) => {
+      const order = (s: string) =>
+        s.includes("kvet") ? 0 : s.includes("hasi") ? 1 : 2
+      return order(a.slug) - order(b.slug)
+    })
+
     return result
   } catch {
-    return {}
+    return []
   }
 }
 
@@ -70,13 +111,13 @@ async function getBestsellers() {
 }
 
 export default async function HomePage() {
-  const [products, categoryImages] = await Promise.all([getBestsellers(), getCategoryImages()])
+  const [products, homeCategories] = await Promise.all([getBestsellers(), getHomepageCategories()])
 
   return (
     <div className="bg-black min-h-screen">
       <HomeNavbar />
       <HomeHero />
-      <HomeWhySection categoryImages={categoryImages} />
+      <HomeWhySection categories={homeCategories} />
       <HomeMissionSection />
       <HomeFeaturesSection products={products} />
       <HomeCTASection />
