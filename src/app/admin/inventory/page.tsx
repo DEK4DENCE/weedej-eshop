@@ -1,9 +1,7 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
-import Link from "next/link"
+import { useEffect, useState } from "react"
 import {
-  Package,
   RefreshCw,
   ChevronDown,
   ChevronRight,
@@ -98,6 +96,9 @@ function StatusBadge({ status }: { status: "empty" | "low" | "ok" }) {
   )
 }
 
+// Shared grid template — 6 equal columns after the chevron
+const COLS = "grid-cols-[28px_2fr_1fr_1fr_1fr_1fr_1fr]"
+
 // ─── Komponenta ───────────────────────────────────────────────────────────────
 
 export default function InventoryPage() {
@@ -153,10 +154,10 @@ export default function InventoryPage() {
   }
 
   function SortIcon({ field }: { field: SortField }) {
-    if (sortField !== field) return <ArrowUpDown className="h-3.5 w-3.5 text-[#9e9e9e]" />
+    if (sortField !== field) return <ArrowUpDown className="h-3 w-3 text-[#c0c0c0]" />
     return sortDir === "asc"
-      ? <ArrowUp className="h-3.5 w-3.5 text-[#2E7D32]" />
-      : <ArrowDown className="h-3.5 w-3.5 text-[#2E7D32]" />
+      ? <ArrowUp className="h-3 w-3 text-[#2E7D32]" />
+      : <ArrowDown className="h-3 w-3 text-[#2E7D32]" />
   }
 
   // Filter
@@ -186,12 +187,6 @@ export default function InventoryPage() {
     }
     return sortDir === "asc" ? cmp : -cmp
   })
-
-  // Totals
-  const totalPurchaseValue = items.reduce((s, i) => s + i.totalPurchaseValue, 0)
-  const totalSalesValue    = items.reduce((s, i) => s + i.totalSalesValue, 0)
-  const emptyCount         = items.filter(i => i.stockStatus === "empty").length
-  const lowCount           = items.filter(i => i.stockStatus === "low").length
 
   const erpUrl = process.env.NEXT_PUBLIC_ERP_URL ?? ""
 
@@ -230,13 +225,6 @@ export default function InventoryPage() {
         </div>
 
         <div className="flex gap-2 shrink-0">
-          <Link
-            href="/admin/inventory/movements"
-            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium border border-[#DEE2E6] rounded-lg text-[#212121] hover:bg-[#F8F9FA] transition-colors"
-          >
-            <Package className="h-4 w-4" />
-            Historie pohybů
-          </Link>
           {erpUrl && (
             <a
               href={`${erpUrl}/inventory`}
@@ -258,32 +246,6 @@ export default function InventoryPage() {
           </button>
         </div>
       </div>
-
-      {/* ── KPI karty ── */}
-      {!loading && items.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="bg-white border border-[#DEE2E6] rounded-xl p-4">
-            <p className="text-xs text-[#9e9e9e] uppercase tracking-wide">Produktů</p>
-            <p className="text-2xl font-bold text-[#212121] mt-1">{items.length}</p>
-          </div>
-          <div className="bg-white border border-[#DEE2E6] rounded-xl p-4">
-            <p className="text-xs text-[#9e9e9e] uppercase tracking-wide">Nákupní hodnota</p>
-            <p className="text-xl font-bold text-[#212121] mt-1">{formatCzk(totalPurchaseValue)}</p>
-          </div>
-          <div className="bg-white border border-[#DEE2E6] rounded-xl p-4">
-            <p className="text-xs text-[#9e9e9e] uppercase tracking-wide">Prodejní hodnota</p>
-            <p className="text-xl font-bold text-[#2E7D32] mt-1">{formatCzk(totalSalesValue)}</p>
-          </div>
-          <div className="bg-white border border-[#DEE2E6] rounded-xl p-4">
-            <p className="text-xs text-[#9e9e9e] uppercase tracking-wide">Výstrahy</p>
-            <div className="flex items-center gap-2 mt-1">
-              {emptyCount > 0 && <span className="text-sm font-bold text-red-600">{emptyCount}× prázdný</span>}
-              {lowCount > 0 && <span className="text-sm font-bold text-amber-600">{lowCount}× nízký</span>}
-              {emptyCount === 0 && lowCount === 0 && <span className="text-sm font-bold text-[#2E7D32]">Vše OK</span>}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ── Filtry ── */}
       <div className="flex flex-wrap items-center gap-2">
@@ -333,21 +295,21 @@ export default function InventoryPage() {
       <div className="bg-white rounded-xl border border-[#DEE2E6] overflow-hidden">
 
         {/* Hlavička */}
-        <div className="grid grid-cols-[auto_2fr_1.2fr_1fr_1fr_1fr_1fr] items-center gap-3 px-4 py-3 bg-[#F8F9FA] border-b border-[#DEE2E6] text-xs font-semibold text-[#515154] select-none">
-          <div className="w-5" />
-          <button className="flex items-center gap-1 text-left hover:text-[#212121]" onClick={() => toggleSort("name")}>
+        <div className={`grid ${COLS} items-center gap-4 px-4 py-3 bg-[#F8F9FA] border-b border-[#DEE2E6] text-xs font-semibold text-[#515154] select-none`}>
+          <div />
+          <button className="flex items-center gap-1 hover:text-[#212121]" onClick={() => toggleSort("name")}>
             Produkt <SortIcon field="name" />
           </button>
-          <button className="flex items-center gap-1 hover:text-[#212121]" onClick={() => toggleSort("category")}>
+          <button className="flex items-center gap-1 justify-center hover:text-[#212121]" onClick={() => toggleSort("category")}>
             Kategorie <SortIcon field="category" />
           </button>
-          <button className="flex items-center gap-1 justify-end hover:text-[#212121]" onClick={() => toggleSort("physical")}>
+          <button className="flex items-center gap-1 justify-center hover:text-[#212121]" onClick={() => toggleSort("physical")}>
             Skladem <SortIcon field="physical" />
           </button>
-          <button className="flex items-center gap-1 justify-end hover:text-[#212121]" onClick={() => toggleSort("purchaseValue")}>
+          <button className="flex items-center gap-1 justify-center hover:text-[#212121]" onClick={() => toggleSort("purchaseValue")}>
             Nák. hodnota <SortIcon field="purchaseValue" />
           </button>
-          <button className="flex items-center gap-1 justify-end hover:text-[#212121]" onClick={() => toggleSort("salesValue")}>
+          <button className="flex items-center gap-1 justify-center hover:text-[#212121]" onClick={() => toggleSort("salesValue")}>
             Prod. hodnota <SortIcon field="salesValue" />
           </button>
           <button className="flex items-center gap-1 justify-center hover:text-[#212121]" onClick={() => toggleSort("status")}>
@@ -367,40 +329,38 @@ export default function InventoryPage() {
         ) : (
           sorted.map((item) => {
             const isOpen = expanded.has(item.productId)
-            const priceWithVat = item.price * (1 + item.vatRate / 100)
-            const avgPurchaseWithVat = item.avgPurchasePrice * (1 + item.vatRate / 100)
 
             return (
               <div key={item.productId} className="border-b border-[#DEE2E6] last:border-0">
 
                 {/* Hlavní řádek */}
                 <div
-                  className="grid grid-cols-[auto_2fr_1.2fr_1fr_1fr_1fr_1fr] items-center gap-3 px-4 py-3 cursor-pointer hover:bg-[#F8F9FA] transition-colors"
+                  className={`grid ${COLS} items-center gap-4 px-4 py-3 cursor-pointer hover:bg-[#F8F9FA] transition-colors`}
                   onClick={() => toggleExpand(item.productId)}
                 >
-                  <div className="w-5 text-[#9e9e9e]">
+                  <div className="text-[#9e9e9e]">
                     {isOpen
                       ? <ChevronDown className="h-4 w-4" />
                       : <ChevronRight className="h-4 w-4" />
                     }
                   </div>
 
-                  <div className="font-medium text-[#212121] text-sm truncate">{item.productName}</div>
+                  <div className="font-medium text-[#212121] text-sm truncate pr-2">{item.productName}</div>
 
-                  <div className="text-sm text-[#515154] truncate">
-                    {item.category?.name ?? <span className="text-[#9e9e9e] italic">—</span>}
+                  <div className="text-sm text-[#515154] text-center truncate">
+                    {item.category?.name ?? <span className="text-[#c0c0c0]">—</span>}
                   </div>
 
-                  <div className="flex justify-end">
+                  <div className="flex justify-center">
                     <StockBadge value={item.physicalStock} unit={item.unit} status={item.stockStatus} />
                   </div>
 
-                  <div className="text-right text-sm text-[#212121]">
-                    {item.totalPurchaseValue > 0 ? formatCzk(item.totalPurchaseValue) : <span className="text-[#9e9e9e]">—</span>}
+                  <div className="text-center text-sm text-[#212121]">
+                    {item.totalPurchaseValue > 0 ? formatCzk(item.totalPurchaseValue) : <span className="text-[#c0c0c0]">—</span>}
                   </div>
 
-                  <div className="text-right text-sm font-medium text-[#2E7D32]">
-                    {item.totalSalesValue > 0 ? formatCzk(item.totalSalesValue) : <span className="text-[#9e9e9e] font-normal">—</span>}
+                  <div className="text-center text-sm font-medium text-[#2E7D32]">
+                    {item.totalSalesValue > 0 ? formatCzk(item.totalSalesValue) : <span className="text-[#c0c0c0] font-normal">—</span>}
                   </div>
 
                   <div className="flex justify-center">
@@ -408,117 +368,53 @@ export default function InventoryPage() {
                   </div>
                 </div>
 
-                {/* Rozbalený detail */}
+                {/* Rozbalený detail — stavy skladu jako řada badges */}
                 {isOpen && (
-                  <div className="bg-[#F8F9FA] border-t border-[#DEE2E6] px-6 py-4 ml-5">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="bg-[#F8F9FA] border-t border-[#DEE2E6] px-8 py-3 flex flex-wrap items-center gap-6">
 
-                      {/* Stavy skladu */}
-                      <div>
-                        <p className="text-xs font-semibold text-[#515154] uppercase tracking-wide mb-2">Stavy skladu</p>
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs text-[#6e6e73]">Fyzický sklad (skladem)</span>
-                            <StockBadge value={item.physicalStock} unit={item.unit} status={item.stockStatus} />
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs text-[#6e6e73]">Rezervováno</span>
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                              item.reservedStock > 0 ? "bg-orange-100 text-orange-700" : "bg-gray-100 text-gray-500"
-                            }`}>
-                              {formatStock(item.reservedStock, item.unit)}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs text-[#6e6e73]">Dostupné</span>
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                              item.availableStock > 0 ? "bg-blue-100 text-blue-700" : "bg-red-100 text-red-700"
-                            }`}>
-                              {formatStock(Math.max(0, item.availableStock), item.unit)}
-                            </span>
-                          </div>
-                          {item.expectedQuantity > 0 && (
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs text-[#6e6e73]">Očekáváno</span>
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">
-                                +{formatStock(item.expectedQuantity, item.unit)}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Ceny */}
-                      <div>
-                        <p className="text-xs font-semibold text-[#515154] uppercase tracking-wide mb-2">Ceny</p>
-                        <div className="space-y-2">
-                          {item.avgPurchasePrice > 0 && (
-                            <>
-                              <div className="flex items-center justify-between">
-                                <span className="text-xs text-[#6e6e73]">Ø nák. cena bez DPH</span>
-                                <span className="text-xs font-medium text-[#212121]">
-                                  {item.avgPurchasePrice.toLocaleString("cs-CZ", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Kč/{item.unit}
-                                </span>
-                              </div>
-                              <div className="flex items-center justify-between">
-                                <span className="text-xs text-[#6e6e73]">Ø nák. cena s DPH</span>
-                                <span className="text-xs font-medium text-[#212121]">
-                                  {avgPurchaseWithVat.toLocaleString("cs-CZ", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Kč/{item.unit}
-                                </span>
-                              </div>
-                            </>
-                          )}
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs text-[#6e6e73]">Prodejní cena bez DPH</span>
-                            <span className="text-xs font-medium text-[#2E7D32]">
-                              {item.price.toLocaleString("cs-CZ", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Kč/{item.unit}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs text-[#6e6e73]">Prodejní cena s DPH ({item.vatRate}%)</span>
-                            <span className="text-xs font-medium text-[#2E7D32]">
-                              {priceWithVat.toLocaleString("cs-CZ", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Kč/{item.unit}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Hodnoty & akce */}
-                      <div>
-                        <p className="text-xs font-semibold text-[#515154] uppercase tracking-wide mb-2">Hodnota skladu</p>
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs text-[#6e6e73]">Nákupní hodnota</span>
-                            <span className="text-xs font-medium text-[#212121]">{formatCzk(item.totalPurchaseValue)}</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs text-[#6e6e73]">Prodejní hodnota</span>
-                            <span className="text-xs font-semibold text-[#2E7D32]">{formatCzk(item.totalSalesValue)}</span>
-                          </div>
-                          {item.totalPurchaseValue > 0 && item.totalSalesValue > 0 && (
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs text-[#6e6e73]">Potenciální zisk</span>
-                              <span className="text-xs font-semibold text-blue-600">
-                                {formatCzk(item.totalSalesValue - item.totalPurchaseValue)}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-
-                        {erpUrl && (
-                          <a
-                            href={`${erpUrl}/inventory`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 mt-4 text-xs text-[#2E7D32] hover:underline"
-                          >
-                            <ExternalLink className="h-3 w-3" />
-                            Skladové pohyby v ERP
-                          </a>
-                        )}
-                      </div>
-
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-[#6e6e73]">Skladem:</span>
+                      <StockBadge value={item.physicalStock} unit={item.unit} status={item.stockStatus} />
                     </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-[#6e6e73]">Rezervováno:</span>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                        item.reservedStock > 0 ? "bg-orange-100 text-orange-700" : "bg-gray-100 text-gray-400"
+                      }`}>
+                        {formatStock(item.reservedStock, item.unit)}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-[#6e6e73]">Dostupné:</span>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                        item.availableStock > 0 ? "bg-blue-100 text-blue-700" : "bg-red-100 text-red-700"
+                      }`}>
+                        {formatStock(Math.max(0, item.availableStock), item.unit)}
+                      </span>
+                    </div>
+
+                    {item.expectedQuantity > 0 && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-[#6e6e73]">Očekáváno:</span>
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">
+                          +{formatStock(item.expectedQuantity, item.unit)}
+                        </span>
+                      </div>
+                    )}
+
+                    {erpUrl && (
+                      <a
+                        href={`${erpUrl}/inventory`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-auto flex items-center gap-1 text-xs text-[#2E7D32] hover:underline"
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                        Pohyby v ERP
+                      </a>
+                    )}
                   </div>
                 )}
               </div>
@@ -528,15 +424,15 @@ export default function InventoryPage() {
 
         {/* Footer součty */}
         {!loading && sorted.length > 0 && (
-          <div className="grid grid-cols-[auto_2fr_1.2fr_1fr_1fr_1fr_1fr] items-center gap-3 px-4 py-3 bg-[#F8F9FA] border-t border-[#DEE2E6] text-sm font-semibold text-[#212121]">
-            <div className="w-5" />
-            <div className="text-xs text-[#9e9e9e]">{sorted.length} produktů</div>
+          <div className={`grid ${COLS} items-center gap-4 px-4 py-3 bg-[#F8F9FA] border-t border-[#DEE2E6] text-xs font-semibold text-[#515154]`}>
+            <div />
+            <div className="text-[#9e9e9e] font-normal">{sorted.length} produktů</div>
             <div />
             <div />
-            <div className="text-right text-xs">
+            <div className="text-center">
               {formatCzk(sorted.reduce((s, i) => s + i.totalPurchaseValue, 0))}
             </div>
-            <div className="text-right text-xs text-[#2E7D32]">
+            <div className="text-center text-[#2E7D32]">
               {formatCzk(sorted.reduce((s, i) => s + i.totalSalesValue, 0))}
             </div>
             <div />
