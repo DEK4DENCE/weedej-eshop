@@ -13,11 +13,18 @@ interface ProductVariantSelectorProps {
 export function ProductVariantSelector({ variants, selectedVariantId, onSelect }: ProductVariantSelectorProps) {
   if (variants.length === 0) return null
 
+  const sorted = [...variants].sort((a, b) => {
+    // Sort numerically by variantValue (1g < 3g < 5g); nulls last
+    const av = a.variantValue ?? Infinity
+    const bv = b.variantValue ?? Infinity
+    return av - bv
+  })
+
   return (
     <div className="flex flex-col gap-3">
       <p className="text-sm font-medium text-[#515154]">Vyberte variantu</p>
       <div className="flex flex-wrap gap-2">
-        {variants.map((variant) => {
+        {sorted.map((variant) => {
           const isSelected = variant.id === selectedVariantId
           const isOutOfStock = variant.stock === 0
 
