@@ -164,16 +164,27 @@ export async function POST(req: NextRequest) {
         // item.unitPrice is in haléře (price WITH VAT per pack)
         const unitPriceKc      = item.unitPrice / 100
         const vatRate          = item.vatRate
-        // Price excl. VAT per pack — matches what the eshop charges per line item
-        const unitPriceExclVat = Math.round(unitPriceKc / (1 + vatRate / 100) * 100) / 100
+        const priceExclVatPerPack = unitPriceKc / (1 + vatRate / 100)
+
+        // If the variant has a physical unit (e.g. 5g), send in that unit so
+        // ERP dispatch quantities and totals are correct (5g × price/g = pack total)
+        const physQty  = item.variantValue && item.variantValue > 0 && item.variantUnit
+          ? item.quantity * item.variantValue
+          : item.quantity
+        const unit     = item.variantValue && item.variantValue > 0 && item.variantUnit
+          ? item.variantUnit
+          : 'ks'
+        const unitPriceCzk = item.variantValue && item.variantValue > 0 && item.variantUnit
+          ? Math.round(priceExclVatPerPack / item.variantValue * 100) / 100
+          : Math.round(priceExclVatPerPack * 100) / 100
 
         const erpName = item.variantLabel ? `${item.productName} — ${item.variantLabel}` : item.productName
         return {
           sku:          item.erpProductId ?? undefined,
           name:         erpName,
-          quantity:     item.quantity,   // number of packs ordered
-          unit:         'ks',            // per pack (ks = piece)
-          unitPriceCzk: unitPriceExclVat,
+          quantity:     physQty,
+          unit,
+          unitPriceCzk,
           vatRate,
         }
       })
