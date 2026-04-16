@@ -39,23 +39,25 @@ export async function POST() {
     const variants = await db.productVariant.deleteMany({})
     console.log(`  ✓ Smazáno ${variants.count} variant produktů`)
 
-    // 6. Product (kategorie zůstanou)
+    // 6. Product (musí před Category)
     const products = await db.product.deleteMany({})
     console.log(`  ✓ Smazáno ${products.count} produktů`)
 
+    // 7. Category
+    const categories = await db.category.deleteMany({})
+    console.log(`  ✓ Smazáno ${categories.count} kategorií`)
+
     console.log("\n✅ Reset e-shop databáze dokončen!")
 
-    const [userCount, categoryCount] = await Promise.all([
-      db.user.count(),
-      db.category.count(),
-    ])
+    const userCount = await db.user.count()
 
     return NextResponse.json({
       success: true,
-      message: `Databáze resetována!\n\nZachováno:\n- Uživatelé: ${userCount}\n- Kategorie: ${categoryCount}\n- Nastavení zachováno`,
+      message: `Databáze resetována!\n\nZachováno:\n- Uživatelé: ${userCount}\n- Nastavení zachováno`,
       deleted: {
         products: products.count,
         variants: variants.count,
+        categories: categories.count,
         orders: orders.count,
         stockMovements: stockMovements.count,
         cartItems: cartItems.count,
@@ -63,7 +65,6 @@ export async function POST() {
       },
       preserved: {
         users: userCount,
-        categories: categoryCount,
       },
     })
   } catch (error: any) {

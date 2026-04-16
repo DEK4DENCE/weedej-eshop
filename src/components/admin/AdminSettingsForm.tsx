@@ -116,7 +116,7 @@ export function AdminSettingsForm({ settings, products }: Props) {
 
   async function handleResetDatabase() {
     const confirmed = window.confirm(
-      '⚠️ POZOR: Tato akce je nevratná!\n\nBudou smazány:\n- Všechny objednávky\n- Všechny produkty a varianty\n- Skladové pohyby\n- Košíky\n- ERP sync záznamy\n\nZachováno:\n- Uživatelé\n- Kategorie\n- Nastavení\n\nOpravdu chcete pokračovat?'
+      '⚠️ POZOR: Tato akce je nevratná!\n\nBudou smazány:\n- Všechny objednávky\n- Všechny produkty, varianty a kategorie\n- Skladové pohyby\n- Košíky\n- ERP sync záznamy\n\nZachováno:\n- Uživatelé\n- Nastavení\n\nOpravdu chcete pokračovat?'
     )
     if (!confirmed) return
 
@@ -298,7 +298,7 @@ export function AdminSettingsForm({ settings, products }: Props) {
           <h2 className="text-base font-semibold text-red-600">Nebezpečná zóna</h2>
         </div>
         <p className="text-xs text-muted-foreground">
-          Smaže všechny objednávky, produkty, varianty, skladové pohyby a košíky. Zachová uživatele, kategorie a nastavení. Po resetu importujte produkty znovu z ERP.
+          Smaže všechny objednávky, produkty, varianty, kategorie, skladové pohyby a košíky. Zachová uživatele a nastavení. Po resetu importujte produkty znovu z ERP.
         </p>
         <button
           type="button"

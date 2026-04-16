@@ -3,14 +3,13 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, Package, ShoppingCart, Users, Tag, Settings, ArrowLeft, Warehouse, BookOpen, Truck } from "lucide-react"
+import { LayoutDashboard, Package, ShoppingCart, Users, Settings, ArrowLeft, Warehouse, BookOpen, Truck } from "lucide-react"
 
 const links = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/products", label: "Produkty", icon: Package },
   { href: "/admin/orders", label: "Objednávky", icon: ShoppingCart },
   { href: "/admin/users", label: "Uživatelé", icon: Users },
-  { href: "/admin/categories", label: "Kategorie", icon: Tag },
   { href: "/admin/inventory", label: "Sklad", icon: Warehouse },
   { href: "/admin/blog", label: "Blog", icon: BookOpen },
   { href: "/admin/shipping", label: "Doprava", icon: Truck },
