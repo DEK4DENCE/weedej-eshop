@@ -1,5 +1,4 @@
-import React from 'react'
-import { MapPin, CreditCard, User, Package } from 'lucide-react'
+import { MapPin, CreditCard, User, Package, Download } from 'lucide-react'
 import { Order } from '@/types/order'
 import { OrderStatusBadge } from './OrderStatusBadge'
 import { OrderTimeline } from './OrderTimeline'
@@ -62,7 +61,19 @@ export function OrderDetail({ order }: OrderDetailProps) {
               Zadáno {formatDate(order.createdAt)}
             </p>
           </div>
-          <OrderStatusBadge status={order.status} />
+          <div className="flex items-center gap-3 flex-wrap">
+            <OrderStatusBadge status={order.status} />
+            {((order as any).invoiceUrl || (order as any).invoicePdfBase64) && (
+              <a
+                href={`/api/account/orders/${order.id}/invoice`}
+                download
+                className="inline-flex items-center gap-1.5 bg-transparent border border-[#6e6e73]/40 text-[#6e6e73] hover:border-[#2E7D32] hover:text-[#2E7D32] rounded-xl px-3 py-1.5 text-xs font-medium transition-colors duration-200"
+              >
+                <Download className="w-3.5 h-3.5" />
+                Faktura PDF
+              </a>
+            )}
+          </div>
         </div>
       </div>
 
