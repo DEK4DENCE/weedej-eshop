@@ -1,8 +1,10 @@
 "use client"
 import Link from "next/link"
-import { ShoppingBag } from "lucide-react"
+import { ShoppingBag, User, LogOut, Package, Settings } from "lucide-react"
 import { useCart } from "@/hooks/useCart"
 import { Logo } from "@/components/ui/Logo"
+import { useSession, signOut } from "next-auth/react"
+import { useState, useRef, useEffect } from "react"
 
 const InstagramIcon = () => (
   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -16,8 +18,105 @@ const FacebookIcon = () => (
   </svg>
 )
 
+function UserMenu() {
+  const { data: session } = useSession()
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  // Close on outside click
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener("mousedown", handler)
+    return () => document.removeEventListener("mousedown", handler)
+  }, [])
+
+  if (!session) {
+    return (
+      <div className="hidden md:flex items-center gap-1 mr-2">
+        <Link
+          href="/login"
+          className="text-[#6e6e73] hover:text-[#1d1d1f] text-sm font-medium px-3 py-2 rounded-lg transition-colors duration-200"
+        >
+          Přihlásit se
+        </Link>
+        <Link
+          href="/register"
+          className="bg-[#2E7D32] text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#1a9020] transition-colors duration-200"
+        >
+          Registrovat
+        </Link>
+      </div>
+    )
+  }
+
+  const displayName = session.user?.name ?? session.user?.email?.split("@")[0] ?? "Účet"
+  const isAdmin = (session.user as any)?.role === "ADMIN"
+
+  return (
+    <div ref={ref} className="hidden md:flex items-center mr-2 relative">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#DEE2E6] hover:border-[#1d1d1f]/30 transition-colors duration-200 text-sm text-[#1d1d1f]"
+      >
+        <div className="w-6 h-6 rounded-full bg-[#2E7D32] flex items-center justify-center">
+          <span className="text-white text-[10px] font-bold uppercase">
+            {displayName.charAt(0)}
+          </span>
+        </div>
+        <span className="font-medium max-w-[100px] truncate">{displayName}</span>
+      </button>
+
+      {open && (
+        <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl border border-[#DEE2E6] shadow-lg py-1 z-50">
+          <div className="px-3 py-2 border-b border-[#DEE2E6]">
+            <p className="text-xs text-[#6e6e73] truncate">{session.user?.email}</p>
+          </div>
+          <Link
+            href="/account"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 px-3 py-2 text-sm text-[#1d1d1f] hover:bg-[#F8F9FA] transition-colors"
+          >
+            <User className="w-4 h-4 text-[#6e6e73]" />
+            Můj účet
+          </Link>
+          <Link
+            href="/account/orders"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 px-3 py-2 text-sm text-[#1d1d1f] hover:bg-[#F8F9FA] transition-colors"
+          >
+            <Package className="w-4 h-4 text-[#6e6e73]" />
+            Objednávky
+          </Link>
+          {isAdmin && (
+            <Link
+              href="/admin"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2 px-3 py-2 text-sm text-[#1d1d1f] hover:bg-[#F8F9FA] transition-colors"
+            >
+              <Settings className="w-4 h-4 text-[#6e6e73]" />
+              Admin
+            </Link>
+          )}
+          <div className="border-t border-[#DEE2E6] mt-1 pt-1">
+            <button
+              onClick={() => { setOpen(false); signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL ?? "/" }) }}
+              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[#6e6e73] hover:text-red-600 hover:bg-red-50 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              Odhlásit se
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function HomeNavbar() {
   const { totalItems, toggleSidebar } = useCart()
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-16 py-4 bg-white/95 backdrop-blur border-b border-[#DEE2E6]">
       {/* Logo */}
@@ -35,21 +134,9 @@ export function HomeNavbar() {
 
       {/* Right actions */}
       <div className="flex items-center gap-2">
-        {/* Auth links — desktop only */}
-        <div className="hidden md:flex items-center gap-1 mr-2">
-          <Link
-            href="/login"
-            className="text-[#6e6e73] hover:text-[#1d1d1f] text-sm font-medium px-3 py-2 rounded-lg transition-colors duration-200"
-          >
-            Přihlásit se
-          </Link>
-          <Link
-            href="/register"
-            className="bg-[#2E7D32] text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#1a9020] transition-colors duration-200"
-          >
-            Registrovat
-          </Link>
-        </div>
+        {/* Auth — shows login/register OR user menu depending on session */}
+        <UserMenu />
+
         <a
           href="https://www.instagram.com/weedej.cz"
           target="_blank"

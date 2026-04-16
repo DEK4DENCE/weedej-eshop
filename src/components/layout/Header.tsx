@@ -93,11 +93,18 @@ export function Header() {
 
           {session ? (
             <DropdownMenu>
-              <DropdownMenuTrigger className="p-2 text-[#6e6e73] hover:text-[#1d1d1f] transition-colors" aria-label="User menu">
-                <User className="h-5 w-5" />
+              <DropdownMenuTrigger className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#DEE2E6] hover:border-[#1d1d1f]/30 transition-colors text-sm text-[#1d1d1f]" aria-label="User menu">
+                <div className="w-6 h-6 rounded-full bg-[#2E7D32] flex items-center justify-center shrink-0">
+                  <span className="text-white text-[10px] font-bold uppercase">
+                    {(session.user?.name ?? session.user?.email ?? "U").charAt(0)}
+                  </span>
+                </div>
+                <span className="font-medium max-w-[120px] truncate">
+                  {session.user?.name ?? session.user?.email?.split("@")[0] ?? "Účet"}
+                </span>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-white border-[#DEE2E6]">
-                <div className="px-2 py-1.5 text-sm font-medium text-[#6e6e73]">{session.user?.email}</div>
+              <DropdownMenuContent align="end" className="bg-white border-[#DEE2E6] w-64">
+                <div className="px-3 py-2 text-sm text-[#6e6e73] break-all">{session.user?.email}</div>
                 <DropdownMenuSeparator className="bg-[#DEE2E6]" />
                 <DropdownMenuItem className="text-[#6e6e73] hover:text-[#1d1d1f] cursor-pointer" onClick={() => router.push("/account")}>
                   <User className="mr-2 h-4 w-4" />Můj účet
