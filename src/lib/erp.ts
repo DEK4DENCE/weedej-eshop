@@ -181,6 +181,38 @@ export async function getErpProducts(): Promise<ErpProduct[]> {
   return res.json()
 }
 
+// ─── Inventory summary (admin) ───────────────────────────────────────────────
+
+export interface ErpInventoryItem {
+  productId: string
+  productName: string
+  unit: string
+  price: number
+  vatRate: number
+  category: { id: string; name: string } | null
+  physicalStock: number
+  reservedStock: number
+  availableStock: number
+  expectedQuantity: number
+  totalExpectedStock: number
+  avgPurchasePrice: number
+  totalPurchaseValue: number
+  totalSalesValue: number
+  stockStatus: 'empty' | 'low' | 'ok'
+}
+
+/**
+ * Načte kompletní inventární přehled z ERP (pro admin stránku skladu)
+ * Zahrnuje fyzický sklad, rezervace, dostupné množství a očekávané dodávky
+ */
+export async function getErpInventory(): Promise<ErpInventoryItem[]> {
+  const res = await erpFetch('/api/external/inventory')
+  if (!res.ok) throw new Error(`ERP inventory error: ${res.status}`)
+  return res.json()
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 /**
  * Načte aktuální stav skladu pro konkrétní ERP produkt ID
  * Pokud ids není zadáno, vrátí vše
