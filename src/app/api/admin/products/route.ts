@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
       categoryId: body.categoryId,
       thcContent: body.thcContent,
       cbdContent: body.cbdContent,
+      activeSubstance: body.activeSubstance ?? null,
       imageUrls: [],
     },
   })

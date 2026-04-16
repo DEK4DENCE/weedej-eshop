@@ -9,6 +9,22 @@ import { useCart } from '@/hooks/useCart'
 import { useState } from 'react'
 import type { Product } from '@/types/product'
 
+const SUBSTANCE_STYLES: Record<string, string> = {
+  THC_X: 'bg-blue-50 border-blue-300 text-blue-700',
+  THC:   'bg-purple-50 border-purple-300 text-purple-700',
+  CBD:   'bg-green-50 border-green-300 text-green-700',
+  HHC:   'bg-orange-50 border-orange-300 text-orange-700',
+}
+const SUBSTANCE_LABELS: Record<string, string> = { THC_X: 'THC-X', THC: 'THC', CBD: 'CBD', HHC: 'HHC' }
+
+function SubstanceBadge({ substance }: { substance: string }) {
+  return (
+    <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full border ${SUBSTANCE_STYLES[substance] ?? 'bg-gray-50 border-gray-300 text-gray-600'}`}>
+      {SUBSTANCE_LABELS[substance] ?? substance}
+    </span>
+  )
+}
+
 interface ProductCardProps {
   product: Product
   onAddToCart?: (product: Product, variantId: string) => void
@@ -84,11 +100,18 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
 
         {/* Info */}
         <div className="p-4 flex flex-col gap-2">
-          {/* Strain type */}
-          {product.strainType && (
-            <span className="text-[10px] font-medium uppercase tracking-wider text-[#aeaeb2]">
-              {product.strainType}
-            </span>
+          {/* Strain type + substance badges */}
+          {(product.strainType || (product as any).activeSubstance) && (
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {product.strainType && (
+                <span className="text-[10px] font-medium uppercase tracking-wider text-[#aeaeb2]">
+                  {product.strainType}
+                </span>
+              )}
+              {(product as any).activeSubstance && (
+                <SubstanceBadge substance={(product as any).activeSubstance} />
+              )}
+            </div>
           )}
 
           <h3 className="text-base font-semibold text-[#1d1d1f] leading-snug line-clamp-2 group-hover:text-[#2E7D32] transition-colors">

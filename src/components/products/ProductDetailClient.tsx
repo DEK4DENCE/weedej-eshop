@@ -6,6 +6,14 @@ import AddToCartButton from "@/components/cart/AddToCartButton"
 import { formatPrice } from "@/lib/utils/formatPrice"
 import type { Product } from "@/types/product"
 
+const SUBSTANCE_STYLES: Record<string, string> = {
+  THC_X: 'bg-blue-50 border-blue-300 text-blue-700',
+  THC:   'bg-purple-50 border-purple-300 text-purple-700',
+  CBD:   'bg-green-50 border-green-300 text-green-700',
+  HHC:   'bg-orange-50 border-orange-300 text-orange-700',
+}
+const SUBSTANCE_LABELS: Record<string, string> = { THC_X: 'THC-X', THC: 'THC', CBD: 'CBD', HHC: 'HHC' }
+
 export function ProductDetailClient({ product }: { product: Product }) {
   const defaultVariant = product.variants.find((v) => v.stock > 0) ?? product.variants[0]
   const [selectedVariantId, setSelectedVariantId] = useState(defaultVariant?.id ?? "")
@@ -38,6 +46,11 @@ export function ProductDetailClient({ product }: { product: Product }) {
               <span className="text-green-600">Sativa {product.sativaPercent}%</span>
               <span className="text-[#DEE2E6]">/</span>
               <span className="text-purple-600">Indica {product.indicaPercent}%</span>
+            </span>
+          )}
+          {(product as any).activeSubstance && (
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-xs font-semibold ${SUBSTANCE_STYLES[(product as any).activeSubstance] ?? 'bg-gray-50 border-gray-300 text-gray-600'}`}>
+              {SUBSTANCE_LABELS[(product as any).activeSubstance] ?? (product as any).activeSubstance}
             </span>
           )}
         </div>

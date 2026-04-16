@@ -4,13 +4,20 @@ import { useState, useEffect } from 'react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { SlidersHorizontal, RotateCcw, ChevronDown } from 'lucide-react'
-import type { Category, StrainType } from '@/types/product'
+import type { Category, StrainType, ActiveSubstance } from '@/types/product'
 
 const STRAIN_TYPES: { value: StrainType; label: string }[] = [
   { value: 'INDICA', label: 'Indica' },
   { value: 'SATIVA', label: 'Sativa' },
   { value: 'HYBRID', label: 'Hybrid' },
   { value: 'CBD', label: 'CBD' },
+]
+
+const SUBSTANCE_TYPES: { value: ActiveSubstance; label: string; color: string }[] = [
+  { value: 'THC_X', label: 'THC-X', color: 'bg-blue-50 border-blue-400 text-blue-700' },
+  { value: 'THC',   label: 'THC',   color: 'bg-purple-50 border-purple-400 text-purple-700' },
+  { value: 'CBD',   label: 'CBD',   color: 'bg-green-50 border-green-500 text-green-700' },
+  { value: 'HHC',   label: 'HHC',   color: 'bg-orange-50 border-orange-400 text-orange-700' },
 ]
 
 export function ProductFilters() {
@@ -28,6 +35,9 @@ export function ProductFilters() {
   const [inStock, setInStock] = useState(searchParams.get('inStock') === 'true')
   const [selectedStrains, setSelectedStrains] = useState<StrainType[]>(
     (searchParams.getAll('strainType') as StrainType[]) ?? []
+  )
+  const [selectedSubstances, setSelectedSubstances] = useState<ActiveSubstance[]>(
+    (searchParams.getAll('substance') as ActiveSubstance[]) ?? []
   )
 
   useEffect(() => {
@@ -49,16 +59,24 @@ export function ProductFilters() {
     )
   }
 
+  function toggleSubstance(sub: ActiveSubstance) {
+    setSelectedSubstances((prev) =>
+      prev.includes(sub) ? prev.filter((s) => s !== sub) : [...prev, sub]
+    )
+  }
+
   function applyFilters() {
     const params = new URLSearchParams(searchParams.toString())
     params.delete('category')
     params.delete('strainType')
+    params.delete('substance')
     params.delete('minPrice')
     params.delete('maxPrice')
     params.delete('inStock')
     params.delete('page')
     selectedCategories.forEach((c) => params.append('category', c))
     selectedStrains.forEach((s) => params.append('strainType', s))
+    selectedSubstances.forEach((s) => params.append('substance', s))
     if (minPrice) params.set('minPrice', minPrice)
     if (maxPrice) params.set('maxPrice', maxPrice)
     if (inStock) params.set('inStock', 'true')
@@ -68,6 +86,7 @@ export function ProductFilters() {
   function resetFilters() {
     setSelectedCategories([])
     setSelectedStrains([])
+    setSelectedSubstances([])
     setMinPrice('')
     setMaxPrice('')
     setInStock(false)
@@ -78,11 +97,12 @@ export function ProductFilters() {
   }
 
   const hasActiveFilters =
-    selectedCategories.length > 0 || selectedStrains.length > 0 || minPrice || maxPrice || inStock
+    selectedCategories.length > 0 || selectedStrains.length > 0 || selectedSubstances.length > 0 || minPrice || maxPrice || inStock
 
   const activeCount =
     selectedCategories.length +
     selectedStrains.length +
+    selectedSubstances.length +
     (minPrice ? 1 : 0) +
     (maxPrice ? 1 : 0) +
     (inStock ? 1 : 0)
@@ -188,6 +208,27 @@ export function ProductFilters() {
             Pouze skladem
           </span>
         </label>
+
+        {/* Active Substance */}
+        <div>
+          <p className="text-sm font-medium text-[#515154] mb-3">Účinná látka</p>
+          <div className="flex flex-wrap gap-2">
+            {SUBSTANCE_TYPES.map(({ value, label, color }) => (
+              <button
+                key={value}
+                onClick={() => toggleSubstance(value)}
+                className={[
+                  'px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200',
+                  selectedSubstances.includes(value)
+                    ? color
+                    : 'bg-[#fafafa] border-[#DEE2E6] text-[#6e6e73] hover:border-[#2E7D32]/50 hover:text-[#1d1d1f]',
+                ].join(' ')}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         {/* Strain Type */}
         <div>

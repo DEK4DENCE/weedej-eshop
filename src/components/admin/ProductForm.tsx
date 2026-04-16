@@ -17,8 +17,17 @@ interface Product {
   id: string; name: string; slug: string; description: string | null
   categoryId: string | null; thcContent: number | null; cbdContent: number | null
   sativaPercent?: number | null; indicaPercent?: number | null
+  activeSubstance?: string | null
   isActive: boolean; imageUrls?: string[]; imageAdjustments?: string | null
 }
+
+const SUBSTANCE_OPTIONS = [
+  { value: '',      label: '— Nevybráno —' },
+  { value: 'THC_X', label: 'THC-X' },
+  { value: 'THC',   label: 'THC' },
+  { value: 'CBD',   label: 'CBD' },
+  { value: 'HHC',   label: 'HHC' },
+]
 
 function calcStrainType(sativa: number, indica: number, cbd: number): string {
   if (cbd > 1) return 'CBD'
@@ -60,6 +69,7 @@ export function ProductForm({ categories, product }: Props) {
     const i = Number(val)
     if (!isNaN(i) && i >= 0 && i <= 100) setSativaPercent(String(100 - i))
   }
+  const [activeSubstance, setActiveSubstance] = useState(product?.activeSubstance ?? '')
   const [isActive, setIsActive] = useState(product?.isActive ?? false)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -76,6 +86,7 @@ export function ProductForm({ categories, product }: Props) {
         sativaPercent: sativaPercent !== "" ? Number(sativaPercent) : null,
         indicaPercent: indicaPercent !== "" ? Number(indicaPercent) : null,
         strainType: autoStrainType ?? undefined,
+        activeSubstance: activeSubstance || null,
         isActive,
       }
       const res = await fetch(product ? `/api/admin/products/${product.id}` : "/api/admin/products", {
@@ -182,6 +193,19 @@ export function ProductForm({ categories, product }: Props) {
             {sativaPercent !== "" && indicaPercent !== "" && Number(sativaPercent) + Number(indicaPercent) !== 100 && (
               <p className="text-xs text-red-500">⚠ Součet musí být 100 % (aktuálně {Number(sativaPercent) + Number(indicaPercent)} %)</p>
             )}
+          </div>
+
+          {/* Active substance */}
+          <div className="space-y-2">
+            <Label>Účinná látka</Label>
+            <Select value={activeSubstance} onValueChange={(v) => setActiveSubstance(v ?? '')}>
+              <SelectTrigger><SelectValue placeholder="— Nevybráno —" /></SelectTrigger>
+              <SelectContent>
+                {SUBSTANCE_OPTIONS.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Active toggle */}

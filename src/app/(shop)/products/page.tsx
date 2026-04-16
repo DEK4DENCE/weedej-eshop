@@ -30,6 +30,7 @@ interface Props {
     maxPrice?: string
     inStock?: string
     strainType?: string | string[]
+    substance?: string | string[]
   }>
 }
 
@@ -58,6 +59,11 @@ async function fetchProducts(params: Awaited<Props["searchParams"]>): Promise<Pr
   if (params.strainType) {
     const strains = Array.isArray(params.strainType) ? params.strainType : [params.strainType]
     where.strainType = { in: strains }
+  }
+
+  if (params.substance) {
+    const substances = Array.isArray(params.substance) ? params.substance : [params.substance]
+    where.activeSubstance = { in: substances }
   }
 
   const products = await db.product.findMany({
@@ -92,6 +98,7 @@ async function fetchProducts(params: Awaited<Props["searchParams"]>): Promise<Pr
     },
     shortDescription: p.shortDescription ?? undefined,
     strainType: p.strainType ?? undefined,
+    activeSubstance: (p as any).activeSubstance ?? undefined,
     sativaPercent: p.sativaPercent !== null ? p.sativaPercent : undefined,
     indicaPercent: p.indicaPercent !== null ? p.indicaPercent : undefined,
   })) as Product[]

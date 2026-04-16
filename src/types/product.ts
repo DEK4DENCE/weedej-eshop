@@ -12,7 +12,8 @@ export interface Product {
   basePrice: number
   thcContent?: number
   cbdContent?: number
-  strainType?: 'INDICA' | 'SATIVA' | 'HYBRID' | 'CBD'
+  strainType?: StrainType
+  activeSubstance?: ActiveSubstance
   sativaPercent?: number
   indicaPercent?: number
   effects: string[]
@@ -48,6 +49,7 @@ export interface Category {
 }
 
 export type StrainType = 'INDICA' | 'SATIVA' | 'HYBRID' | 'CBD'
+export type ActiveSubstance = 'CBD' | 'THC' | 'THC_X' | 'HHC'
 
 export interface ProductFilters {
   category?: string

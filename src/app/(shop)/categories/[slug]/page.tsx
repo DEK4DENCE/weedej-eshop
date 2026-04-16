@@ -54,6 +54,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     updatedAt: p.updatedAt.toISOString(),
     shortDescription: p.shortDescription ?? undefined,
     strainType: p.strainType ?? undefined,
+    activeSubstance: (p as any).activeSubstance ?? undefined,
     sativaPercent: p.sativaPercent !== null ? p.sativaPercent : undefined,
     indicaPercent: p.indicaPercent !== null ? p.indicaPercent : undefined,
     variants: p.variants.map((v) => ({
