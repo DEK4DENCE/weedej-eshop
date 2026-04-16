@@ -32,6 +32,7 @@ function formatErpStock(stock: number | null, unit: string | null): string {
 export default function InventoryPage() {
   const [products, setProducts] = useState<ProductRow[]>([])
   const [loading, setLoading] = useState(true)
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
   const [adjusting, setAdjusting] = useState<string | null>(null)
   const [form, setForm] = useState<{ type: "IN" | "OUT"; quantity: string; reason: string }>({
@@ -48,6 +49,7 @@ export default function InventoryPage() {
     if (res.ok) {
       const data = await res.json()
       setProducts(data)
+      setLastRefresh(new Date())
     }
     setLoading(false)
   }
@@ -101,7 +103,14 @@ export default function InventoryPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-[#212121]">Správa skladu</h1>
-          <p className="text-sm text-[#6e6e73] mt-1">Sklad produktů — rozklikni pro zobrazení variant</p>
+          <p className="text-sm text-[#6e6e73] mt-1">
+            Sklad produktů — data přímo z ERP
+            {lastRefresh && (
+              <span className="ml-2 text-xs text-[#9e9e9e]">
+                · aktualizováno {lastRefresh.toLocaleTimeString("cs-CZ")}
+              </span>
+            )}
+          </p>
         </div>
         <div className="flex gap-3">
           <Link
@@ -113,10 +122,11 @@ export default function InventoryPage() {
           </Link>
           <button
             onClick={fetchData}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[#2E7D32] text-white rounded-lg hover:bg-[#1a5e1f] transition-colors"
+            disabled={loading}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[#2E7D32] text-white rounded-lg hover:bg-[#1a5e1f] disabled:opacity-60 transition-colors"
           >
-            <RefreshCw className="h-4 w-4" />
-            Obnovit
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            {loading ? "Načítám z ERP…" : "Obnovit z ERP"}
           </button>
         </div>
       </div>
