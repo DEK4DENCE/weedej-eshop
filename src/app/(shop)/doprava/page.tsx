@@ -1,25 +1,36 @@
 import type { Metadata } from "next"
 import { Truck, CreditCard, Package, Clock, Shield } from "lucide-react"
 import Link from "next/link"
+import { db } from "@/lib/db"
 
 export const metadata: Metadata = {
   title: "Doprava a platba — Weedej",
-  description: "Informace o možnostech doručení a platbách v Weedej. Dopravujeme diskrétně po celé ČR. Česká pošta, zásilkovna, DPD.",
-  alternates: { canonical: 'https://weedej-cannabis-eshop-dek4dences-projects.vercel.app/doprava' },
+  description: "Informace o možnostech doručení a platbách v Weedej. Dopravujeme diskrétně po celé ČR.",
+  alternates: { canonical: 'https://weedej.cz/doprava' },
   openGraph: {
     title: "Doprava a platba — Weedej",
     description: "Informace o možnostech doručení a platbách v Weedej. Dopravujeme diskrétně po celé ČR.",
-    url: 'https://weedej-cannabis-eshop-dek4dences-projects.vercel.app/doprava',
+    url: 'https://weedej.cz/doprava',
     locale: 'cs_CZ',
   },
 }
 
-export default function DopravaPage() {
+function formatPrice(price: number): string {
+  if (price === 0) return "Zdarma"
+  return `${price.toLocaleString("cs-CZ")} Kč`
+}
+
+export default async function DopravaPage() {
+  const shippingMethods = await db.shippingMethod.findMany({
+    where: { isActive: true },
+    orderBy: { sortOrder: "asc" },
+  })
+
   return (
     <div className="container mx-auto px-4 py-12 max-w-3xl">
       <p className="text-xs font-semibold uppercase tracking-widest text-[#2E7D32] mb-2">Informace</p>
       <h1 className="text-3xl font-bold font-playfair text-[#1d1d1f] mb-2">Doprava a platba</h1>
-      <p className="text-[#6e6e73] mb-10">Doručujeme diskrétně po celé České republice.</p>
+      <p className="text-[#6e6e73] mb-10">Doručujeme diskrétně po celé České republiky.</p>
 
       {/* Shipping */}
       <section className="mb-10">
@@ -28,48 +39,43 @@ export default function DopravaPage() {
           <h2 className="text-xl font-semibold text-[#1d1d1f]">Možnosti dopravy</h2>
         </div>
         <div className="grid gap-4">
-          {[
-            {
-              name: 'Česká pošta — doporučený dopis',
-              price: '89 Kč',
-              eta: '2–3 pracovní dny',
-              note: 'Doručení do schránky nebo na poštu',
-            },
-            {
-              name: 'PPL — kurýr na adresu',
-              price: '129 Kč',
-              eta: '1–2 pracovní dny',
-              note: 'Doručení na vámi zvolenou adresu, SMS notifikace',
-            },
-            {
-              name: 'Doprava zdarma',
-              price: 'Zdarma',
-              eta: '1–3 pracovní dny',
-              note: 'Při objednávce nad 1 500 Kč',
-              highlight: true,
-            },
-          ].map((method) => (
-            <div
-              key={method.name}
-              className={`flex items-start justify-between p-4 rounded-2xl border ${
-                method.highlight
-                  ? 'border-[#2E7D32] bg-[#E8F5E9]'
-                  : 'border-[#DEE2E6] bg-white'
-              }`}
-            >
-              <div>
-                <p className="font-semibold text-sm text-[#1d1d1f]">{method.name}</p>
-                <p className="text-xs text-[#6e6e73] mt-0.5">{method.note}</p>
-                <div className="flex items-center gap-1.5 mt-1.5">
-                  <Clock className="h-3 w-3 text-[#aeaeb2]" />
-                  <span className="text-xs text-[#aeaeb2]">{method.eta}</span>
+          {shippingMethods.map((method) => {
+            const price = Number(method.price)
+            const freeThreshold = method.freeThreshold ? Number(method.freeThreshold) : null
+            const isFree = price === 0
+
+            return (
+              <div
+                key={method.id}
+                className={`flex items-start justify-between p-4 rounded-2xl border ${
+                  isFree
+                    ? "border-[#2E7D32] bg-[#E8F5E9]"
+                    : "border-[#DEE2E6] bg-white"
+                }`}
+              >
+                <div>
+                  <p className="font-semibold text-sm text-[#1d1d1f]">{method.name}</p>
+                  <p className="text-xs text-[#6e6e73] mt-0.5">{method.description}</p>
+                  {freeThreshold && freeThreshold > 0 && !isFree && (
+                    <p className="text-xs text-[#2E7D32] mt-0.5">
+                      Zdarma při objednávce nad {freeThreshold.toLocaleString("cs-CZ")} Kč
+                    </p>
+                  )}
+                  <div className="flex items-center gap-1.5 mt-1.5">
+                    <Clock className="h-3 w-3 text-[#aeaeb2]" />
+                    <span className="text-xs text-[#aeaeb2]">{method.estimatedDays}</span>
+                  </div>
                 </div>
+                <span className={`text-sm font-bold font-mono shrink-0 ml-4 ${isFree ? "text-[#2E7D32]" : "text-[#8B6914]"}`}>
+                  {formatPrice(price)}
+                </span>
               </div>
-              <span className={`text-sm font-bold font-mono ${method.highlight ? 'text-[#2E7D32]' : 'text-[#8B6914]'}`}>
-                {method.price}
-              </span>
-            </div>
-          ))}
+            )
+          })}
+
+          {shippingMethods.length === 0 && (
+            <p className="text-sm text-[#6e6e73]">Momentálně nejsou dostupné žádné způsoby dopravy.</p>
+          )}
         </div>
       </section>
 
@@ -93,10 +99,10 @@ export default function DopravaPage() {
         </div>
         <div className="grid sm:grid-cols-2 gap-4">
           {[
-            { name: 'Platební karta', desc: 'Visa, Mastercard', icon: '💳' },
-            { name: 'Apple Pay', desc: 'Rychlá platba na iOS', icon: '' },
-            { name: 'Google Pay', desc: 'Rychlá platba na Android', icon: '🤖' },
-            { name: 'Bankovní převod', desc: 'Na vyžádání', icon: '🏦' },
+            { name: "Platební karta", desc: "Visa, Mastercard", icon: "💳" },
+            { name: "Apple Pay", desc: "Rychlá platba na iOS", icon: "" },
+            { name: "Google Pay", desc: "Rychlá platba na Android", icon: "🤖" },
+            { name: "Bankovní převod", desc: "Na vyžádání", icon: "🏦" },
           ].map((p) => (
             <div key={p.name} className="flex items-center gap-3 p-4 rounded-xl border border-[#DEE2E6] bg-white">
               <span className="text-xl">{p.icon}</span>
@@ -121,9 +127,9 @@ export default function DopravaPage() {
         <h2 className="text-xl font-semibold text-[#1d1d1f] mb-3">Vrácení zboží</h2>
         <p className="text-sm text-[#6e6e73] mb-3">
           Máte právo vrátit neotevřené zboží do <strong>14 dnů</strong> od doručení bez udání důvodu.
-          Napište nám na{' '}
+          Napište nám na{" "}
           <a href="mailto:info@weedej.cz" className="text-[#2E7D32] hover:underline">info@weedej.cz</a> a
-          my vám poskytneme instrukce. Více v{' '}
+          my vám poskytneme instrukce. Více v{" "}
           <Link href="/obchodni-podminky" className="text-[#2E7D32] hover:underline">
             Obchodních podmínkách
           </Link>.
