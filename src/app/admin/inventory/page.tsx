@@ -33,6 +33,7 @@ export default function InventoryPage() {
   const [products, setProducts] = useState<ProductRow[]>([])
   const [loading, setLoading] = useState(true)
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
+  const [erpMeta, setErpMeta] = useState<{ source: string; error?: string; matched?: number; requested?: number } | null>(null)
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
   const [adjusting, setAdjusting] = useState<string | null>(null)
   const [form, setForm] = useState<{ type: "IN" | "OUT"; quantity: string; reason: string }>({
@@ -48,7 +49,14 @@ export default function InventoryPage() {
     const res = await fetch("/api/admin/inventory")
     if (res.ok) {
       const data = await res.json()
-      setProducts(data)
+      // API returns { products, _meta } — support both old array and new shape
+      if (Array.isArray(data)) {
+        setProducts(data)
+        setErpMeta(null)
+      } else {
+        setProducts(data.products ?? [])
+        setErpMeta(data._meta ?? null)
+      }
       setLastRefresh(new Date())
     }
     setLoading(false)
@@ -103,14 +111,28 @@ export default function InventoryPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-[#212121]">Správa skladu</h1>
-          <p className="text-sm text-[#6e6e73] mt-1">
-            Sklad produktů — data přímo z ERP
+          <div className="flex items-center gap-2 mt-1 flex-wrap">
+            {erpMeta ? (
+              erpMeta.source === "erp" ? (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-[#2E7D32]">
+                  ● Live z ERP
+                  {erpMeta.matched != null && <span className="opacity-70">({erpMeta.matched}/{erpMeta.requested} produktů)</span>}
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+                  ⚠ Záložní data z DB
+                </span>
+              )
+            ) : null}
             {lastRefresh && (
-              <span className="ml-2 text-xs text-[#9e9e9e]">
-                · aktualizováno {lastRefresh.toLocaleTimeString("cs-CZ")}
+              <span className="text-xs text-[#9e9e9e]">
+                aktualizováno {lastRefresh.toLocaleTimeString("cs-CZ")}
               </span>
             )}
-          </p>
+          </div>
+          {erpMeta?.error && (
+            <p className="text-xs text-amber-600 mt-1 max-w-lg">{erpMeta.error}</p>
+          )}
         </div>
         <div className="flex gap-3">
           <Link
