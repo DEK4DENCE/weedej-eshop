@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Package, CheckCircle2, Circle } from 'lucide-react'
 import { Order } from '@/types/order'
 import { OrderStatusBadge } from './OrderStatusBadge'
@@ -126,15 +127,30 @@ export function OrderCard({ order }: OrderCardProps) {
 
           {/* Thumbnail strip */}
           <div className="flex items-center gap-2 mt-4 mb-2">
-            {thumbnailItems.map((item) => (
-              <div
-                key={item.id}
-                className="w-12 h-12 rounded-lg bg-[#F8F9FA] border border-[#DEE2E6] flex items-center justify-center overflow-hidden flex-shrink-0"
-                title={item.productName}
-              >
-                <Package className="w-5 h-5 text-[#6e6e73]" />
-              </div>
-            ))}
+            {thumbnailItems.map((item) => {
+              const imageUrl = (item as any).variant?.product?.imageUrls?.[0] as string | undefined
+              return (
+                <div
+                  key={item.id}
+                  className="w-12 h-12 rounded-lg bg-[#F8F9FA] border border-[#DEE2E6] overflow-hidden flex-shrink-0 relative"
+                  title={item.productName}
+                >
+                  {imageUrl ? (
+                    <Image
+                      src={imageUrl}
+                      alt={item.productName}
+                      fill
+                      className="object-cover"
+                      sizes="48px"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Package className="w-5 h-5 text-[#6e6e73]" />
+                    </div>
+                  )}
+                </div>
+              )
+            })}
             {order.items.length > 3 && (
               <div className="w-12 h-12 rounded-lg bg-[#F8F9FA] border border-[#DEE2E6] flex items-center justify-center flex-shrink-0">
                 <span className="text-xs font-medium text-[#6e6e73]">
