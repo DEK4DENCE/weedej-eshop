@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic"
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { Eye, RefreshCw } from "lucide-react"
+import { Eye, RefreshCw, AlertTriangle, CheckCircle2, Clock } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -16,11 +16,15 @@ interface Order {
   totalAmount: number
   createdAt: string
   erpOrderNumber: string | null
+  erpSyncStatus: string
+  erpSyncLastError: string | null
+  erpSyncAttempts: number
   user: { name: string | null; email: string }
 }
 
 const statusColors: Record<string, string> = {
   PENDING:          "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
+  PAID:             "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
   PROCESSING:       "bg-blue-500/20 text-blue-400 border-blue-500/30",
   PACKED:           "bg-orange-500/20 text-orange-400 border-orange-500/30",
   SHIPPED:          "bg-purple-500/20 text-purple-400 border-purple-500/30",
@@ -30,11 +34,54 @@ const statusColors: Record<string, string> = {
   REFUNDED:         "bg-gray-500/20 text-gray-400 border-gray-500/30",
 }
 
+function ErpSyncBadge({ order }: { order: Order }) {
+  if (order.erpOrderNumber) {
+    return (
+      <div className="flex flex-col gap-0.5">
+        <span className="font-mono text-sm font-semibold text-emerald-600">{order.erpOrderNumber}</span>
+        <span className="flex items-center gap-1 text-xs text-emerald-600">
+          <CheckCircle2 className="h-3 w-3" /> synced
+        </span>
+      </div>
+    )
+  }
+  if (order.erpSyncStatus === "sync_failed") {
+    return (
+      <div className="flex flex-col gap-0.5">
+        <span className="font-mono text-xs text-muted-foreground">#{order.id.slice(-8).toUpperCase()}</span>
+        <span className="flex items-center gap-1 text-xs text-red-500">
+          <AlertTriangle className="h-3 w-3" /> sync failed
+        </span>
+        {order.erpSyncLastError && (
+          <span className="text-xs text-red-400 max-w-[200px] truncate" title={order.erpSyncLastError}>
+            {order.erpSyncLastError}
+          </span>
+        )}
+      </div>
+    )
+  }
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="font-mono text-xs text-muted-foreground">#{order.id.slice(-8).toUpperCase()}</span>
+      <span className="flex items-center gap-1 text-xs text-yellow-500">
+        <Clock className="h-3 w-3" /> pending sync ({order.erpSyncAttempts} pokus)
+      </span>
+      {order.erpSyncLastError && (
+        <span className="text-xs text-yellow-500 max-w-[200px] truncate" title={order.erpSyncLastError}>
+          {order.erpSyncLastError}
+        </span>
+      )}
+    </div>
+  )
+}
+
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
+  const [forceSyncing, setForceSyncing] = useState(false)
   const [syncMsg, setSyncMsg] = useState("")
+  const [syncMsgType, setSyncMsgType] = useState<"info" | "error">("info")
 
   async function fetchOrders() {
     setLoading(true)
@@ -50,34 +97,78 @@ export default function AdminOrdersPage() {
       const res = await fetch("/api/admin/erp/sync-orders", { method: "POST" })
       const data = await res.json()
       setSyncMsg(data.message ?? "Sync dokončen")
+      setSyncMsgType("info")
       await fetchOrders()
     } catch {
       setSyncMsg("Chyba při synchronizaci")
+      setSyncMsgType("error")
     } finally {
       setSyncing(false)
     }
   }
 
+  async function handleForceSyncPending() {
+    setForceSyncing(true)
+    setSyncMsg("")
+    try {
+      const res = await fetch("/api/admin/erp/force-sync", { method: "POST" })
+      const data = await res.json()
+      if (!res.ok) {
+        setSyncMsg(data.error ?? "Chyba při force sync")
+        setSyncMsgType("error")
+      } else {
+        setSyncMsg(data.message ?? "Force sync dokončen")
+        setSyncMsgType(data.failed > 0 ? "error" : "info")
+      }
+      await fetchOrders()
+    } catch (e: any) {
+      setSyncMsg(`Chyba: ${e.message}`)
+      setSyncMsgType("error")
+    } finally {
+      setForceSyncing(false)
+    }
+  }
+
   useEffect(() => { fetchOrders() }, [])
+
+  const pendingCount = orders.filter(o => o.erpSyncStatus === "pending_erp_sync" || o.erpSyncStatus === "sync_failed").length
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold font-playfair">Orders</h1>
-        <Button
-          onClick={handleSyncErp}
-          disabled={syncing}
-          variant="outline"
-          size="sm"
-          className="flex items-center gap-2"
-        >
-          <RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
-          {syncing ? "Synchronizuji..." : "Sync ze ERP"}
-        </Button>
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <h1 className="text-3xl font-bold font-playfair">Objednávky</h1>
+        <div className="flex gap-2">
+          {pendingCount > 0 && (
+            <Button
+              onClick={handleForceSyncPending}
+              disabled={forceSyncing}
+              variant="default"
+              size="sm"
+              className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white"
+            >
+              <RefreshCw className={`h-4 w-4 ${forceSyncing ? "animate-spin" : ""}`} />
+              {forceSyncing ? "Synchronizuji..." : `Sync do ERP (${pendingCount})`}
+            </Button>
+          )}
+          <Button
+            onClick={handleSyncErp}
+            disabled={syncing}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
+            {syncing ? "..." : "Sync ze ERP"}
+          </Button>
+        </div>
       </div>
 
       {syncMsg && (
-        <div className="p-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 text-sm">
+        <div className={`p-3 rounded-lg border text-sm ${
+          syncMsgType === "error"
+            ? "bg-red-50 border-red-200 text-red-700"
+            : "bg-blue-50 border-blue-200 text-blue-700"
+        }`}>
           {syncMsg}
         </div>
       )}
@@ -89,7 +180,7 @@ export default function AdminOrdersPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Číslo objednávky</TableHead>
+                <TableHead>ERP / Číslo</TableHead>
                 <TableHead>Zákazník</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Celkem</TableHead>
@@ -101,15 +192,7 @@ export default function AdminOrdersPage() {
               {orders.map((order) => (
                 <TableRow key={order.id}>
                   <TableCell>
-                    {order.erpOrderNumber ? (
-                      <span className="font-mono text-sm font-semibold text-emerald-600">
-                        {order.erpOrderNumber}
-                      </span>
-                    ) : (
-                      <span className="font-mono text-xs text-muted-foreground">
-                        #{order.id.slice(-8).toUpperCase()}
-                      </span>
-                    )}
+                    <ErpSyncBadge order={order} />
                   </TableCell>
                   <TableCell>{order.user.name ?? order.user.email}</TableCell>
                   <TableCell>
