@@ -39,9 +39,6 @@ export function ProductVariantSelector({ variants, selectedVariantId, onSelect }
               ].join(' ')}
             >
               <span>{variant.name}</span>
-              {variant.variantValue && variant.variantUnit && variant.variantUnit !== 'ks' && (
-                <span className="text-xs text-[#6e6e73]">{variant.variantValue}{variant.variantUnit}</span>
-              )}
               <span className="text-xs font-bold text-[#8B6914] font-mono mt-0.5">
                 {formatPrice(Number(variant.price))}
               </span>
