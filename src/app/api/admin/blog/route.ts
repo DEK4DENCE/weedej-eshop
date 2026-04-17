@@ -19,6 +19,7 @@ export async function GET() {
   const posts = await db.blogPost.findMany({
     orderBy: { createdAt: "desc" },
     include: { author: { select: { name: true, email: true } } },
+    take: 200,
   })
   return NextResponse.json(posts)
 }

@@ -23,7 +23,7 @@ export async function PATCH(
 ) {
   const session = await auth()
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  const userId = (session.user as any).id
+  const userId = session.user.id
   const { id } = await params
 
   const address = await getAddress(id, userId)
@@ -55,7 +55,7 @@ export async function DELETE(
 ) {
   const session = await auth()
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  const userId = (session.user as any).id
+  const userId = session.user.id
   const { id } = await params
 
   const address = await getAddress(id, userId)

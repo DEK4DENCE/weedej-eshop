@@ -16,7 +16,7 @@ const addressSchema = z.object({
 export async function GET() {
   const session = await auth()
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  const userId = (session.user as any).id
+  const userId = session.user.id
 
   const addresses = await db.address.findMany({
     where: { userId },
@@ -28,7 +28,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  const userId = (session.user as any).id
+  const userId = session.user.id
 
   const body = await req.json()
   const parsed = addressSchema.safeParse(body)

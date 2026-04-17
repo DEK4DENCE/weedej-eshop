@@ -105,17 +105,28 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ created: 0, updated: 0, skipped: 0, message: "ERP nevrátilo žádné produkty." })
   }
 
+  // Batch fetch all existing variants for all ERP product IDs in one query
+  const erpIds = erpProducts.map((p: any) => String(p.id))
+  const existingVariants = await db.productVariant.findMany({
+    where: { erpProductId: { in: erpIds } },
+    include: { product: true },
+  })
+  // Map: erpProductId → first matching variant (with product)
+  const existingByErpId = new Map<string, typeof existingVariants[number]>()
+  for (const v of existingVariants) {
+    if (v.erpProductId && !existingByErpId.has(v.erpProductId)) {
+      existingByErpId.set(v.erpProductId, v)
+    }
+  }
+
   let created = 0
   let updated = 0
   let skipped = 0
 
   for (const erp of erpProducts) {
     try {
-      // Zkontroluj, jestli už produkt existuje (přes erpProductId na variantě)
-      const existing = await db.productVariant.findFirst({
-        where: { erpProductId: String(erp.id) },
-        include: { product: true },
-      })
+      // Use pre-fetched map instead of per-product DB query
+      const existing = existingByErpId.get(String(erp.id)) ?? null
 
       if (existing) {
         // Aktualizuj základní cenu, název a ERP sklad produktu
@@ -138,11 +149,12 @@ export async function POST(req: NextRequest) {
           const eshopByName = new Map(eshopVariantsList.map((v) => [v.name, v]))
           const erpNames = new Set((erp.eshopVariants as any[]).map((v) => v.name))
 
-          // Smaž zastaralé varianty (např. "Standardní" z původního importu)
-          for (const eshopVar of eshopVariantsList) {
-            if (!erpNames.has(eshopVar.name)) {
-              await db.productVariant.delete({ where: { id: eshopVar.id } }).catch(() => {})
-            }
+          // Smaž zastaralé varianty (např. "Standardní" z původního importu) — hromadně
+          const staleIds = eshopVariantsList
+            .filter((v) => !erpNames.has(v.name))
+            .map((v) => v.id)
+          if (staleIds.length > 0) {
+            await db.productVariant.deleteMany({ where: { id: { in: staleIds } } }).catch(() => {})
           }
 
           for (const erpVar of erp.eshopVariants) {
