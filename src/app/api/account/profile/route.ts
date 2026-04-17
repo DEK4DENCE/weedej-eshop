@@ -13,7 +13,7 @@ export async function GET() {
   const session = await auth()
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   const user = await db.user.findUnique({
-    where: { id: (session.user as any).id },
+    where: { id: session.user.id },
     select: { id: true, name: true, email: true, phone: true, newsletter: true },
   })
   return NextResponse.json(user)
@@ -26,7 +26,7 @@ export async function PATCH(req: NextRequest) {
   const parsed = schema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: "Invalid data" }, { status: 400 })
   const user = await db.user.update({
-    where: { id: (session.user as any).id },
+    where: { id: session.user.id },
     data: parsed.data,
     select: { id: true, name: true, email: true, phone: true, newsletter: true },
   })

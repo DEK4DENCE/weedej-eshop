@@ -55,6 +55,7 @@ export default function MovementsPage() {
       </div>
 
       <div className="bg-white rounded-xl border border-[#DEE2E6] overflow-hidden">
+        <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-[#DEE2E6] bg-[#F8F9FA]">
@@ -123,6 +124,7 @@ export default function MovementsPage() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   )

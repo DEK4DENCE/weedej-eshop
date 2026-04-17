@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useEffect, useRef } from 'react'
 import { useCart } from '@/hooks/useCart'
 import CartItem from '@/components/cart/CartItem'
 import CartSummary from '@/components/cart/CartSummary'
@@ -37,6 +38,56 @@ const backdropVariants = {
 export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const { items, totalItems, totalPrice, updateQty, removeItem, isLoading } = useCart()
   const router = useRouter()
+  const drawerRef = useRef<HTMLElement>(null)
+  const triggerRef = useRef<HTMLElement | null>(null)
+
+  // Save trigger element and trap focus when sidebar opens
+  useEffect(() => {
+    if (isOpen) {
+      triggerRef.current = document.activeElement as HTMLElement
+      // Move focus to first focusable element inside drawer
+      const focusableSelectors =
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      const el = drawerRef.current?.querySelector<HTMLElement>(focusableSelectors)
+      el?.focus()
+    } else {
+      // Return focus to trigger on close
+      triggerRef.current?.focus()
+    }
+  }, [isOpen])
+
+  // Focus trap: keep focus inside the drawer while open
+  useEffect(() => {
+    if (!isOpen) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose()
+        return
+      }
+      if (e.key !== 'Tab') return
+      const focusableSelectors =
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      const focusable = Array.from(
+        drawerRef.current?.querySelectorAll<HTMLElement>(focusableSelectors) ?? []
+      ).filter((el) => !el.hasAttribute('disabled'))
+      if (focusable.length === 0) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault()
+          last.focus()
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault()
+          first.focus()
+        }
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, onClose])
 
   const handleCheckout = () => {
     onClose()
@@ -70,13 +121,16 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
 
           {/* Drawer */}
           <motion.aside
+            ref={drawerRef}
             key="cart-drawer"
             variants={drawerVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Košík"
             className="fixed right-0 top-0 z-50 h-full w-[400px] max-w-[90vw] bg-white border-l border-[#DEE2E6] shadow-[-8px_0_32px_rgba(0,0,0,0.12)] flex flex-col"
-            aria-label="Nákupní košík"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-[#DEE2E6] flex-shrink-0">

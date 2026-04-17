@@ -12,11 +12,11 @@ export default async function CheckoutPage() {
 
   const [user, addresses] = await Promise.all([
     db.user.findUnique({
-      where: { id: (session.user as any).id },
+      where: { id: session.user.id },
       select: { name: true, phone: true, email: true },
     }),
     db.address.findMany({
-      where: { userId: (session.user as any).id },
+      where: { userId: session.user.id },
       orderBy: [{ isDefault: 'desc' }, { id: 'asc' }],
     }),
   ])

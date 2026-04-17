@@ -87,7 +87,6 @@ export default async function BlogPostPage({ params }: Props) {
             alt={post.title}
             fill
             className="object-cover"
-            unoptimized
           />
         </div>
       )}

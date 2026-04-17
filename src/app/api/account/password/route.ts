@@ -15,7 +15,7 @@ export async function PATCH(req: NextRequest) {
   const body = await req.json()
   const parsed = schema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: "Invalid data" }, { status: 400 })
-  const user = await db.user.findUnique({ where: { id: (session.user as any).id } })
+  const user = await db.user.findUnique({ where: { id: session.user.id } })
   if (!user?.passwordHash) return NextResponse.json({ error: "No password set" }, { status: 400 })
   const valid = await comparePassword(parsed.data.currentPassword, user.passwordHash)
   if (!valid) return NextResponse.json({ error: "Current password is incorrect" }, { status: 400 })

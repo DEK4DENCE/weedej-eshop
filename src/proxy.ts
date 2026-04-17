@@ -54,7 +54,7 @@ export default auth((req) => {
       loginUrl.searchParams.set('callbackUrl', pathname)
       return NextResponse.redirect(loginUrl)
     }
-    if ((session.user as any)?.role !== 'ADMIN') {
+    if (session.user?.role !== 'ADMIN') {
       if (pathname.startsWith('/api/')) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
       }

@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster"
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
-  if (!session || (session.user as any)?.role !== "ADMIN") redirect("/")
+  if (!session || session.user?.role !== "ADMIN") redirect("/")
 
   return (
     <div className="flex min-h-screen">

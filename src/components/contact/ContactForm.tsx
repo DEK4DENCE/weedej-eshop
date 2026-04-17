@@ -38,21 +38,21 @@ export function ContactForm() {
       {error && <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm">{error}</div>}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-semibold text-[#6B7280] mb-1.5 uppercase tracking-wider">Jméno *</label>
-          <input name="name" type="text" required placeholder="Vaše jméno" className="w-full px-4 py-2.5 rounded-xl border border-[#DEE2E6] bg-[#F8F9FA] text-[#212121] text-sm outline-none focus:border-[#2E7D32] focus:ring-2 focus:ring-[#2E7D32]/10 transition-all" />
+          <label htmlFor="contact-name" className="block text-xs font-semibold text-[#6B7280] mb-1.5 uppercase tracking-wider">Jméno *</label>
+          <input id="contact-name" name="name" type="text" required placeholder="Vaše jméno" className="w-full px-4 py-2.5 rounded-xl border border-[#DEE2E6] bg-[#F8F9FA] text-[#212121] text-sm outline-none focus:border-[#2E7D32] focus:ring-2 focus:ring-[#2E7D32]/10 transition-all" />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-[#6B7280] mb-1.5 uppercase tracking-wider">E-mail *</label>
-          <input name="email" type="email" required placeholder="vas@email.cz" className="w-full px-4 py-2.5 rounded-xl border border-[#DEE2E6] bg-[#F8F9FA] text-[#212121] text-sm outline-none focus:border-[#2E7D32] focus:ring-2 focus:ring-[#2E7D32]/10 transition-all" />
+          <label htmlFor="contact-email" className="block text-xs font-semibold text-[#6B7280] mb-1.5 uppercase tracking-wider">E-mail *</label>
+          <input id="contact-email" name="email" type="email" required placeholder="vas@email.cz" className="w-full px-4 py-2.5 rounded-xl border border-[#DEE2E6] bg-[#F8F9FA] text-[#212121] text-sm outline-none focus:border-[#2E7D32] focus:ring-2 focus:ring-[#2E7D32]/10 transition-all" />
         </div>
       </div>
       <div>
-        <label className="block text-xs font-semibold text-[#6B7280] mb-1.5 uppercase tracking-wider">Telefon</label>
-        <input name="phone" type="tel" placeholder="+420 000 000 000" className="w-full px-4 py-2.5 rounded-xl border border-[#DEE2E6] bg-[#F8F9FA] text-[#212121] text-sm outline-none focus:border-[#2E7D32] focus:ring-2 focus:ring-[#2E7D32]/10 transition-all" />
+        <label htmlFor="contact-phone" className="block text-xs font-semibold text-[#6B7280] mb-1.5 uppercase tracking-wider">Telefon</label>
+        <input id="contact-phone" name="phone" type="tel" placeholder="+420 000 000 000" className="w-full px-4 py-2.5 rounded-xl border border-[#DEE2E6] bg-[#F8F9FA] text-[#212121] text-sm outline-none focus:border-[#2E7D32] focus:ring-2 focus:ring-[#2E7D32]/10 transition-all" />
       </div>
       <div>
-        <label className="block text-xs font-semibold text-[#6B7280] mb-1.5 uppercase tracking-wider">Zpráva *</label>
-        <textarea name="message" required rows={5} placeholder="Popište váš dotaz..." className="w-full px-4 py-2.5 rounded-xl border border-[#DEE2E6] bg-[#F8F9FA] text-[#212121] text-sm outline-none focus:border-[#2E7D32] focus:ring-2 focus:ring-[#2E7D32]/10 transition-all resize-none" />
+        <label htmlFor="contact-message" className="block text-xs font-semibold text-[#6B7280] mb-1.5 uppercase tracking-wider">Zpráva *</label>
+        <textarea id="contact-message" name="message" required rows={5} placeholder="Popište váš dotaz..." className="w-full px-4 py-2.5 rounded-xl border border-[#DEE2E6] bg-[#F8F9FA] text-[#212121] text-sm outline-none focus:border-[#2E7D32] focus:ring-2 focus:ring-[#2E7D32]/10 transition-all resize-none" />
       </div>
       <button type="submit" disabled={loading} className="w-full bg-[#2E7D32] hover:bg-[#1B5E20] disabled:opacity-60 text-white font-bold py-3 rounded-xl transition-colors">
         {loading ? 'Odesílám...' : 'Odeslat zprávu'}

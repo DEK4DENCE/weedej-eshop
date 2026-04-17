@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { sendEmail } from '@/lib/email/send'
 import React from 'react'
 
+/** Strip CR/LF characters to prevent email header injection */
+function sanitizeHeader(value: string): string {
+  return value.replace(/[\r\n]/g, ' ').trim()
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { name, email, phone, message } = await req.json()
@@ -16,15 +21,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Zpráva musí mít 10–5000 znaků' }, { status: 400 })
     }
 
+    const safeName = sanitizeHeader(name)
+    const safeEmail = sanitizeHeader(email)
+
     const adminEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
     await sendEmail({
       to: adminEmail,
-      subject: `Nová zpráva z kontaktního formuláře — ${name}`,
+      subject: sanitizeHeader(`Nová zpráva z kontaktního formuláře — ${safeName}`),
       emailType: 'contactForm',
       react: React.createElement('div', null,
-        React.createElement('h2', null, `Zpráva od: ${name}`),
-        React.createElement('p', null, `Email: ${email}`),
-        phone ? React.createElement('p', null, `Telefon: ${phone}`) : null,
+        React.createElement('h2', null, `Zpráva od: ${safeName}`),
+        React.createElement('p', null, `Email: ${safeEmail}`),
+        phone ? React.createElement('p', null, `Telefon: ${sanitizeHeader(String(phone))}`) : null,
         React.createElement('hr', null),
         React.createElement('p', null, message)
       )

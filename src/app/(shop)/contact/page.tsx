@@ -50,6 +50,7 @@ export default function ContactPage() {
             <div className="rounded-2xl overflow-hidden border border-[#DEE2E6] shadow-sm">
               <iframe
                 src="https://maps.google.com/maps?q=Bene%C5%A1ovsk%C3%A1+432%2F3%2C+405+02+D%C4%9B%C4%8D%C3%ADn&output=embed&z=16"
+                title="Mapa - Weedej"
                 width="100%" height="260" style={{border:0, display:'block'}}
                 allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"
               />

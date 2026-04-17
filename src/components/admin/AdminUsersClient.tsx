@@ -56,7 +56,7 @@ export function AdminUsersClient({ users: initial }: { users: User[] }) {
   }
 
   return (
-    <div className="rounded-md border border-border/40">
+    <div className="rounded-md border border-border/40 overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>

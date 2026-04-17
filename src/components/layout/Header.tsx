@@ -136,7 +136,7 @@ export function Header({ categories = [] }: HeaderProps) {
                 <DropdownMenuItem className="text-[#6e6e73] hover:text-[#1d1d1f] cursor-pointer" onClick={() => router.push("/account/orders")}>
                   <Package className="mr-2 h-4 w-4" />Objednávky
                 </DropdownMenuItem>
-                {(session.user as any)?.role === "ADMIN" && (
+                {session.user?.role === "ADMIN" && (
                   <DropdownMenuItem className="text-[#6e6e73] hover:text-[#1d1d1f] cursor-pointer" onClick={() => router.push("/admin")}>
                     <Settings className="mr-2 h-4 w-4" />Admin
                   </DropdownMenuItem>
@@ -201,7 +201,7 @@ export function Header({ categories = [] }: HeaderProps) {
                   <Link href="/account/orders" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 text-sm font-medium text-[#1d1d1f] hover:text-[#2E7D32] hover:bg-[#E8F5E9] px-3 py-2.5 rounded-xl transition-colors">
                     <Package className="h-4 w-4" />Objednávky
                   </Link>
-                  {(session.user as any)?.role === "ADMIN" && (
+                  {session.user?.role === "ADMIN" && (
                     <Link href="/admin" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 text-sm font-medium text-[#1d1d1f] hover:text-[#2E7D32] hover:bg-[#E8F5E9] px-3 py-2.5 rounded-xl transition-colors">
                       <Settings className="h-4 w-4" />Admin
                     </Link>

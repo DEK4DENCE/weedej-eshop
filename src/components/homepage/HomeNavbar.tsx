@@ -59,7 +59,7 @@ function UserMenu({ onClose }: { onClose?: () => void }) {
   }
 
   const displayName = session.user?.name ?? session.user?.email?.split("@")[0] ?? "Účet"
-  const isAdmin = (session.user as any)?.role === "ADMIN"
+  const isAdmin = session.user?.role === "ADMIN"
 
   return (
     <div ref={ref} className="hidden md:flex items-center mr-2 relative">

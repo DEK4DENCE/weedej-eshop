@@ -43,7 +43,7 @@ export async function GET(
 
   const { orderId } = await params
   const order = await db.order.findFirst({
-    where: { id: orderId, userId: (session.user as any).id },
+    where: { id: orderId, userId: session.user.id },
     select: {
       id: true,
       invoiceNumber: true,

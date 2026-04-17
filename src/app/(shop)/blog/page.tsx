@@ -58,7 +58,6 @@ export default async function BlogPage() {
                       alt={`Obrázek k článku: ${post.title}`}
                       fill
                       className="object-cover hover:scale-105 transition-transform duration-300"
-                      unoptimized
                     />
                   </div>
                 ) : (

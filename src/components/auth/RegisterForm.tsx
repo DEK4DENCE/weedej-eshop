@@ -225,6 +225,11 @@ export function RegisterForm() {
           )}
         </div>
 
+        <label className="flex items-start gap-2 text-sm text-[#6e6e73]">
+          <input type="checkbox" required className="mt-0.5 accent-[#2E7D32]" />
+          <span>Souhlasím se <a href="/privacy" className="text-[#2E7D32] underline">zpracováním osobních údajů</a></span>
+        </label>
+
         <Button
           type="submit"
           disabled={isSubmitting}

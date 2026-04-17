@@ -120,6 +120,14 @@ export function CheckoutForm({ user, addresses }: Props) {
     }
   }
 
+  const checkoutSteps = [
+    { number: 1, label: "Košík" },
+    { number: 2, label: "Objednávka" },
+    { number: 3, label: "Platba" },
+    { number: 4, label: "Potvrzení" },
+  ]
+  const currentStep = 2
+
   if (items.length === 0) {
     return (
       <div className="text-center py-16">
@@ -130,7 +138,59 @@ export function CheckoutForm({ user, addresses }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <>
+      {/* Step indicator */}
+      <nav aria-label="Průběh objednávky" className="mb-8">
+        <ol className="flex items-center justify-center gap-0">
+          {checkoutSteps.map((step, index) => {
+            const isDone = step.number < currentStep
+            const isCurrent = step.number === currentStep
+            return (
+              <li key={step.number} className="flex items-center">
+                <div className="flex flex-col items-center gap-1.5">
+                  <div
+                    aria-current={isCurrent ? "step" : undefined}
+                    className={[
+                      "flex items-center justify-center w-9 h-9 rounded-full text-sm font-semibold border-2 transition-colors",
+                      isDone
+                        ? "bg-[#2E7D32] border-[#2E7D32] text-white"
+                        : isCurrent
+                        ? "bg-white border-[#2E7D32] text-[#2E7D32]"
+                        : "bg-white border-[#DEE2E6] text-[#aeaeb2]",
+                    ].join(" ")}
+                  >
+                    {isDone ? (
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M3 8l3.5 3.5L13 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    ) : (
+                      step.number
+                    )}
+                  </div>
+                  <span
+                    className={[
+                      "text-xs font-medium whitespace-nowrap",
+                      isCurrent ? "text-[#2E7D32]" : isDone ? "text-[#1d1d1f]" : "text-[#aeaeb2]",
+                    ].join(" ")}
+                  >
+                    {step.label}
+                  </span>
+                </div>
+                {index < checkoutSteps.length - 1 && (
+                  <div
+                    className={[
+                      "h-0.5 w-16 mx-2 mb-5 rounded",
+                      isDone ? "bg-[#2E7D32]" : "bg-[#DEE2E6]",
+                    ].join(" ")}
+                    aria-hidden="true"
+                  />
+                )}
+              </li>
+            )
+          })}
+        </ol>
+      </nav>
+      <form onSubmit={handleSubmit}>
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
         {/* Left: form */}
         <div className="lg:col-span-3 space-y-6">
@@ -405,5 +465,6 @@ export function CheckoutForm({ user, addresses }: Props) {
         </div>
       </div>
     </form>
+    </>
   )
 }

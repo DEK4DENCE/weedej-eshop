@@ -89,7 +89,7 @@ export function AdminProductsTable({ products }: { products: ProductRow[] }) {
       </div>
 
       {/* Table */}
-      <div className="rounded-md border border-border/40">
+      <div className="rounded-md border border-border/40 overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>

@@ -205,7 +205,7 @@ export default function AdminOrdersPage() {
       {loading ? (
         <div className="text-center py-12 text-muted-foreground text-sm">Načítání...</div>
       ) : (
-        <div className="rounded-md border border-border/40">
+        <div className="rounded-md border border-border/40 overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>

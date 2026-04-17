@@ -1,22 +1,23 @@
 // SECURITY-5: Field-level encryption for sensitive settings stored in DB
 // Uses AES-256-GCM. Requires SETTINGS_ENCRYPTION_KEY env var (any passphrase).
 // Values are stored as `enc:iv_hex:tag_hex:ciphertext_hex`.
-// Gracefully falls back to plaintext if the key is not set (dev/CI environments).
+// SETTINGS_ENCRYPTION_KEY MUST be set — plaintext writes are never allowed.
 
 import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from 'crypto'
 
 const ALGORITHM = 'aes-256-gcm'
 const ENCRYPTION_PREFIX = 'enc:'
 
-function deriveKey(): Buffer | null {
+function deriveKey(): Buffer {
   const secret = process.env.SETTINGS_ENCRYPTION_KEY
-  if (!secret) return null
+  if (!secret) {
+    throw new Error('SETTINGS_ENCRYPTION_KEY environment variable is required')
+  }
   return scryptSync(secret, 'weedej-settings-v1', 32)
 }
 
 export function encryptSetting(plaintext: string): string {
   const key = deriveKey()
-  if (!key) return plaintext  // no key configured — store plaintext (dev)
 
   const iv = randomBytes(16)
   const cipher = createCipheriv(ALGORITHM, key, iv)
@@ -30,10 +31,13 @@ export function encryptSetting(plaintext: string): string {
 }
 
 export function decryptSetting(value: string): string {
-  if (!value.startsWith(ENCRYPTION_PREFIX)) return value  // plaintext — return as-is
+  // Legacy plaintext data (no enc: prefix) — return as-is with a warning
+  if (!value.startsWith(ENCRYPTION_PREFIX)) {
+    console.warn('[encrypt] decryptSetting: value does not have encrypted prefix — returning as-is (legacy plaintext data)')
+    return value
+  }
 
   const key = deriveKey()
-  if (!key) return value  // no key — can't decrypt, return raw (will be opaque)
 
   try {
     const parts = value.slice(ENCRYPTION_PREFIX.length).split(':')
