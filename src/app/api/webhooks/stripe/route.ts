@@ -192,6 +192,19 @@ export async function POST(req: NextRequest) {
         }
       })
 
+      // Shipping as a line item so ERP totals match the Stripe charge
+      const shippingCzk = shippingAmount / 100
+      if (shippingCzk > 0) {
+        erpItems.push({
+          sku:          undefined,
+          name:         'Doprava',
+          quantity:     1,
+          unit:         'ks',
+          unitPriceCzk: Math.round(shippingCzk / 1.21 * 100) / 100,
+          vatRate:      21,
+        })
+      }
+
       const paymentRef = typeof session.payment_intent === 'string'
         ? session.payment_intent
         : session.id

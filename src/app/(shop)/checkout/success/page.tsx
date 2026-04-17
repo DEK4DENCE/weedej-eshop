@@ -149,6 +149,19 @@ async function processOrder(sessionId: string): Promise<{ erpOrderNumber: string
       }
     })
 
+    // Shipping as a line item so ERP totals match the Stripe charge
+    const shippingCzk = shippingAmount / 100
+    if (shippingCzk > 0) {
+      erpItems.push({
+        sku:          undefined,
+        name:         'Doprava',
+        quantity:     1,
+        unit:         'ks',
+        unitPriceCzk: Math.round(shippingCzk / 1.21 * 100) / 100,
+        vatRate:      21,
+      })
+    }
+
     let erpOrderNumber: string | null = null
     let invoiceNumber:  string | null = null
     let invoicePdfUrl:  string | null = null

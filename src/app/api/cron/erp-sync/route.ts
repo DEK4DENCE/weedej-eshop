@@ -113,6 +113,19 @@ export async function GET(req: NextRequest) {
         }
       })
 
+      // Shipping as a line item so ERP totals match the original charge
+      // order.shippingAmount is stored in haléře (same units as Stripe)
+      const shippingCzk = Number(order.shippingAmount ?? 0) / 100
+      if (shippingCzk > 0) {
+        erpItems.push({
+          name:         'Doprava',
+          quantity:     1,
+          unit:         'ks',
+          unitPriceCzk: Math.round(shippingCzk / 1.21 * 100) / 100,
+          vatRate:      21,
+        })
+      }
+
       const syncResult = await syncOrderToErp({
         eshopOrderId:     order.id,
         items:            erpItems,
