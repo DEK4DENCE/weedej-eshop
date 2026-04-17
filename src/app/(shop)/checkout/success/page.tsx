@@ -85,6 +85,7 @@ async function processOrder(sessionId: string): Promise<{ erpOrderNumber: string
             stripeSessionId:       sessionId,
             stripePaymentIntentId: typeof session.payment_intent === "string" ? session.payment_intent : null,
             status:          "PAID",
+            paidAt:          new Date(),
             erpSyncStatus:   "pending_erp_sync",
             deliveryType,
             currency:        (session.currency ?? "czk").toUpperCase(),

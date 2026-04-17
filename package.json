@@ -5,7 +5,7 @@
   "packageManager": "npm@11.6.4",
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && prisma db push --accept-data-loss && next build",
+    "build": "prisma generate && prisma migrate deploy && next build",
     "postinstall": "prisma generate",
     "lint": "tsc --noEmit",
     "start": "next start",
@@ -29,6 +29,7 @@
     "@radix-ui/react-toast": "^1.2.15",
     "@react-email/components": "^1.0.11",
     "@react-email/render": "^2.0.5",
+    "@sentry/nextjs": "^10.49.0",
     "@stripe/stripe-js": "^9.1.0",
     "@tailwindcss/typography": "^0.5.19",
     "@types/bcryptjs": "^2.4.6",

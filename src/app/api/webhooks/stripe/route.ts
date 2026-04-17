@@ -126,6 +126,7 @@ export async function POST(req: NextRequest) {
         stripeSessionId:       session.id,
         stripePaymentIntentId: typeof session.payment_intent === 'string' ? session.payment_intent : null,
         status:          'PAID',
+        paidAt:          new Date(),
         erpSyncStatus:   'pending_erp_sync',
         deliveryType,
         currency:        (session.currency ?? 'czk').toUpperCase(),

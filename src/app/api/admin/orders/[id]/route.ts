@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
+import { stripe } from "@/lib/stripe"
 import { sendEmail } from "@/lib/email/send"
 import { OrderShippedWithTracking } from "@/lib/email/templates/OrderShipped"
 import { OrderCancelled } from "@/lib/email/templates/OrderCancelled"
@@ -11,8 +12,8 @@ import React from "react"
 // C3: Valid order state transitions — prevents illegal moves like DELIVERED → PAID
 const VALID_TRANSITIONS: Record<string, string[]> = {
   PENDING:          ["PAID", "CANCELLED"],
-  PAID:             ["PROCESSING", "CANCELLED"],
-  PROCESSING:       ["PACKED", "SHIPPED", "CANCELLED"],
+  PAID:             ["PROCESSING", "CANCELLED", "REFUNDED"],
+  PROCESSING:       ["PACKED", "SHIPPED", "CANCELLED", "REFUNDED"],
   PACKED:           ["SHIPPED", "CANCELLED"],
   SHIPPED:          ["OUT_FOR_DELIVERY", "DELIVERED"],
   OUT_FOR_DELIVERY: ["DELIVERED"],
@@ -87,6 +88,20 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         ])
       )
     } else if (status === "REFUNDED") {
+      // Issue Stripe refund before restoring stock
+      const orderForRefund = await db.order.findUnique({
+        where: { id },
+        select: { stripePaymentIntentId: true },
+      })
+      if (orderForRefund?.stripePaymentIntentId) {
+        try {
+          await stripe.refunds.create({ payment_intent: orderForRefund.stripePaymentIntentId })
+        } catch (refundErr: any) {
+          if (refundErr?.code !== "charge_already_refunded") {
+            return NextResponse.json({ error: `Stripe refund failed: ${refundErr?.message}` }, { status: 400 })
+          }
+        }
+      }
       // Restore stock to each variant and create a RELEASED movement for audit trail
       await db.$transaction(
         order.items.flatMap((item) => [

@@ -2,11 +2,11 @@
 
 import { useEffect } from "react"
 import { Button } from "@/components/ui/button"
+import * as Sentry from "@sentry/nextjs"
 
 export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => {
-    // TODO: Replace with Sentry.captureException(error) once @sentry/nextjs is installed
-    console.error('[RouteError]', error.digest ? `digest=${error.digest}` : '', error)
+    Sentry.captureException(error)
   }, [error])
   return (
     <div className="flex min-h-screen items-center justify-center flex-col gap-6 px-4 text-center">
