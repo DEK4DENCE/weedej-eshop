@@ -103,14 +103,20 @@ export default auth((req) => {
   }
 
   // ── Protected user routes: require any session ────────────────────────────
+  // /checkout/success is intentionally excluded: it derives userId from Stripe metadata
+  // (not from session) and must be reachable even if the session cookie was dropped by
+  // the browser during the cross-origin Stripe redirect. Ownership is verified server-side
+  // inside the page via the cryptographically-random Stripe session_id in the URL.
   const protectedPaths = ['/account', '/checkout', '/api/cart', '/api/orders', '/api/checkout']
   const isProtected = protectedPaths.some((p) => pathname.startsWith(p))
+    && !pathname.startsWith('/checkout/success')
   if (isProtected && !session) {
     if (pathname.startsWith('/api/')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
     const loginUrl = new URL('/login', req.url)
-    loginUrl.searchParams.set('callbackUrl', pathname)
+    // Preserve full URL including query string so session_id is not lost on redirect-back
+    loginUrl.searchParams.set('callbackUrl', pathname + req.nextUrl.search)
     return NextResponse.redirect(loginUrl)
   }
 
