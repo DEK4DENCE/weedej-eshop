@@ -32,6 +32,8 @@ interface Props {
     inStock?: string
     strainType?: string | string[]
     substance?: string | string[]
+    terpene?: string | string[]
+    effect?: string | string[]
   }>
 }
 
@@ -67,8 +69,19 @@ async function fetchProducts(params: Awaited<Props["searchParams"]>): Promise<Pr
     where.activeSubstance = { in: substances }
   }
 
-  if (params.inStock === 'true') {
+  // Default: show only in-stock products. Explicitly set inStock=false to show all.
+  if (params.inStock !== 'false') {
     where.variants = { some: { stock: { gt: 0 } } }
+  }
+
+  if (params.terpene) {
+    const terpenes = Array.isArray(params.terpene) ? params.terpene : [params.terpene]
+    where.terpenes = { hasSome: terpenes }
+  }
+
+  if (params.effect) {
+    const effects = Array.isArray(params.effect) ? params.effect : [params.effect]
+    where.effects = { hasSome: effects }
   }
 
   const products = await db.product.findMany({
