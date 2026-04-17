@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useCart } from "@/hooks/useCart"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -11,6 +11,13 @@ import Image from "next/image"
 import Link from "next/link"
 import type { CartItem as DbCartItem } from "@/types/cart"
 import type { GuestCartItem } from "@/store/cartStore"
+
+interface ShippingMethod {
+  id: string
+  name: string
+  price: string | number
+  freeThreshold: string | number | null
+}
 
 function isDbItem(item: DbCartItem | GuestCartItem): item is DbCartItem {
   return "product" in item && "variant" in item
@@ -39,6 +46,18 @@ export function CheckoutClient() {
   const { items, totalPrice } = useCart()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [shippingMethods, setShippingMethods] = useState<ShippingMethod[]>([])
+
+  useEffect(() => {
+    fetch("/api/shipping")
+      .then((res) => res.json())
+      .then((data: ShippingMethod[]) => {
+        if (Array.isArray(data)) setShippingMethods(data)
+      })
+      .catch(() => {
+        // Fallback: leave shippingMethods empty — shipping cost shown as unknown
+      })
+  }, [])
 
   const handleCheckout = async () => {
     setLoading(true)
@@ -69,8 +88,15 @@ export function CheckoutClient() {
     )
   }
 
-  const shipping = 4.99
-  const total = totalPrice + shipping
+  // Resolve shipping cost from the first active shipping method.
+  // Apply free threshold if the subtotal qualifies.
+  const defaultMethod = shippingMethods[0] ?? null
+  const freeThreshold = defaultMethod?.freeThreshold != null ? Number(defaultMethod.freeThreshold) : null
+  const shippingCost = defaultMethod
+    ? (freeThreshold != null && totalPrice >= freeThreshold ? 0 : Number(defaultMethod.price))
+    : 0
+  const isFreeShipping = shippingCost === 0
+  const total = totalPrice + shippingCost
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -97,7 +123,10 @@ export function CheckoutClient() {
           <Separator />
           <div className="space-y-2 text-sm">
             <div className="flex justify-between"><span className="text-muted-foreground">Mezisoučet</span><span>{formatPrice(totalPrice)}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">Doprava</span><span>{formatPrice(shipping)}</span></div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Doprava</span>
+              <span>{isFreeShipping ? "Zdarma" : defaultMethod ? formatPrice(shippingCost) : "—"}</span>
+            </div>
             <Separator />
             <div className="flex justify-between font-semibold text-base"><span>Celkem</span><span>{formatPrice(total)}</span></div>
           </div>

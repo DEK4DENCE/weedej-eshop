@@ -5,13 +5,38 @@ import { sendEmail } from "@/lib/email/send"
 import { OrderShippedWithTracking } from "@/lib/email/templates/OrderShipped"
 import { OrderCancelled } from "@/lib/email/templates/OrderCancelled"
 import { OrderDelivered } from "@/lib/email/templates/OrderDelivered"
+import { logAdminAction } from "@/lib/audit"
 import React from "react"
 
+// C3: Valid order state transitions — prevents illegal moves like DELIVERED → PAID
+const VALID_TRANSITIONS: Record<string, string[]> = {
+  PENDING:          ["PAID", "CANCELLED"],
+  PAID:             ["PROCESSING", "CANCELLED"],
+  PROCESSING:       ["PACKED", "SHIPPED", "CANCELLED"],
+  PACKED:           ["SHIPPED", "CANCELLED"],
+  SHIPPED:          ["OUT_FOR_DELIVERY", "DELIVERED"],
+  OUT_FOR_DELIVERY: ["DELIVERED"],
+  DELIVERED:        [],
+  CANCELLED:        [],
+  REFUNDED:         [],
+}
+
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { error: authError } = await requireAdmin()
+  const { session, error: authError } = await requireAdmin()
   if (authError) return authError
   const { id } = await params
   const { status } = await req.json()
+
+  // C3: Validate state transition before touching the DB
+  const current = await db.order.findUnique({ where: { id }, select: { status: true } })
+  if (!current) return NextResponse.json({ error: "Order not found" }, { status: 404 })
+  const allowed = VALID_TRANSITIONS[current.status] ?? []
+  if (!allowed.includes(status)) {
+    return NextResponse.json(
+      { error: `Invalid transition: ${current.status} → ${status}` },
+      { status: 400 }
+    )
+  }
 
   // Set timestamp fields on status transitions
   const extraData: Record<string, unknown> = {}
@@ -185,6 +210,16 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   } catch (emailError) {
     console.error("Failed to send order status email:", emailError)
   }
+
+  // H5: Log admin action for audit trail
+  await logAdminAction({
+    adminId:    session.user.id as string,
+    action:     "UPDATE_ORDER_STATUS",
+    entityType: "Order",
+    entityId:   id,
+    oldValue:   { status: current.status },
+    newValue:   { status },
+  }).catch((e: unknown) => console.error("[Audit] logAdminAction failed:", e))
 
   return NextResponse.json(order)
 }

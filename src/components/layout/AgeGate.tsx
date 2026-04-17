@@ -66,9 +66,16 @@ export function AgeGate() {
     )
   }
 
-  const handleConfirm = () => {
-    // Set a cookie readable by the server-side middleware
-    document.cookie = `${AGE_COOKIE}=true; path=/; max-age=31536000; SameSite=Lax`
+  const handleConfirm = async () => {
+    try {
+      // Set cookie server-side via API so middleware can read it (C5 bypass prevention)
+      const formData = new FormData()
+      formData.append("from", window.location.pathname)
+      await fetch("/api/age-gate/verify", { method: "POST", body: formData })
+    } catch {
+      // Fallback: client-side cookie if API unreachable
+      document.cookie = `${AGE_COOKIE}=true; path=/; max-age=31536000; SameSite=Strict${location.protocol === "https:" ? "; Secure" : ""}`
+    }
     localStorage.setItem(STORAGE_KEY, "1")
     setShow(false)
   }

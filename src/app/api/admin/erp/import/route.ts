@@ -2,8 +2,44 @@
 // POST /api/admin/erp/import  — importuje produkty z ERP do eshop DB
 
 import { NextRequest, NextResponse } from "next/server"
+import { z } from "zod"
 import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
+import { calcVariantStock } from "@/lib/erp/calcVariantStock"
+import { generateSlug } from "@/lib/utils/slug"
+
+// ─── ERP payload schemas ──────────────────────────────────────────────────────
+
+const ErpEshopVariantSchema = z.object({
+  name:         z.string().min(1),
+  price:        z.number().positive(),
+  isDefault:    z.boolean().optional().default(false),
+  variantValue: z.number().optional().nullable(),
+  variantUnit:  z.string().optional().nullable(),
+})
+
+const ErpCategorySchema = z.object({
+  name: z.string().min(1),
+  slug: z.string().optional(),
+})
+
+const ErpProductSchema = z.object({
+  id:               z.union([z.string(), z.number()]).transform(String),
+  name:             z.string().min(1),
+  slug:             z.string().optional(),
+  description:      z.string().optional().nullable(),
+  shortDescription: z.string().optional().nullable(),
+  priceWithVat:     z.number().positive(),
+  vatRate:          z.number().optional(),
+  stock:            z.number().int().min(0).optional().default(0),
+  unit:             z.string().optional().default('ks'),
+  category:         ErpCategorySchema.optional().nullable(),
+  eshopVariants:    z.array(ErpEshopVariantSchema).optional(),
+})
+
+const ErpProductsArraySchema = z.array(ErpProductSchema)
+
+type ErpProduct = z.output<typeof ErpProductSchema>
 
 // Patterns like "(THC-X)", "(HHC)", "(CBD)", "(THC)" in product names
 const SUBSTANCE_PATTERN = /\s*\((THC-X|THC_X|THC|CBD|HHC)\)\s*/gi
@@ -18,18 +54,6 @@ function extractSubstance(name: string): string | null {
 
 function cleanName(name: string): string {
   return name.replace(SUBSTANCE_PATTERN, ' ').replace(/\s{2,}/g, ' ').trim()
-}
-
-function calcVariantStock(
-  erpStock: number,
-  erpProductUnit: string,
-  variantValue: number | null | undefined,
-  variantUnit: string | null | undefined,
-): number {
-  if (!variantValue || variantValue <= 0) return Math.max(0, Math.floor(erpStock))
-  const effectiveUnit = variantUnit ?? erpProductUnit
-  if (effectiveUnit !== erpProductUnit) return 0
-  return Math.max(0, Math.floor(erpStock / variantValue))
 }
 
 // ─── Test připojení ───────────────────────────────────────────────────────────
@@ -81,7 +105,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Načti produkty z ERP
-  let erpProducts: any[]
+  let erpProducts: ErpProduct[]
   try {
     const res = await fetch(`${erpUrl}/api/external/products`, {
       headers: { "X-API-Key": erpKey },
@@ -93,7 +117,16 @@ export async function POST(req: NextRequest) {
         { status: 502 }
       )
     }
-    erpProducts = await res.json()
+    const rawData = await res.json()
+    const parseResult = ErpProductsArraySchema.safeParse(rawData)
+    if (!parseResult.success) {
+      console.error('[ERP Import] Invalid ERP response payload:', parseResult.error.flatten())
+      return NextResponse.json(
+        { error: 'ERP returned invalid data', details: parseResult.error.flatten() },
+        { status: 502 }
+      )
+    }
+    erpProducts = parseResult.data
   } catch (err: any) {
     const msg = err?.name === "TimeoutError"
       ? "ERP neodpovídá (timeout)."
@@ -101,12 +134,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: msg }, { status: 502 })
   }
 
-  if (!Array.isArray(erpProducts) || erpProducts.length === 0) {
+  if (erpProducts.length === 0) {
     return NextResponse.json({ created: 0, updated: 0, skipped: 0, message: "ERP nevrátilo žádné produkty." })
   }
 
   // Batch fetch all existing variants for all ERP product IDs in one query
-  const erpIds = erpProducts.map((p: any) => String(p.id))
+  const erpIds = erpProducts.map((p) => p.id)
   const existingVariants = await db.productVariant.findMany({
     where: { erpProductId: { in: erpIds } },
     include: { product: true },
@@ -123,170 +156,161 @@ export async function POST(req: NextRequest) {
   let updated = 0
   let skipped = 0
 
+  // C4: Wrap every product import in its own transaction so a failure leaves no orphaned data
   for (const erp of erpProducts) {
     try {
-      // Use pre-fetched map instead of per-product DB query
-      const existing = existingByErpId.get(String(erp.id)) ?? null
+      await db.$transaction(async (tx) => {
+        // Use pre-fetched map instead of per-product DB query
+        const existing = existingByErpId.get(erp.id) ?? null
 
-      if (existing) {
-        // Aktualizuj základní cenu, název a ERP sklad produktu
+        if (existing) {
+          // Aktualizuj základní cenu, název a ERP sklad produktu
+          const substance = extractSubstance(erp.name)
+          const cleanedName = cleanName(erp.name)
+          const substanceData = substance && !existing.product.activeSubstance
+            ? { activeSubstance: substance as "CBD" | "THC" | "THC_X" | "HHC" }
+            : {}
+          await tx.product.update({
+            where: { id: existing.productId },
+            data: { basePrice: erp.priceWithVat, name: cleanedName, vatRate: erp.vatRate ?? 21, erpStock: erp.stock ?? 0, erpUnit: erp.unit ?? null, ...substanceData },
+          })
+
+          if (erp.eshopVariants && erp.eshopVariants.length > 0) {
+            // Synchronizace variant z ERP — match podle jména
+            const eshopVariantsList = await tx.productVariant.findMany({
+              where: { productId: existing.productId, erpProductId: erp.id },
+              select: { id: true, name: true },
+            })
+            const eshopByName = new Map(eshopVariantsList.map((v) => [v.name, v]))
+            const erpNames = new Set((erp.eshopVariants ?? []).map((v) => v.name))
+
+            // Smaž zastaralé varianty (např. "Standardní" z původního importu) — hromadně
+            const staleIds = eshopVariantsList
+              .filter((v) => !erpNames.has(v.name))
+              .map((v) => v.id)
+            if (staleIds.length > 0) {
+              await tx.productVariant.deleteMany({ where: { id: { in: staleIds } } })
+            }
+
+            for (const erpVar of erp.eshopVariants) {
+              const varStock = calcVariantStock(Number(erp.stock ?? 0), erp.unit, erpVar.variantValue, erpVar.variantUnit)
+
+              const existingVar = eshopByName.get(erpVar.name)
+              if (existingVar) {
+                await tx.productVariant.update({
+                  where: { id: existingVar.id },
+                  data: { price: erpVar.price, variantValue: erpVar.variantValue ?? null, variantUnit: erpVar.variantUnit ?? null, isDefault: erpVar.isDefault, stock: varStock },
+                })
+              } else {
+                await tx.productVariant.create({
+                  data: {
+                    productId: existing.productId,
+                    name: erpVar.name,
+                    price: erpVar.price,
+                    variantValue: erpVar.variantValue ?? null,
+                    variantUnit: erpVar.variantUnit ?? null,
+                    isDefault: erpVar.isDefault,
+                    stock: varStock,
+                    erpProductId: erp.id,
+                  },
+                })
+              }
+            }
+          } else {
+            // Fallback: aktualizuj cenu a sklad legacy varianty
+            await tx.productVariant.update({
+              where: { id: existing.id },
+              data: {
+                price: erp.priceWithVat,
+                stock: Math.max(0, Math.floor(Number(erp.stock ?? 0))),
+              },
+            })
+          }
+          updated++
+          return
+        }
+
+        // Vytvoř nebo najdi kategorii
+        let categoryId: string | null = null
+        if (erp.category?.name) {
+          const slug = erp.category.slug ?? generateSlug(erp.category.name)
+          const cat = await tx.category.upsert({
+            where: { slug },
+            create: { name: erp.category.name, slug, isActive: true, sortOrder: 0 },
+            update: {},
+          })
+          categoryId = cat.id
+        }
+
+        // Extrakt účinné látky a vyčisti název
         const substance = extractSubstance(erp.name)
         const cleanedName = cleanName(erp.name)
-        const substanceData = substance && !existing.product.activeSubstance
-          ? { activeSubstance: substance as any }
-          : {}
-        await db.product.update({
-          where: { id: existing.productId },
-          data: { basePrice: erp.priceWithVat, name: cleanedName, vatRate: erp.vatRate ?? 21, erpStock: erp.stock ?? 0, erpUnit: erp.unit ?? null, ...substanceData },
+
+        // Slug pro nový produkt
+        const baseSlug = generateSlug(erp.slug ?? cleanedName)
+        const slug = `${baseSlug}-${erp.id.slice(0, 6)}`
+
+        // Vytvoř produkt — isActive: false, admin ho aktivuje po doplnění obrázků
+        // category is required by schema; throw inside the tx so it rolls back cleanly
+        if (!categoryId) throw new Error(`Product ${erp.id} has no category`)
+
+        const product = await tx.product.create({
+          data: {
+            name: cleanedName,
+            slug,
+            description: erp.description ?? erp.name,
+            shortDescription: erp.shortDescription ?? undefined,
+            imageUrls: [],
+            isActive: false,
+            isFeatured: false,
+            basePrice: erp.priceWithVat,
+            vatRate: erp.vatRate ?? 21,
+            erpStock: erp.stock ?? 0,
+            erpUnit: erp.unit ?? null,
+            activeSubstance: substance ? (substance as "CBD" | "THC" | "THC_X" | "HHC") : undefined,
+            effects: [],
+            flavours: [],
+            terpenes: [],
+            categoryId,
+          },
         })
 
         if (erp.eshopVariants && erp.eshopVariants.length > 0) {
-          // Synchronizace variant z ERP — match podle jména
-          const eshopVariantsList = await db.productVariant.findMany({
-            where: { productId: existing.productId, erpProductId: String(erp.id) },
-            select: { id: true, name: true },
-          })
-          const eshopByName = new Map(eshopVariantsList.map((v) => [v.name, v]))
-          const erpNames = new Set((erp.eshopVariants as any[]).map((v) => v.name))
-
-          // Smaž zastaralé varianty (např. "Standardní" z původního importu) — hromadně
-          const staleIds = eshopVariantsList
-            .filter((v) => !erpNames.has(v.name))
-            .map((v) => v.id)
-          if (staleIds.length > 0) {
-            await db.productVariant.deleteMany({ where: { id: { in: staleIds } } }).catch(() => {})
-          }
-
+          // Vytvoř varianty dle ERP se správným skladem
           for (const erpVar of erp.eshopVariants) {
             const varStock = calcVariantStock(Number(erp.stock ?? 0), erp.unit, erpVar.variantValue, erpVar.variantUnit)
-
-            const existingVar = eshopByName.get(erpVar.name)
-            if (existingVar) {
-              await db.productVariant.update({
-                where: { id: existingVar.id },
-                data: { price: erpVar.price, variantValue: erpVar.variantValue ?? null, variantUnit: erpVar.variantUnit ?? null, isDefault: erpVar.isDefault, stock: varStock },
-              })
-            } else {
-              await db.productVariant.create({
-                data: {
-                  productId: existing.productId,
-                  name: erpVar.name,
-                  price: erpVar.price,
-                  variantValue: erpVar.variantValue ?? null,
-                  variantUnit: erpVar.variantUnit ?? null,
-                  isDefault: erpVar.isDefault,
-                  stock: varStock,
-                  erpProductId: String(erp.id),
-                },
-              })
-            }
+            await tx.productVariant.create({
+              data: {
+                productId: product.id,
+                name: erpVar.name,
+                price: erpVar.price,
+                variantValue: erpVar.variantValue ?? null,
+                variantUnit: erpVar.variantUnit ?? null,
+                isDefault: erpVar.isDefault,
+                stock: varStock,
+                erpProductId: erp.id,
+              },
+            })
           }
         } else {
-          // Fallback: aktualizuj cenu a sklad legacy varianty
-          await db.productVariant.update({
-            where: { id: existing.id },
-            data: {
-              price: erp.priceWithVat,
-              stock: Math.max(0, Math.floor(Number(erp.stock ?? 0))),
-            },
-          })
-        }
-        updated++
-        continue
-      }
-
-      // Vytvoř nebo najdi kategorii
-      let categoryId: string | null = null
-      if (erp.category?.name) {
-        const slug =
-          erp.category.slug ??
-          erp.category.name
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/[^a-z0-9\s-]/g, "")
-            .replace(/\s+/g, "-")
-            .replace(/-+/g, "-")
-            .trim()
-        const cat = await db.category.upsert({
-          where: { slug },
-          create: { name: erp.category.name, slug, isActive: true, sortOrder: 0 },
-          update: {},
-        })
-        categoryId = cat.id
-      }
-
-      // Extrakt účinné látky a vyčisti název
-      const substance = extractSubstance(erp.name)
-      const cleanedName = cleanName(erp.name)
-
-      // Slug pro nový produkt
-      const baseSlug = (erp.slug ?? cleanedName)
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z0-9\s-]/g, "")
-        .replace(/\s+/g, "-")
-        .replace(/-+/g, "-")
-        .trim()
-      const slug = `${baseSlug}-${String(erp.id).slice(0, 6)}`
-
-      // Vytvoř produkt — isActive: false, admin ho aktivuje po doplnění obrázků
-      const productData: any = {
-        name: cleanedName,
-        slug,
-        description: erp.description ?? erp.name,
-        shortDescription: erp.shortDescription ?? undefined,
-        imageUrls: [],
-        isActive: false,
-        isFeatured: false,
-        basePrice: erp.priceWithVat,
-        vatRate: erp.vatRate ?? 21,
-        erpStock: erp.stock ?? 0,
-        erpUnit: erp.unit ?? null,
-        activeSubstance: substance ? (substance as any) : undefined,
-        effects: [],
-        flavours: [],
-        terpenes: [],
-      }
-      if (categoryId) productData.categoryId = categoryId
-
-      const product = await db.product.create({ data: productData })
-
-      if (erp.eshopVariants && erp.eshopVariants.length > 0) {
-        // Vytvoř varianty dle ERP se správným skladem
-        for (const erpVar of erp.eshopVariants) {
-          const varStock = calcVariantStock(Number(erp.stock ?? 0), erp.unit, erpVar.variantValue, erpVar.variantUnit)
-          await db.productVariant.create({
+          // Fallback: vytvoř jednu výchozí variantu
+          await tx.productVariant.create({
             data: {
               productId: product.id,
-              name: erpVar.name,
-              price: erpVar.price,
-              variantValue: erpVar.variantValue ?? null,
-              variantUnit: erpVar.variantUnit ?? null,
-              isDefault: erpVar.isDefault,
-              stock: varStock,
-              erpProductId: String(erp.id),
+              name: "Standardní",
+              price: erp.priceWithVat,
+              stock: Math.max(0, Math.floor(Number(erp.stock ?? 0))),
+              isDefault: true,
+              erpProductId: erp.id,
             },
           })
         }
-      } else {
-        // Fallback: vytvoř jednu výchozí variantu
-        await db.productVariant.create({
-          data: {
-            productId: product.id,
-            name: "Standardní",
-            price: erp.priceWithVat,
-            stock: Math.max(0, Math.floor(Number(erp.stock ?? 0))),
-            isDefault: true,
-            erpProductId: String(erp.id),
-          },
-        })
-      }
 
-      created++
-    } catch (err: any) {
-      console.error(`[ERP Import] Chyba při importu produktu ${erp.id}:`, err?.message)
+        created++
+      })
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err)
+      console.error(`[ERP Import] Chyba při importu produktu ${erp.id}:`, message)
       skipped++
     }
   }

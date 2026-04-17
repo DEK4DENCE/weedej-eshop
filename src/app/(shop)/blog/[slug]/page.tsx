@@ -1,5 +1,6 @@
 // PERF-2: Blog posts are rarely updated — cache for 5 minutes
 export const revalidate = 300
+export const dynamicParams = true
 
 import { db } from "@/lib/db"
 import { notFound } from "next/navigation"
@@ -11,6 +12,11 @@ import { ShareButton } from "@/components/blog/ShareButton"
 import { BASE_URL } from "@/lib/config"
 
 interface Props { params: Promise<{ slug: string }> }
+
+export async function generateStaticParams() {
+  const posts = await db.blogPost.findMany({ where: { published: true }, select: { slug: true } })
+  return posts.map((p) => ({ slug: p.slug }))
+}
 
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat("cs-CZ", { day: "numeric", month: "long", year: "numeric" }).format(date)

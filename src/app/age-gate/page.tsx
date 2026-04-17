@@ -1,23 +1,45 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { Shield } from "lucide-react"
 import { Suspense } from "react"
 
 const AGE_COOKIE = "age_verified"
 
 function AgeGatePage() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const [denied, setDenied] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  const handleConfirm = () => {
-    document.cookie = `${AGE_COOKIE}=true; path=/; max-age=31536000; SameSite=Lax`
-    const from = searchParams.get("from") || "/"
-    // Ensure the destination is a relative path to prevent open redirect
-    const destination = from.startsWith("/") ? from : "/"
-    router.replace(destination)
+  const from = searchParams.get("from") || "/"
+  // Ensure the destination is a relative path to prevent open redirect
+  const destination = from.startsWith("/") ? from : "/"
+
+  const handleConfirm = async () => {
+    setLoading(true)
+    try {
+      // Set cookie server-side so it is enforced by middleware (C5).
+      // The POST action returns a redirect — following it reloads the destination page.
+      const formData = new FormData()
+      formData.append("from", destination)
+      const res = await fetch("/api/age-gate/verify", {
+        method: "POST",
+        body: formData,
+      })
+      if (res.ok) {
+        // The API sets the cookie; now navigate to the intended destination
+        window.location.href = destination
+      } else {
+        // Fallback: set cookie client-side and navigate
+        document.cookie = `${AGE_COOKIE}=true; path=/; max-age=31536000; SameSite=Strict${location.protocol === "https:" ? "; Secure" : ""}`
+        window.location.href = destination
+      }
+    } catch {
+      // Fallback on network error
+      document.cookie = `${AGE_COOKIE}=true; path=/; max-age=31536000; SameSite=Strict${location.protocol === "https:" ? "; Secure" : ""}`
+      window.location.href = destination
+    }
   }
 
   const handleDeny = () => {
@@ -91,9 +113,10 @@ function AgeGatePage() {
         <div className="flex gap-3 justify-center">
           <button
             onClick={handleConfirm}
-            className="flex-1 bg-[#2E7D32] hover:bg-[#1a9020] text-white font-bold py-3 px-6 rounded-xl text-sm transition-colors hover:shadow-[0_4px_20px_rgba(34,168,41,0.35)]"
+            disabled={loading}
+            className="flex-1 bg-[#2E7D32] hover:bg-[#1a9020] text-white font-bold py-3 px-6 rounded-xl text-sm transition-colors hover:shadow-[0_4px_20px_rgba(34,168,41,0.35)] disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Ano, je mi 18+
+            {loading ? "..." : "Ano, je mi 18+"}
           </button>
           <button
             onClick={handleDeny}

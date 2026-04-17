@@ -32,6 +32,15 @@ export async function PATCH(
       return NextResponse.json({ message: 'Item removed' })
     }
 
+    // Stock validation
+    const variant = await prisma.productVariant.findUnique({
+      where: { id: existing.variantId },
+      select: { stock: true },
+    })
+    if (variant && quantity > variant.stock) {
+      return NextResponse.json({ error: 'Nedostatečný sklad' }, { status: 409 })
+    }
+
     const item = await prisma.cartItem.update({
       where: { id: itemId },
       data: { quantity },

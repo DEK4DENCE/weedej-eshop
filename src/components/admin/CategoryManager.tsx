@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/useToast"
 import { Plus, Trash2, Pencil, Check, X } from "lucide-react"
+import { generateSlug } from "@/lib/utils/slug"
 
 interface Category { id: string; name: string; slug: string }
 
@@ -26,7 +27,7 @@ export function CategoryManager({ initialCategories }: { initialCategories: Cate
       const res = await fetch("/api/admin/categories", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newName, slug: newName.toLowerCase().replace(/\s+/g, "-") }),
+        body: JSON.stringify({ name: newName, slug: generateSlug(newName) }),
       })
       if (!res.ok) throw new Error("Failed to create")
       const cat = await res.json()

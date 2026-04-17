@@ -235,49 +235,62 @@ export function CheckoutForm({ user, addresses }: Props) {
               {shippingMethods.map((method) => {
                 const isFree = method.freeThreshold != null && totalPrice >= method.freeThreshold
                 const displayPrice = isFree ? "Zdarma" : `${method.price} Kč`
+                const isSelected = deliveryType === "COURIER" && selectedShippingId === method.id
                 return (
-                  <motion.button
+                  <motion.label
                     key={method.id}
-                    type="button"
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
-                    onClick={() => { setDeliveryType("COURIER"); setSelectedShippingId(method.id) }}
-                    className={`w-full flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-colors ${
-                      deliveryType === "COURIER" && selectedShippingId === method.id
+                    className={`w-full flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-colors cursor-pointer ${
+                      isSelected
                         ? "border-[#2E7D32] bg-[#f0faf0]"
                         : "border-[#DEE2E6] hover:border-[#2E7D32]"
                     }`}
                   >
-                    <Truck className={`h-5 w-5 mt-0.5 shrink-0 ${deliveryType === "COURIER" && selectedShippingId === method.id ? "text-[#2E7D32]" : "text-[#6e6e73]"}`} />
+                    <input
+                      type="radio"
+                      name="delivery"
+                      value={method.id}
+                      checked={isSelected}
+                      onChange={() => { setDeliveryType("COURIER"); setSelectedShippingId(method.id) }}
+                      className="sr-only"
+                    />
+                    <Truck className={`h-5 w-5 mt-0.5 shrink-0 ${isSelected ? "text-[#2E7D32]" : "text-[#6e6e73]"}`} />
                     <div className="flex-1">
                       <p className="font-medium text-sm">{method.name}</p>
                       <p className="text-xs text-muted-foreground">{method.description}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">{method.estimatedDays}</p>
                     </div>
                     <span className={`text-sm font-semibold shrink-0 ${isFree ? "text-green-600" : ""}`}>{displayPrice}</span>
-                  </motion.button>
+                  </motion.label>
                 )
               })}
 
               {/* Always show PICKUP_IN_STORE */}
-              <motion.button
-                type="button"
+              <motion.label
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
-                onClick={() => setDeliveryType("PICKUP_IN_STORE")}
-                className={`w-full flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-colors ${
+                className={`w-full flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-colors cursor-pointer ${
                   deliveryType === "PICKUP_IN_STORE"
                     ? "border-[#2E7D32] bg-[#f0faf0]"
                     : "border-[#DEE2E6] hover:border-[#2E7D32]"
                 }`}
               >
+                <input
+                  type="radio"
+                  name="delivery"
+                  value="PICKUP_IN_STORE"
+                  checked={deliveryType === "PICKUP_IN_STORE"}
+                  onChange={() => setDeliveryType("PICKUP_IN_STORE")}
+                  className="sr-only"
+                />
                 <Store className={`h-5 w-5 mt-0.5 shrink-0 ${deliveryType === "PICKUP_IN_STORE" ? "text-[#2E7D32]" : "text-[#6e6e73]"}`} />
                 <div className="flex-1">
                   <p className="font-medium text-sm">Vyzvednutí v prodejně</p>
                   <p className="text-xs text-muted-foreground">Vyzvedněte objednávku osobně v naší prodejně</p>
                 </div>
                 <span className="text-sm font-semibold shrink-0 text-green-600">Zdarma</span>
-              </motion.button>
+              </motion.label>
             </CardContent>
           </Card>
 

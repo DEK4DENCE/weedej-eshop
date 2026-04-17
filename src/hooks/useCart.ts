@@ -1,7 +1,7 @@
 'use client'
 import { useSession } from 'next-auth/react'
 import { useCartStore } from '@/store/cartStore'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 
 interface AddItemPayload {
   variantId: string
@@ -40,25 +40,58 @@ export function useCart() {
     fetchCart()
   }, [fetchCart])
 
-  // Merge guest cart into DB on login
+  // Track whether we have already attempted a merge for this session to avoid
+  // re-running on every render after items is emptied by clearCart().
+  const mergeAttemptedRef = useRef(false)
+
+  // Merge guest cart into DB on login — properly awaited with error handling (H8)
   useEffect(() => {
-    if (session?.user && guestCart.items.length > 0) {
+    if (session?.user && guestCart.items.length > 0 && !mergeAttemptedRef.current) {
+      mergeAttemptedRef.current = true
       const merge = async () => {
+        const failed: string[] = []
         for (const item of guestCart.items) {
-          await fetch('/api/cart', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              variantId: item.variantId,
-              productId: item.productId,
-              quantity: item.quantity,
-            }),
-          })
+          try {
+            const res = await fetch('/api/cart', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                variantId: item.variantId,
+                productId: item.productId,
+                quantity: item.quantity,
+              }),
+            })
+            if (!res.ok) {
+              failed.push(item.productName)
+            }
+          } catch {
+            failed.push(item.productName)
+          }
         }
         guestCart.clearCart()
         await fetchCart()
+        if (failed.length > 0) {
+          console.error('[Cart] Some items failed to merge:', failed.join(', '))
+          // Surface to user via a custom DOM event so any toast listener can pick it up
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(
+              new CustomEvent('cart:merge-error', {
+                detail: { items: failed },
+              })
+            )
+          }
+        }
       }
-      merge()
+      merge().catch((err) => {
+        console.error('[Cart] Merge failed unexpectedly:', err)
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('cart:merge-error', { detail: { items: [] } }))
+        }
+      })
+    }
+    // Reset merge flag when session is cleared (user logs out)
+    if (!session?.user) {
+      mergeAttemptedRef.current = false
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.user])
@@ -99,6 +132,11 @@ export function useCart() {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ quantity }),
+      }).then((res) => {
+        if (!res.ok) {
+          // Re-sync on any server error (including 409 stock exceeded)
+          fetchCart()
+        }
       }).catch((err) => {
         console.error('[Cart] updateQty failed:', err)
         fetchCart()  // re-sync on error

@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/useToast"
-import { Loader2, Plus, Trash2, Star, MapPin, Mail, Phone } from "lucide-react"
-import { useSession } from "next-auth/react"
+import { Loader2, Plus, Trash2, Star, MapPin, Mail, Phone, AlertTriangle } from "lucide-react"
+import { useSession, signOut } from "next-auth/react"
 import { PasswordChangeForm } from "@/components/account/PasswordChangeForm"
 
 interface Address {
@@ -411,6 +411,84 @@ export function AccountSettingsClient() {
 
       {/* Change Password */}
       <PasswordChangeForm />
+
+      {/* H4: GDPR — Delete Account */}
+      <DeleteAccountSection />
     </div>
+  )
+}
+
+function DeleteAccountSection() {
+  const { toast } = useToast()
+  const [confirm, setConfirm] = useState(false)
+  const [loading, setLoading] = useState(false)
+
+  const handleDelete = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch("/api/user/delete", { method: "DELETE" })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error ?? "Nepodařilo se smazat účet")
+      }
+      toast({ title: "Váš účet byl úspěšně smazán." })
+      // Sign out and redirect to home page after account deletion
+      await signOut({ callbackUrl: "/" })
+    } catch (err: any) {
+      toast({ title: err.message, variant: "destructive" })
+      setLoading(false)
+      setConfirm(false)
+    }
+  }
+
+  return (
+    <Card className="border-red-200">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-red-600">
+          <AlertTriangle size={18} />
+          Smazat účet
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <p className="text-sm text-[#6e6e73]">
+          Tato akce je nevratná. Vaše osobní údaje budou anonymizovány v souladu s GDPR.
+          Historie objednávek bude zachována pro účetní účely.
+        </p>
+        {!confirm ? (
+          <Button
+            variant="outline"
+            className="border-red-300 text-red-600 hover:bg-red-50 hover:text-red-700"
+            onClick={() => setConfirm(true)}
+          >
+            Smazat můj účet
+          </Button>
+        ) : (
+          <div className="space-y-3 rounded-xl border border-red-200 bg-red-50 p-4">
+            <p className="text-sm font-semibold text-red-700">
+              Opravdu chcete smazat svůj účet? Tuto akci nelze vrátit zpět.
+            </p>
+            <div className="flex gap-2">
+              <Button
+                onClick={handleDelete}
+                disabled={loading}
+                className="bg-red-600 hover:bg-red-700 text-white"
+                size="sm"
+              >
+                {loading ? <><Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />Mazání...</> : "Ano, smazat účet"}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setConfirm(false)}
+                disabled={loading}
+                className="text-[#6e6e73] hover:text-[#1d1d1f]"
+              >
+                Zrušit
+              </Button>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   )
 }

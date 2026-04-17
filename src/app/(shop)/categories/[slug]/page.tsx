@@ -1,4 +1,5 @@
 export const revalidate = 300
+export const dynamicParams = true
 
 import { notFound } from "next/navigation"
 import { db } from "@/lib/db"
@@ -12,6 +13,11 @@ import { BASE_URL } from "@/lib/config"
 interface Props {
   params: Promise<{ slug: string }>
   searchParams: Promise<{ sort?: string; page?: string }>
+}
+
+export async function generateStaticParams() {
+  const categories = await db.category.findMany({ select: { slug: true } })
+  return categories.map((c) => ({ slug: c.slug }))
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -76,21 +82,36 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     },
   }))
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: category.name,
+    description: category.description ?? `Produkty v kategorii ${category.name}`,
+    url: `https://weedej.cz/categories/${category.slug}`,
+    numberOfItems: products.length,
+  }
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6 font-playfair text-[#F0F5F0]">{category.name}</h1>
-      {category.description && (
-        <p className="text-[#6B8A6B] mb-8">{category.description}</p>
-      )}
-      <Suspense fallback={
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-80 rounded-xl" />
-          ))}
-        </div>
-      }>
-        <ProductGrid products={products} />
-      </Suspense>
-    </div>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6 font-playfair text-[#F0F5F0]">{category.name}</h1>
+        {category.description && (
+          <p className="text-[#6B8A6B] mb-8">{category.description}</p>
+        )}
+        <Suspense fallback={
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="h-80 rounded-xl" />
+            ))}
+          </div>
+        }>
+          <ProductGrid products={products} />
+        </Suspense>
+      </div>
+    </>
   )
 }

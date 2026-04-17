@@ -25,6 +25,45 @@ function isCsrfExempt(pathname: string): boolean {
   )
 }
 
+// ── Auth endpoint rate limiting (H1) ───────────────────────────────────────
+// Applies to sign-in, register, and password-reset endpoints to prevent brute force.
+const AUTH_RATE_LIMITED_PATHS = [
+  '/api/auth/signin',
+  '/api/auth/callback',
+  '/api/auth/register',
+  '/api/auth/forgot-password',
+  '/api/forgot-password',
+  '/api/register',
+]
+const AUTH_RATE_LIMIT_MAX    = 10
+const AUTH_RATE_LIMIT_WINDOW = 60_000 // 1 minute in ms
+const authRateLimitMap = new Map<string, { count: number; resetAt: number }>()
+
+function checkAuthRateLimit(ip: string, pathname: string): boolean {
+  if (!AUTH_RATE_LIMITED_PATHS.some((p) => pathname.startsWith(p))) return true
+  const now   = Date.now()
+  const key   = `${ip}:${pathname}`
+  const entry = authRateLimitMap.get(key)
+  if (!entry || now > entry.resetAt) {
+    authRateLimitMap.set(key, { count: 1, resetAt: now + AUTH_RATE_LIMIT_WINDOW })
+    return true
+  }
+  if (entry.count >= AUTH_RATE_LIMIT_MAX) return false
+  entry.count++
+  return true
+}
+
+// Periodically prune expired auth rate-limit entries to prevent memory growth
+let lastAuthPrune = Date.now()
+function pruneAuthRateLimitMap() {
+  const now = Date.now()
+  if (now - lastAuthPrune < 60_000) return
+  lastAuthPrune = now
+  for (const [key, val] of authRateLimitMap) {
+    if (now > val.resetAt) authRateLimitMap.delete(key)
+  }
+}
+
 // ── Admin rate limiting ─────────────────────────────────────────────────────
 // NOTE: In-memory — does not persist across serverless cold starts.
 // For production hardening, replace with Upstash Redis (@upstash/ratelimit).
@@ -47,6 +86,19 @@ function checkAdminRateLimit(ip: string): { allowed: boolean; retryAfter?: numbe
 export default auth((req) => {
   const { pathname } = req.nextUrl
   const session = req.auth
+
+  pruneAuthRateLimitMap()
+
+  // ── Auth endpoint rate limiting (H1) ─────────────────────────────────────
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+           ?? req.headers.get('x-real-ip')
+           ?? '127.0.0.1'
+  if (!checkAuthRateLimit(ip, pathname)) {
+    return NextResponse.json(
+      { error: 'Too many requests' },
+      { status: 429, headers: { 'Retry-After': '60' } }
+    )
+  }
 
   // ── CSRF: block cross-origin state-changing requests to /api/* ─────────────
   if (

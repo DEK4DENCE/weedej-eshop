@@ -1,17 +1,20 @@
 // PERF-2: Blog list doesn't need real-time data — cache for 5 minutes
 export const revalidate = 300
 
+import type { Metadata } from "next"
 import { db } from "@/lib/db"
 import Link from "next/link"
 import Image from "next/image"
 import { CalendarDays } from "lucide-react"
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Blog — Weedej",
-  description: "Novinky, tipy a informace ze světa cannabis. Čtěte naše články o CBD, THC-X produktech, wellness a zdravém životním stylu.",
+  description: "Články a novinky ze světa CBD, konopí a wellness produktů.",
+  alternates: { canonical: "https://weedej.cz/blog" },
   openGraph: {
     title: "Blog — Weedej",
-    description: "Novinky, tipy a informace ze světa cannabis.",
+    description: "Články a novinky ze světa CBD, konopí a wellness produktů.",
+    url: "https://weedej.cz/blog",
     locale: "cs_CZ",
   },
 }

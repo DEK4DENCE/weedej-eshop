@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
 import { revalidatePath } from "next/cache"
+import { generateSlug } from "@/lib/utils/slug"
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { error: authError } = await requireAdmin()
@@ -10,7 +11,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const body = await req.json()
   const name = typeof body.name === "string" ? body.name.trim() : ""
   if (!name || name.length > 100) return NextResponse.json({ error: "name is required (max 100 chars)" }, { status: 400 })
-  const slug = name.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "")
+  const slug = generateSlug(name)
   const category = await db.category.update({ where: { id }, data: { name, slug } })
   revalidatePath("/products")
   revalidatePath("/")

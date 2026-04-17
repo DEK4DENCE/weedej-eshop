@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/useToast"
 import { Loader2 } from "lucide-react"
 import { ProductImages } from "@/components/admin/ProductImages"
+import { generateSlug } from "@/lib/utils/slug"
 
 interface Category { id: string; name: string }
 interface Product {
@@ -78,7 +79,7 @@ export function ProductForm({ categories, product }: Props) {
     try {
       const payload = {
         name,
-        slug: slug || name.toLowerCase().replace(/\s+/g, "-"),
+        slug: slug || generateSlug(name),
         description,
         categoryId: categoryId || null,
         thcContent: thcContent ? Number(thcContent) : null,

@@ -64,6 +64,14 @@ model User {
   updatedAt      DateTime  @updatedAt
   sessionVersion Int       @default(1)
 
+  // H4: GDPR right to erasure — soft delete via anonymisation
+  deletedAt      DateTime?
+
+  // H2: Email change verification — new email awaiting confirmation
+  emailChangePending     String?
+  emailChangeToken       String?   @unique
+  emailChangeTokenExpiry DateTime?
+
   newsletter              Boolean   @default(false)
   dateOfBirth             DateTime?
   cart                    Cart?
@@ -73,8 +81,10 @@ model User {
   emailVerificationTokens EmailVerificationToken[]
   accounts                Account[]
   blogPosts               BlogPost[]
+  adminAuditLogs          AdminAuditLog[]
 
   @@index([email])
+  @@index([emailChangeToken])
 }
 
 model Account {
@@ -208,6 +218,7 @@ model ProductVariant {
   variantValue Float?  // Množství na variantu (100, 30, 3.5 …)
   variantUnit  String? // Jednotka varianty: "g" | "ml" | "ks"
   stock        Int     @default(0)
+  erpStock     Int?    @default(0) // Last ERP-reported stock — used to detect manual overrides
   isDefault    Boolean @default(false)
   erpProductId String? // ID produktu v ERP (Product.id) — pro sync skladu a ceny
 
@@ -283,6 +294,9 @@ model Order {
   // pending_erp_sync | synced | sync_failed
   erpSyncAttempts       Int          @default(0)
   erpSyncLastError      String?
+  // Idempotency flags — prevent double stock deduction and duplicate emails
+  stockDeducted         Boolean     @default(false)
+  emailSent             Boolean     @default(false)
   // Timeline timestamps
   paidAt                DateTime?
   // Shipping
@@ -371,4 +385,22 @@ model ShippingMethod {
   sortOrder     Int      @default(0)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+// H5: Audit trail for admin actions (order status changes, product edits, etc.)
+model AdminAuditLog {
+  id         String   @id @default(cuid())
+  adminId    String
+  action     String
+  entityType String
+  entityId   String
+  oldValue   Json?
+  newValue   Json?
+  createdAt  DateTime @default(now())
+
+  admin User @relation(fields: [adminId], references: [id])
+
+  @@index([adminId])
+  @@index([entityType, entityId])
+  @@index([createdAt(sort: Desc)])
 }

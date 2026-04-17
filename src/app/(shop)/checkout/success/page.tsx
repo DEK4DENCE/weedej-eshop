@@ -63,6 +63,8 @@ async function processOrder(sessionId: string): Promise<{ erpOrderNumber: string
         erpProductId: variant?.erpProductId ?? null,
         variantValue: variant?.variantValue ?? null,
         variantUnit:  variant?.variantUnit  ?? null,
+        // C2: use product-level VAT rate instead of hardcoded 21
+        vatRate:      Number(variant?.product?.vatRate ?? 21),
       }
     })
 
@@ -135,9 +137,11 @@ async function processOrder(sessionId: string): Promise<{ erpOrderNumber: string
     const paymentRef = typeof session.payment_intent === "string" ? session.payment_intent : sessionId
 
     const erpItems = items.map((item) => {
+      // C2: use per-product vatRate instead of hardcoded 21%
+      const vatRate          = item.vatRate
       const unitPriceKc      = item.unitPrice / 100
-      const unitPriceExclVat = Math.round(unitPriceKc / 1.21 * 100) / 100
-      const erpQty  = item.variantValue ? item.quantity * item.variantValue : item.quantity
+      const unitPriceExclVat = Math.round((unitPriceKc / (1 + vatRate / 100)) * 100) / 100
+      const erpQty  = item.variantValue ? item.quantity * (item.variantValue as number) : item.quantity
       const erpName = item.variantLabel ? `${item.productName} — ${item.variantLabel}` : item.productName
       return {
         sku:          item.erpProductId ?? undefined,
@@ -145,11 +149,12 @@ async function processOrder(sessionId: string): Promise<{ erpOrderNumber: string
         quantity:     erpQty,
         unit:         item.variantUnit ?? 'ks',
         unitPriceCzk: unitPriceExclVat,
-        vatRate:      21,
+        vatRate,
       }
     })
 
     // Shipping as a line item so ERP totals match the Stripe charge
+    // Shipping VAT is always 21% per Czech tax law
     const shippingCzk = shippingAmount / 100
     if (shippingCzk > 0) {
       erpItems.push({
@@ -205,17 +210,8 @@ async function processOrder(sessionId: string): Promise<{ erpOrderNumber: string
       await db.erpSyncAttempt.create({ data: { orderId: order.id, success: true } })
 
       console.log(`[Success] ERP sync OK orderId=${order.id} erpOrderNumber=${erpOrderNumber}`)
-
-      // Deduct stock
-      for (const item of items) {
-        await db.productVariant.update({
-          where: { id: item.variantId },
-          data:  { stock: { decrement: item.quantity } },
-        }).catch((e) => console.error('[Silent error]', e))
-        await db.stockMovement.create({
-          data: { variantId: item.variantId, type: "RESERVED", quantity: item.quantity, orderId: order.id, reason: "Order paid" },
-        }).catch((e) => console.error('[Silent error]', e))
-      }
+      // Stock deduction is the webhook's responsibility (C1).
+      // The success page never deducts stock — the webhook is the authoritative path.
     } catch (erpErr: any) {
       console.error(`[Success] ERP sync failed for orderId=${order.id}:`, erpErr?.message)
       await db.order.update({
@@ -225,8 +221,13 @@ async function processOrder(sessionId: string): Promise<{ erpOrderNumber: string
       await db.erpSyncAttempt.create({ data: { orderId: order.id, success: false, error: erpErr?.message } }).catch((e) => console.error('[Silent error]', e))
     }
 
-    // ── Send confirmation email ────────────────────────────────────────────
-    if (user?.email) {
+    // ── Send confirmation email (H12: after ERP sync; H13: emailSent guard) ──
+    // Re-read emailSent from DB to avoid duplicate sends if webhook already fired.
+    const freshOrderForEmail = await db.order.findUnique({
+      where:  { id: order.id },
+      select: { emailSent: true },
+    })
+    if (user?.email && !freshOrderForEmail?.emailSent) {
       try {
         const firstName    = user.name?.split(" ")[0] ?? "zákazníku"
         const shippingAddr = addr
@@ -265,6 +266,8 @@ async function processOrder(sessionId: string): Promise<{ erpOrderNumber: string
             }),
           })
         }
+        // Mark email sent atomically to block duplicate from webhook (H13)
+        await db.order.update({ where: { id: order.id }, data: { emailSent: true } }).catch(() => {})
       } catch (emailErr: any) {
         console.error(`[Success] Email failed for orderId=${order.id}:`, emailErr?.message)
       }

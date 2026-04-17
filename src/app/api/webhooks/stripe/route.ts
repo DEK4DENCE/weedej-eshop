@@ -55,6 +55,15 @@ export async function POST(req: NextRequest) {
   try {
 
   const session      = event.data.object as Stripe.Checkout.Session
+
+  // H3: Verify payment was actually successful before fulfilling the order.
+  // checkout.session.completed fires even for unpaid sessions (e.g. bank transfers
+  // pending). Only fulfil when payment_status === 'paid'.
+  if (session.payment_status !== 'paid') {
+    console.warn('[Stripe] checkout.session.completed but payment_status is not paid:', session.id, session.payment_status)
+    return NextResponse.json({ received: true })
+  }
+
   const userId       = session.metadata?.userId
   const itemsRaw     = session.metadata?.items
   const deliveryType = (session.metadata?.deliveryType ?? 'COURIER') as 'COURIER' | 'PICKUP_IN_STORE'
@@ -99,7 +108,7 @@ export async function POST(req: NextRequest) {
     include: { items: true, address: true },
   })
 
-  if (existingOrder?.erpSyncStatus === 'synced') {
+  if (existingOrder?.erpSyncStatus === 'synced' && existingOrder?.stockDeducted && existingOrder?.emailSent) {
     console.log(`[Stripe] Already fully processed — skipping, orderId=${existingOrder.id}`)
     return NextResponse.json({ received: true })
   }
@@ -265,8 +274,68 @@ export async function POST(req: NextRequest) {
     })
   }
 
-  // ── Send customer email ─────────────────────────────────────────────────────
-  if (user?.email) {
+  // ── Deduct stock (idempotent — only if not already deducted) ───────────────
+  // Stock deduction runs BEFORE email (H12) — email is only sent after the
+  // stock transaction is confirmed to avoid sending confirmation for orders
+  // whose stock could not be reserved (Finding C1, H12).
+  // Re-read the order inside a transaction to prevent double deduction from
+  // a race between the webhook and the success page (Finding C1).
+  try {
+    await db.$transaction(async (tx) => {
+      const freshOrder = await tx.order.findUnique({
+        where:  { id: order.id },
+        select: { stockDeducted: true },
+      })
+      if (freshOrder?.stockDeducted) {
+        console.log(`[Stock] Already deducted for orderId=${order.id} — skipping`)
+        return
+      }
+
+      // H9: verify stock will not go negative before decrementing
+      for (const item of items) {
+        const variant = await tx.productVariant.findUnique({
+          where:  { id: item.variantId },
+          select: { stock: true },
+        })
+        if (!variant) continue
+        if (variant.stock < item.quantity) {
+          console.error(`[Stock] Insufficient stock for variantId=${item.variantId}: have ${variant.stock}, need ${item.quantity}`)
+          throw new Error(`Insufficient stock for variant ${item.variantId}`)
+        }
+      }
+
+      for (const item of items) {
+        await tx.productVariant.update({
+          where: { id: item.variantId },
+          data:  { stock: { decrement: item.quantity } },
+        })
+        await tx.stockMovement.create({
+          data: {
+            variantId: item.variantId,
+            type:      'RESERVED',
+            quantity:  item.quantity,
+            orderId:   order.id,
+            reason:    'Order paid',
+          },
+        })
+      }
+
+      await tx.order.update({
+        where: { id: order.id },
+        data:  { stockDeducted: true },
+      })
+    })
+  } catch (stockErr) {
+    console.error(`[Stock] Error for orderId=${order.id}:`, stockErr instanceof Error ? stockErr.message : String(stockErr))
+  }
+
+  // ── Send customer email (H12: after stock tx; H13: emailSent idempotency) ───
+  // Re-read emailSent to avoid duplicate emails if both webhook and success page run.
+  const freshOrderForEmail = await db.order.findUnique({
+    where:  { id: order.id },
+    select: { emailSent: true },
+  })
+  if (user?.email && !freshOrderForEmail?.emailSent) {
     try {
       const firstName    = user.name?.split(' ')[0] ?? 'there'
       const shippingAddr = addr
@@ -319,8 +388,10 @@ export async function POST(req: NextRequest) {
           }),
         })
       }
+      // Mark email sent atomically (H13)
+      await db.order.update({ where: { id: order.id }, data: { emailSent: true } })
     } catch (emailErr) {
-      console.error(`[Email] Failed for orderId=${order.id}:`, (emailErr as any)?.message)
+      console.error(`[Email] Failed for orderId=${order.id}:`, emailErr instanceof Error ? emailErr.message : String(emailErr))
     }
   }
 
@@ -348,28 +419,7 @@ export async function POST(req: NextRequest) {
       })
     }
   } catch (adminEmailErr) {
-    console.error(`[AdminEmail] Failed for orderId=${order.id}:`, (adminEmailErr as any)?.message)
-  }
-
-  // ── Deduct stock ────────────────────────────────────────────────────────────
-  for (const item of items) {
-    try {
-      await db.productVariant.update({
-        where: { id: item.variantId },
-        data:  { stock: { decrement: item.quantity } },
-      })
-      await db.stockMovement.create({
-        data: {
-          variantId: item.variantId,
-          type:      'RESERVED',
-          quantity:  item.quantity,
-          orderId:   order.id,
-          reason:    'Order paid',
-        },
-      })
-    } catch (stockErr) {
-      console.error(`[Stock] Error for variantId=${item.variantId} orderId=${order.id}:`, (stockErr as any)?.message)
-    }
+    console.error(`[AdminEmail] Failed for orderId=${order.id}:`, adminEmailErr instanceof Error ? adminEmailErr.message : String(adminEmailErr))
   }
 
   // ── Clear cart ──────────────────────────────────────────────────────────────
@@ -379,9 +429,9 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ received: true })
 
-  } catch (handlerErr: any) {
+  } catch (handlerErr: unknown) {
     // Never let an uncaught error return a non-200 to Stripe — that would cause retries
-    console.error('[Stripe] Unhandled webhook error:', handlerErr?.message)
+    console.error('[Stripe] Unhandled webhook error:', handlerErr instanceof Error ? handlerErr.message : String(handlerErr))
     return NextResponse.json({ received: true })
   }
 }

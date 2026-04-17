@@ -1,4 +1,5 @@
 export const revalidate = 300
+export const dynamicParams = true
 
 import { cache } from 'react'
 import { notFound } from "next/navigation"
@@ -21,6 +22,11 @@ const getProduct = cache((slug: string) =>
     include: { category: true, variants: { orderBy: { isDefault: 'desc' } } },
   })
 )
+
+export async function generateStaticParams() {
+  const products = await db.product.findMany({ where: { isActive: true }, select: { slug: true } })
+  return products.map((p) => ({ slug: p.slug }))
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
@@ -116,14 +122,19 @@ export default async function ProductDetailPage({ params }: Props) {
     } : {}),
   }
 
+  const breadcrumbItems: Array<{ '@type': string; position: number; name: string; item: string }> = [
+    { '@type': 'ListItem', position: 1, name: 'Domů', item: BASE_URL },
+    { '@type': 'ListItem', position: 2, name: 'Produkty', item: `${BASE_URL}/products` },
+  ]
+  if (product.category) {
+    breadcrumbItems.push({ '@type': 'ListItem', position: 3, name: product.category.name, item: `${BASE_URL}/kategorie/${product.category.slug}` })
+  }
+  breadcrumbItems.push({ '@type': 'ListItem', position: breadcrumbItems.length + 1, name: product.name, item: `${BASE_URL}/products/${product.slug}` })
+
   const breadcrumbLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Domů', item: BASE_URL },
-      { '@type': 'ListItem', position: 2, name: 'Produkty', item: `${BASE_URL}/products` },
-      { '@type': 'ListItem', position: 3, name: product.name, item: `${BASE_URL}/products/${product.slug}` },
-    ],
+    itemListElement: breadcrumbItems,
   }
 
   return (
@@ -137,6 +148,21 @@ export default async function ProductDetailPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
       <div className="container mx-auto px-4 py-8">
+        <nav aria-label="Breadcrumb" className="text-sm text-[#6e6e73] mb-4">
+          <ol className="flex items-center gap-1.5 flex-wrap">
+            <li><Link href="/" className="hover:text-[#2E7D32] transition-colors">Domů</Link></li>
+            <li aria-hidden="true">/</li>
+            <li><Link href="/products" className="hover:text-[#2E7D32] transition-colors">Produkty</Link></li>
+            {product.category && (
+              <>
+                <li aria-hidden="true">/</li>
+                <li><Link href={`/kategorie/${product.category.slug}`} className="hover:text-[#2E7D32] transition-colors">{product.category.name}</Link></li>
+              </>
+            )}
+            <li aria-hidden="true">/</li>
+            <li aria-current="page" className="text-[#1d1d1f] font-medium truncate max-w-[200px]">{product.name}</li>
+          </ol>
+        </nav>
         <Link
           href="/products"
           className="inline-flex items-center gap-1.5 text-sm text-[#6e6e73] hover:text-[#1d1d1f] transition-colors mb-6"

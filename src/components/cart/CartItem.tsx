@@ -22,6 +22,7 @@ export default function CartItem({ item, itemId, onUpdateQty, onRemove }: CartIt
   const productName = isDb ? item.product.name : (item as GuestCartItem).productName
   const variantName = isDb ? item.variant.name : (item as GuestCartItem).variantName
   const price = isDb ? Number(item.variant.price) : (item as GuestCartItem).price
+  const stock = isDb ? item.variant.stock : null
   const imageUrl = isDb
     ? item.product.imageUrls?.[0] ?? '/images/placeholder-product.webp'
     : (item as GuestCartItem).imageUrl || '/images/placeholder-product.webp'
@@ -62,8 +63,9 @@ export default function CartItem({ item, itemId, onUpdateQty, onRemove }: CartIt
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.85 }}
             onClick={() => onUpdateQty(itemId, variantId, item.quantity + 1)}
+            disabled={stock != null && item.quantity >= stock}
             aria-label="Zvýšit množství"
-            className="w-8 h-8 rounded-full border border-[#DEE2E6] flex items-center justify-center text-[#6e6e73] hover:border-[#2E7D32] hover:text-[#2E7D32] transition-colors"
+            className="w-8 h-8 rounded-full border border-[#DEE2E6] flex items-center justify-center text-[#6e6e73] hover:border-[#2E7D32] hover:text-[#2E7D32] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Plus size={14} />
           </motion.button>

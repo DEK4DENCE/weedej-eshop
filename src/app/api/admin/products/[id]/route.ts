@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
 import { revalidatePath } from "next/cache"
+import { logAdminAction } from "@/lib/audit"
 
 const ALLOWED_PRODUCT_FIELDS = new Set([
   "name", "slug", "description", "shortDescription", "imageUrls",
@@ -11,7 +12,7 @@ const ALLOWED_PRODUCT_FIELDS = new Set([
 ])
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { error: authError } = await requireAdmin()
+  const { session, error: authError } = await requireAdmin()
   if (authError) return authError
   const { id } = await params
   const body = await req.json()
@@ -21,17 +22,38 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (ALLOWED_PRODUCT_FIELDS.has(key)) productData[key] = body[key]
   }
 
+  // H5: capture old value for audit log
+  const before = await db.product.findUnique({ where: { id }, select: { name: true, isActive: true, vatRate: true, basePrice: true } })
   const product = await db.product.update({ where: { id }, data: productData })
+
+  await logAdminAction({
+    adminId:    session.user.id as string,
+    action:     "UPDATE_PRODUCT",
+    entityType: "Product",
+    entityId:   id,
+    oldValue:   before,
+    newValue:   productData,
+  }).catch((e: unknown) => console.error("[Audit] logAdminAction failed:", e))
+
   revalidatePath("/products")
   revalidatePath(`/products/${product.slug}`)
   return NextResponse.json(product)
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { error: authError } = await requireAdmin()
+  const { session, error: authError } = await requireAdmin()
   if (authError) return authError
   const { id } = await params
   await db.product.update({ where: { id }, data: { isActive: false } })
+
+  await logAdminAction({
+    adminId:    session.user.id as string,
+    action:     "DEACTIVATE_PRODUCT",
+    entityType: "Product",
+    entityId:   id,
+    newValue:   { isActive: false },
+  }).catch((e: unknown) => console.error("[Audit] logAdminAction failed:", e))
+
   revalidatePath("/products")
   return NextResponse.json({ success: true })
 }

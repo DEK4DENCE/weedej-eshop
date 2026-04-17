@@ -20,7 +20,7 @@ export function Logo({ variant = "dark", size = "md", className = "" }: LogoProp
   const { outer, inner, border, innerBorder } = iconSizes[size]
 
   return (
-    <Link href="/" className={`flex items-center gap-2.5 ${className}`}>
+    <Link href="/" aria-label="Weedej — zpět na hlavní stránku" className={`flex items-center gap-2.5 ${className}`}>
       <div className={`relative ${outer} flex items-center justify-center rounded-full ${border} ${iconColor}`}>
         <div className={`${inner} rounded-full ${innerBorder} ${iconColor}`} />
       </div>
