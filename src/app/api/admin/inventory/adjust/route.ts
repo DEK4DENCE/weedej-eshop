@@ -30,20 +30,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Insufficient stock" }, { status: 400 })
   }
 
-  const updatedVariant = await db.productVariant.update({
-    where: { id: variantId },
-    data: { stock: type === "IN" ? { increment: qty } : { decrement: qty } },
-  })
-
-  await db.stockMovement.create({
-    data: {
-      variantId,
-      type,
-      quantity: qty,
-      reason: reason ?? null,
-      adminId: adminSession.user.id,
-    },
-  })
+  const [updatedVariant] = await db.$transaction([
+    db.productVariant.update({
+      where: { id: variantId },
+      data: { stock: type === "IN" ? { increment: qty } : { decrement: qty } },
+    }),
+    db.stockMovement.create({
+      data: {
+        variantId,
+        type,
+        quantity: qty,
+        reason: reason ?? null,
+        adminId: adminSession.user.id,
+      },
+    }),
+  ])
 
   return NextResponse.json({ stock: updatedVariant.stock })
 }

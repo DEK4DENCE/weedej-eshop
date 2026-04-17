@@ -37,13 +37,14 @@ export async function PATCH(
 
   const { isDefault, ...rest } = parsed.data
 
-  if (isDefault) {
-    await db.address.updateMany({ where: { userId, isDefault: true }, data: { isDefault: false } })
-  }
-
-  const updated = await db.address.update({
-    where: { id },
-    data: { ...rest, ...(isDefault !== undefined ? { isDefault } : {}) },
+  const updated = await db.$transaction(async (tx) => {
+    if (isDefault) {
+      await tx.address.updateMany({ where: { userId, isDefault: true }, data: { isDefault: false } })
+    }
+    return tx.address.update({
+      where: { id },
+      data: { ...rest, ...(isDefault !== undefined ? { isDefault } : {}) },
+    })
   })
   return NextResponse.json(updated)
 }

@@ -23,6 +23,7 @@ export async function GET() {
       user: { select: { email: true, name: true } },
     },
     orderBy: { createdAt: "desc" },
+    take: 200,
   })
 
   return NextResponse.json(orders)

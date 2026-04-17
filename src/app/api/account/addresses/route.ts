@@ -40,12 +40,11 @@ export async function POST(req: NextRequest) {
   const existingCount = await db.address.count({ where: { userId } })
   const makeDefault = isDefault || existingCount === 0
 
-  if (makeDefault) {
-    await db.address.updateMany({ where: { userId, isDefault: true }, data: { isDefault: false } })
-  }
-
-  const address = await db.address.create({
-    data: { ...rest, userId, isDefault: makeDefault },
+  const address = await db.$transaction(async (tx) => {
+    if (makeDefault) {
+      await tx.address.updateMany({ where: { userId, isDefault: true }, data: { isDefault: false } })
+    }
+    return tx.address.create({ data: { ...rest, userId, isDefault: makeDefault } })
   })
   return NextResponse.json(address, { status: 201 })
 }

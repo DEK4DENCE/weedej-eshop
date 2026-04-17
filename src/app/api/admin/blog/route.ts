@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
+import { revalidatePath } from "next/cache"
 
 function toSlug(title: string) {
   return title
@@ -30,9 +31,18 @@ export async function POST(req: NextRequest) {
   const { title, excerpt, content, coverImage, published } = body
   const authorId = adminSession.user.id
 
-  if (!title || !excerpt || !content) {
-    return NextResponse.json({ error: "title, excerpt, and content are required" }, { status: 400 })
+  if (!title || typeof title !== "string" || !title.trim()) {
+    return NextResponse.json({ error: "title is required" }, { status: 400 })
   }
+  if (title.length > 255) return NextResponse.json({ error: "title max 255 chars" }, { status: 400 })
+  if (!excerpt || typeof excerpt !== "string" || !excerpt.trim()) {
+    return NextResponse.json({ error: "excerpt is required" }, { status: 400 })
+  }
+  if (excerpt.length > 500) return NextResponse.json({ error: "excerpt max 500 chars" }, { status: 400 })
+  if (!content || typeof content !== "string" || !content.trim()) {
+    return NextResponse.json({ error: "content is required" }, { status: 400 })
+  }
+  if (content.length > 100_000) return NextResponse.json({ error: "content max 100 000 chars" }, { status: 400 })
 
   const slug = body.slug || toSlug(title)
 
@@ -49,5 +59,6 @@ export async function POST(req: NextRequest) {
     },
   })
 
+  revalidatePath("/blog")
   return NextResponse.json(post, { status: 201 })
 }

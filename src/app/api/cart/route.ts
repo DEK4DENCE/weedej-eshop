@@ -28,6 +28,10 @@ export async function POST(req: NextRequest) {
   if (!variantId || !productId) {
     return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
   }
+  const qty = Number(quantity)
+  if (!Number.isInteger(qty) || qty < 1 || qty > 999) {
+    return NextResponse.json({ error: 'quantity must be between 1 and 999' }, { status: 400 })
+  }
 
   // Ensure cart exists
   const cart = await prisma.cart.upsert({

@@ -30,33 +30,37 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   // Handle stock transitions on status change
   try {
     if (status === "SHIPPED" || status === "DELIVERED") {
-      for (const item of order.items) {
-        await db.stockMovement.create({
-          data: {
-            variantId: item.variantId,
-            type: "SOLD",
-            quantity: item.quantity,
-            orderId: id,
-            reason: `Order ${status.toLowerCase()}`,
-          },
-        })
-      }
+      await db.$transaction(
+        order.items.map((item) =>
+          db.stockMovement.create({
+            data: {
+              variantId: item.variantId,
+              type: "SOLD",
+              quantity: item.quantity,
+              orderId: id,
+              reason: `Order ${status.toLowerCase()}`,
+            },
+          })
+        )
+      )
     } else if (status === "CANCELLED") {
-      for (const item of order.items) {
-        await db.productVariant.update({
-          where: { id: item.variantId },
-          data: { stock: { increment: item.quantity } },
-        })
-        await db.stockMovement.create({
-          data: {
-            variantId: item.variantId,
-            type: "RELEASED",
-            quantity: item.quantity,
-            orderId: id,
-            reason: "Order cancelled",
-          },
-        })
-      }
+      await db.$transaction(
+        order.items.flatMap((item) => [
+          db.productVariant.update({
+            where: { id: item.variantId },
+            data: { stock: { increment: item.quantity } },
+          }),
+          db.stockMovement.create({
+            data: {
+              variantId: item.variantId,
+              type: "RELEASED",
+              quantity: item.quantity,
+              orderId: id,
+              reason: "Order cancelled",
+            },
+          }),
+        ])
+      )
     }
   } catch (stockError) {
     console.error("Failed to update stock on order status change:", stockError)

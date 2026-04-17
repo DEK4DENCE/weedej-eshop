@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
+import { revalidatePath } from "next/cache"
 
 export async function POST(req: NextRequest) {
   const { error: authError } = await requireAdmin()
@@ -27,5 +28,6 @@ export async function POST(req: NextRequest) {
       imageUrls: [],
     },
   })
+  revalidatePath("/products")
   return NextResponse.json(product, { status: 201 })
 }

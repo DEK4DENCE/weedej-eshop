@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
+import { revalidatePath } from "next/cache"
 
 function toSlug(title: string) {
   return title
@@ -44,6 +45,16 @@ export async function PUT(req: NextRequest, { params }: Context) {
       ? existing.publishedAt
       : null
 
+  if (title !== undefined && (typeof title !== "string" || title.trim().length === 0 || title.length > 255)) {
+    return NextResponse.json({ error: "title must be 1-255 chars" }, { status: 400 })
+  }
+  if (excerpt !== undefined && (typeof excerpt !== "string" || excerpt.length > 500)) {
+    return NextResponse.json({ error: "excerpt max 500 chars" }, { status: 400 })
+  }
+  if (content !== undefined && (typeof content !== "string" || content.length > 100_000)) {
+    return NextResponse.json({ error: "content max 100 000 chars" }, { status: 400 })
+  }
+
   const post = await db.blogPost.update({
     where: { id },
     data: {
@@ -57,6 +68,8 @@ export async function PUT(req: NextRequest, { params }: Context) {
     },
   })
 
+  revalidatePath("/blog")
+  revalidatePath(`/blog/${post.slug}`)
   return NextResponse.json(post)
 }
 
@@ -69,5 +82,7 @@ export async function DELETE(_req: NextRequest, { params }: Context) {
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 })
 
   await db.blogPost.delete({ where: { id } })
+  revalidatePath("/blog")
+  revalidatePath(`/blog/${existing.slug}`)
   return NextResponse.json({ success: true })
 }
