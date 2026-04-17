@@ -1,10 +1,10 @@
 "use client"
 
-// H14: GDPR-compliant wrapper — only loads Vercel Analytics after cookie consent.
-// Reads the `cookie_consent` cookie (set by the cookie banner) before rendering.
-
 import { useEffect, useState } from "react"
 import { Analytics } from "@vercel/analytics/react"
+import { GoogleAnalytics } from "@next/third-parties/google"
+
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? ""
 
 function getCookieValue(name: string): string | null {
   if (typeof document === "undefined") return null
@@ -12,23 +12,19 @@ function getCookieValue(name: string): string | null {
   return match ? decodeURIComponent(match[1]) : null
 }
 
+function hasConsent(): boolean {
+  const val = getCookieValue("cookie_consent") ?? getCookieValue("analytics_consent")
+  return val === "true" || val === "1" || val === "accepted" || val === "all"
+}
+
 export function ConsentAnalytics() {
   const [consented, setConsented] = useState(false)
 
   useEffect(() => {
-    // Check on mount and on storage events (in case consent is granted in another tab)
-    function check() {
-      const val = getCookieValue("cookie_consent") ?? getCookieValue("analytics_consent")
-      setConsented(val === "true" || val === "1" || val === "accepted" || val === "all")
-    }
-
+    function check() { setConsented(hasConsent()) }
     check()
-
-    // Re-check when the user accepts the cookie banner (dispatches a storage event)
     window.addEventListener("storage", check)
-    // Also re-check on a custom event that the cookie banner can dispatch
     window.addEventListener("cookieConsentUpdated", check)
-
     return () => {
       window.removeEventListener("storage", check)
       window.removeEventListener("cookieConsentUpdated", check)
@@ -37,5 +33,10 @@ export function ConsentAnalytics() {
 
   if (!consented) return null
 
-  return <Analytics />
+  return (
+    <>
+      <Analytics />
+      {GA_ID && <GoogleAnalytics gaId={GA_ID} />}
+    </>
+  )
 }

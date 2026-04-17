@@ -17,6 +17,7 @@ export function CookieConsent() {
   function accept() {
     document.cookie = 'cookie_consent=accepted; max-age=31536000; path=/; SameSite=Lax'
     setVisible(false)
+    window.dispatchEvent(new Event('cookieConsentUpdated'))
   }
 
   function reject() {
