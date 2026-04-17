@@ -49,6 +49,11 @@ export function AdminSettingsForm({ settings, products }: Props) {
   const [importResult, setImportResult] = useState<{ created: number; updated: number; skipped: number } | null>(null)
   const [importError, setImportError] = useState<string | null>(null)
 
+  // Stock sync state
+  const [syncing, setSyncing] = useState(false)
+  const [syncResult, setSyncResult] = useState<string | null>(null)
+  const [syncError, setSyncError] = useState<string | null>(null)
+
   // Cleanup substances state
   const [cleaning, setCleaning] = useState(false)
   const [cleanResult, setCleanResult] = useState<string | null>(null)
@@ -144,6 +149,25 @@ export function AdminSettingsForm({ settings, products }: Props) {
       setImportError('Chyba sítě při importu.')
     } finally {
       setImporting(false)
+    }
+  }
+
+  async function handleSyncStock() {
+    setSyncing(true)
+    setSyncResult(null)
+    setSyncError(null)
+    try {
+      const res = await fetch('/api/admin/erp/sync', { method: 'POST' })
+      const data = await res.json()
+      if (res.ok) {
+        setSyncResult(data.message ?? 'Synchronizace dokončena.')
+      } else {
+        setSyncError(data.error ?? 'Synchronizace selhala.')
+      }
+    } catch {
+      setSyncError('Chyba sítě při synchronizaci.')
+    } finally {
+      setSyncing(false)
     }
   }
 
@@ -395,6 +419,33 @@ export function AdminSettingsForm({ settings, products }: Props) {
             <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-lg px-3 py-2.5 text-sm text-red-700">
               <XCircle className="h-4 w-4 shrink-0" />
               {importError}
+            </div>
+          )}
+        </div>
+
+        <div className="border-t border-border/40 pt-4 space-y-3">
+          <button
+            type="button"
+            disabled={syncing || !erpUrl || !erpKey}
+            onClick={handleSyncStock}
+            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${syncing ? 'animate-spin' : ''}`} />
+            {syncing ? 'Synchronizuji sklad…' : 'Synchronizovat sklad z ERP'}
+          </button>
+          <p className="text-xs text-muted-foreground">
+            Aktualizuje stavy skladu všech variant dle ERP. Použijte pokud se stavy na eshopu neshodují s ERP.
+          </p>
+          {syncResult && (
+            <div className="flex items-start gap-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2.5 text-sm text-green-800">
+              <CheckCircle className="h-4 w-4 mt-0.5 shrink-0" />
+              {syncResult}
+            </div>
+          )}
+          {syncError && (
+            <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-lg px-3 py-2.5 text-sm text-red-700">
+              <XCircle className="h-4 w-4 shrink-0" />
+              {syncError}
             </div>
           )}
         </div>
