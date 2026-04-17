@@ -51,7 +51,7 @@ export function Header({ categories = [] }: HeaderProps) {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <div onClick={() => setMobileOpen(false)} className="flex-shrink-0">
-          <Logo variant="dark" size="md" />
+          <Logo variant="dark" size="xl" />
         </div>
 
         {/* Desktop nav */}
