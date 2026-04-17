@@ -5,6 +5,7 @@ import { notFound } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatPrice } from "@/lib/utils/formatPrice"
 import { AdminOrderStatusClient } from "@/components/admin/AdminOrderStatusClient"
+import { AdminOrderInvoice } from "@/components/admin/AdminOrderInvoice"
 import { CheckCircle2, Circle, Clock } from "lucide-react"
 
 interface Props { params: Promise<{ id: string }> }
@@ -67,10 +68,27 @@ export default async function AdminOrderDetailPage({ params }: Props) {
               </p>
             )}
             {order.invoiceNumber && (
-              <p className="text-sm">
-                <span className="text-muted-foreground">Faktura: </span>
-                <span className="font-mono">{order.invoiceNumber}</span>
-              </p>
+              <div className="space-y-2">
+                <p className="text-sm">
+                  <span className="text-muted-foreground">Faktura: </span>
+                  <span className="font-mono">{order.invoiceNumber}</span>
+                </p>
+                <AdminOrderInvoice
+                  orderId={order.id}
+                  invoiceNumber={order.invoiceNumber}
+                  hasInvoicePdf={!!((order as any).invoicePdfBase64)}
+                />
+              </div>
+            )}
+            {!order.invoiceNumber && order.erpOrderNumber && (
+              <div className="space-y-1">
+                <p className="text-xs text-amber-600">Faktura zatím nevygenerována</p>
+                <AdminOrderInvoice
+                  orderId={order.id}
+                  invoiceNumber={null}
+                  hasInvoicePdf={false}
+                />
+              </div>
             )}
           </CardContent>
         </Card>
