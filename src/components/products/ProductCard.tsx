@@ -151,15 +151,31 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
             </div>
           )}
 
-          {/* Effects + Flavours */}
+          {/* Effects + Flavours — separated rows */}
           {(product.effects.length > 0 || product.flavours.length > 0) && (
-            <div className="flex flex-wrap gap-1">
-              {product.effects.slice(0, 3).map((e) => (
-                <span key={e} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#2E7D32]/10 text-[#2E7D32]">{e}</span>
-              ))}
-              {product.flavours.slice(0, 3).map((f) => (
-                <span key={f} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#b8860b]/10 text-[#8B6914]">{f}</span>
-              ))}
+            <div className="flex flex-col gap-1">
+              {product.effects.length > 0 && (
+                <div className="flex items-center gap-1 flex-wrap">
+                  <span className="text-[9px] font-semibold uppercase tracking-wider text-[#aeaeb2] shrink-0 mr-0.5">Účinky</span>
+                  {product.effects.slice(0, 3).map((e) => (
+                    <span key={e} className="px-1.5 py-0.5 rounded-full text-[9px] font-medium bg-[#2E7D32]/8 text-[#2E7D32] border border-[#2E7D32]/20 max-w-[76px] truncate" title={e}>{e}</span>
+                  ))}
+                  {product.effects.length > 3 && (
+                    <span className="text-[9px] text-[#aeaeb2]">+{product.effects.length - 3}</span>
+                  )}
+                </div>
+              )}
+              {product.flavours.length > 0 && (
+                <div className="flex items-center gap-1 flex-wrap">
+                  <span className="text-[9px] font-semibold uppercase tracking-wider text-[#aeaeb2] shrink-0 mr-0.5">Chutě</span>
+                  {product.flavours.slice(0, 3).map((f) => (
+                    <span key={f} className="px-1.5 py-0.5 rounded-full text-[9px] font-medium bg-amber-50 text-amber-700 border border-amber-200 max-w-[76px] truncate" title={f}>{f}</span>
+                  ))}
+                  {product.flavours.length > 3 && (
+                    <span className="text-[9px] text-[#aeaeb2]">+{product.flavours.length - 3}</span>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
