@@ -80,9 +80,13 @@ async function fetchProducts(params: Awaited<Props["searchParams"]>): Promise<Pr
     take: 48,
   })
 
+  // A product is "in stock" if any variant has stock > 0 OR ERP reports stock > 0
+  const isProductInStock = (p: typeof products[0]) =>
+    p.variants.some((v) => v.stock > 0) || Number((p as any).erpStock ?? 0) > 0
+
   // Always show in-stock products first
-  const inStock = products.filter((p) => p.variants.some((v) => v.stock > 0))
-  const outOfStock = products.filter((p) => p.variants.every((v) => v.stock === 0))
+  const inStock = products.filter(isProductInStock)
+  const outOfStock = products.filter((p) => !isProductInStock(p))
   const sorted = [...inStock, ...outOfStock]
 
   return sorted.map((p) => ({
@@ -110,6 +114,8 @@ async function fetchProducts(params: Awaited<Props["searchParams"]>): Promise<Pr
     activeSubstance: (p as any).activeSubstance ?? undefined,
     sativaPercent: p.sativaPercent !== null ? p.sativaPercent : undefined,
     indicaPercent: p.indicaPercent !== null ? p.indicaPercent : undefined,
+    erpStock: (p as any).erpStock != null ? Number((p as any).erpStock) : undefined,
+    erpUnit: (p as any).erpUnit ?? undefined,
   })) as Product[]
 }
 

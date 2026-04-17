@@ -31,6 +31,9 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onAddToCart }: ProductCardProps) {
+  // ERP stock (raw units, e.g. 100 for 100g) — used as fallback when local variant stock is 0
+  const erpStockUnits = Number(product.erpStock ?? 0)
+
   // Show the smallest in-stock variant by variantValue; fall back to smallest overall
   const inStockVariants = product.variants.filter((v) => v.stock > 0)
   const pickSmallest = (arr: typeof product.variants) =>
@@ -40,7 +43,9 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
     )
   const defaultVariant = pickSmallest(inStockVariants) ?? pickSmallest(product.variants) ?? product.variants[0]
   const price = defaultVariant?.price ?? product.basePrice
-  const isOutOfStock = defaultVariant ? defaultVariant.stock === 0 : false
+
+  // A product is out of stock only when BOTH local variant stock is 0 AND ERP has no stock
+  const isOutOfStock = defaultVariant ? (defaultVariant.stock === 0 && erpStockUnits === 0) : false
   const isLowStock = defaultVariant ? defaultVariant.stock > 0 && defaultVariant.stock <= 5 : false
   const mainImage = product.imageUrls[0] ?? '/images/placeholder-product.webp'
   const adjustments = product.imageAdjustments ? JSON.parse(product.imageAdjustments) : {}
@@ -142,11 +147,11 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
           {/* Stock status */}
           {defaultVariant && (
             <div>
-              {defaultVariant.stock === 0 ? (
+              {isOutOfStock ? (
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">
                   Není skladem
                 </span>
-              ) : defaultVariant.stock <= 5 ? (
+              ) : defaultVariant.stock > 0 && defaultVariant.stock <= 5 ? (
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
                   Posledních {defaultVariant.stock} ks
                 </span>

@@ -113,5 +113,31 @@ async function applyStockUpdate(
     }).catch(() => {})
   }
 
+  // Also update variants without erpProductId using product.erpStock as fallback
+  const updatedProductIds = [...new Set(variants.map(v => v.productId))]
+  if (updatedProductIds.length > 0) {
+    const products = await db.product.findMany({
+      where: { id: { in: updatedProductIds } },
+      select: { id: true, erpStock: true, erpUnit: true },
+    })
+    const unlinkedVariants = await db.productVariant.findMany({
+      where: { productId: { in: updatedProductIds }, erpProductId: null },
+      select: { id: true, productId: true, variantValue: true, variantUnit: true },
+    })
+    const productById = new Map(products.map(p => [p.id, p]))
+    for (const v of unlinkedVariants) {
+      const prod = productById.get(v.productId)
+      if (!prod || !prod.erpStock) continue
+      const newStock = calcVariantStock(
+        Number(prod.erpStock),
+        prod.erpUnit ?? 'ks',
+        v.variantValue,
+        v.variantUnit,
+      )
+      await db.productVariant.update({ where: { id: v.id }, data: { stock: newStock } })
+      updated++
+    }
+  }
+
   console.log(`[StockWebhook] Updated ${updated} variant(s) for erpProductIds=${erpProductIds.join(',')}`)
 }

@@ -149,6 +149,44 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // ── Fallback pass: update unlinked variants using product.erpStock ───────────
+    // Variants without erpProductId are skipped by the main loop above.
+    // For each product that was updated, recalculate stock for ALL its variants
+    // so the eshop always reflects the ERP source of truth.
+    const updatedProductIds = [...new Set(
+      [...byErpProduct.values()].flat().map(v => v.productId)
+    )]
+
+    if (updatedProductIds.length > 0) {
+      const updatedProducts = await db.product.findMany({
+        where: { id: { in: updatedProductIds } },
+        select: { id: true, erpStock: true, erpUnit: true },
+      })
+      const allUnlinkedVariants = await db.productVariant.findMany({
+        where: {
+          productId: { in: updatedProductIds },
+          erpProductId: null,
+        },
+        select: { id: true, productId: true, variantValue: true, variantUnit: true },
+      })
+      const productById = new Map(updatedProducts.map(p => [p.id, p]))
+      for (const v of allUnlinkedVariants) {
+        const prod = productById.get(v.productId)
+        if (!prod || !prod.erpStock) continue
+        const newStock = calcVariantStock(
+          Number(prod.erpStock),
+          prod.erpUnit ?? 'ks',
+          v.variantValue,
+          v.variantUnit,
+        )
+        await db.productVariant.update({
+          where: { id: v.id },
+          data: { stock: newStock },
+        })
+        variantsUpdated++
+      }
+    }
+
     return NextResponse.json({
       message: `Synchronizace dokončena: ${variantsCreated} vytvořeno, ${variantsUpdated} aktualizováno, ${variantsDeleted} smazáno`,
       created: variantsCreated,

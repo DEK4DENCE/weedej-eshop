@@ -21,6 +21,8 @@ export interface Product {
   terpenes: string[]
   imageAdjustments?: string | null
   variants: ProductVariant[]
+  erpStock?: number | null   // Raw ERP stock in erpUnit (e.g. 100 for 100g)
+  erpUnit?: string | null    // ERP stock unit: "g" | "ml" | "ks"
   createdAt: string
   updatedAt: string
 }
