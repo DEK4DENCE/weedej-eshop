@@ -136,11 +136,18 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
             </p>
           )}
 
-          {/* THC/CBD if present */}
-          {(product.thcContent || product.cbdContent) && (
-            <div className="flex gap-3 text-xs text-[#6e6e73]">
+          {/* THC/CBD + Sativa/Indica if present */}
+          {(product.thcContent != null || product.cbdContent != null || (product.sativaPercent != null && product.indicaPercent != null)) && (
+            <div className="flex flex-wrap gap-2 text-xs text-[#6e6e73]">
               {product.thcContent != null && <span>THC: {product.thcContent}%</span>}
               {product.cbdContent != null && <span>CBD: {product.cbdContent}%</span>}
+              {product.sativaPercent != null && product.indicaPercent != null && (
+                <span>
+                  <span className="text-green-600">S {product.sativaPercent}%</span>
+                  {' / '}
+                  <span className="text-purple-600">I {product.indicaPercent}%</span>
+                </span>
+              )}
             </div>
           )}
 
