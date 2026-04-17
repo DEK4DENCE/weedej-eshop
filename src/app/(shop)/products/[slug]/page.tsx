@@ -59,6 +59,8 @@ export default async function ProductDetailPage({ params }: Props) {
     activeSubstance: (raw as any).activeSubstance ?? undefined,
     sativaPercent: raw.sativaPercent ?? undefined,
     indicaPercent: raw.indicaPercent ?? undefined,
+    erpStock: (raw as any).erpStock != null ? Number((raw as any).erpStock) : undefined,
+    erpUnit: (raw as any).erpUnit ?? undefined,
     variants: raw.variants.map((v) => ({
       ...v,
       price: Number(v.price),
