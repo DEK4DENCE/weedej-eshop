@@ -3,10 +3,10 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from 'next/navigation'
 import { Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import { registerSchema, type RegisterInput } from '@/lib/validations/auth'
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -40,10 +40,10 @@ function PasswordStrength({ password }: { password: string }) {
 }
 
 export function RegisterForm() {
-  const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [serverError, setServerError] = useState('')
+  const [registeredEmail, setRegisteredEmail] = useState<string | null>(null)
 
   const {
     register,
@@ -71,10 +71,39 @@ export function RegisterForm() {
         return
       }
 
-      router.push('/login?registered=true')
+      setRegisteredEmail(data.email)
+      return
     } catch {
       setServerError('Něco se pokazilo. Zkuste to prosím znovu.')
     }
+  }
+
+  // Show "check your email" screen after successful registration
+  if (registeredEmail) {
+    return (
+      <div className="bg-white border border-[#DEE2E6] rounded-2xl p-8 w-full max-w-md text-center">
+        <div className="w-14 h-14 bg-[#f0faf0] rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg className="w-7 h-7 text-[#2E7D32]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <h1 className="text-xl font-semibold text-[#1d1d1f] mb-2">Zkontrolujte svůj e-mail</h1>
+        <p className="text-[#6e6e73] text-sm mb-2">
+          Poslali jsme aktivační odkaz na
+        </p>
+        <p className="font-semibold text-[#1d1d1f] text-sm mb-6">{registeredEmail}</p>
+        <p className="text-[#6e6e73] text-xs mb-6">
+          Klikněte na odkaz v e-mailu pro aktivaci účtu. Odkaz platí 24 hodin.<br />
+          Dokud účet neaktivujete, nebude možné se přihlásit.
+        </p>
+        <Link
+          href="/login"
+          className="inline-block text-[#2E7D32] hover:text-[#1a9020] text-sm font-medium transition-colors"
+        >
+          Zpět na přihlášení
+        </Link>
+      </div>
+    )
   }
 
   return (

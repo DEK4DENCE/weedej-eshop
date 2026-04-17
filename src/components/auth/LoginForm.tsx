@@ -18,6 +18,7 @@ export function LoginForm() {
   const callbackUrl = searchParams.get('callbackUrl') ?? '/products'
   const [showPassword, setShowPassword] = useState(false)
   const [serverError, setServerError] = useState('')
+  const [notVerified, setNotVerified] = useState(false)
 
   const {
     register,
@@ -29,6 +30,7 @@ export function LoginForm() {
 
   async function onSubmit(data: LoginInput) {
     setServerError('')
+    setNotVerified(false)
     const result = await signIn('credentials', {
       email: data.email,
       password: data.password,
@@ -36,7 +38,11 @@ export function LoginForm() {
     })
 
     if (result?.error) {
-      setServerError('Nesprávný e-mail nebo heslo. Zkuste to prosím znovu.')
+      if (result.error.includes('EMAIL_NOT_VERIFIED')) {
+        setNotVerified(true)
+      } else {
+        setServerError('Nesprávný e-mail nebo heslo. Zkuste to prosím znovu.')
+      }
       return
     }
 
@@ -55,6 +61,16 @@ export function LoginForm() {
         {serverError && (
           <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3">
             {serverError}
+          </div>
+        )}
+
+        {notVerified && (
+          <div className="bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-xl px-4 py-3">
+            <p className="font-medium mb-1">Účet není ověřen</p>
+            <p>Zkontrolujte svůj e-mail a klikněte na aktivační odkaz, který jsme vám poslali při registraci.</p>
+            <Link href="/resend-verification" className="text-[#2E7D32] hover:underline text-xs mt-1.5 inline-block">
+              Znovu odeslat aktivační e-mail →
+            </Link>
           </div>
         )}
 

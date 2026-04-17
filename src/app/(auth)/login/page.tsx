@@ -16,6 +16,12 @@ export default function LoginPage() {
         description: 'Zkontrolujte prosím svůj e-mail a ověřte účet před přihlášením.',
       })
     }
+    if (searchParams.get('verified') === 'true') {
+      toast({
+        title: 'E-mail ověřen!',
+        description: 'Váš účet je aktivní. Nyní se můžete přihlásit.',
+      })
+    }
     if (searchParams.get('reset') === 'true') {
       toast({
         title: 'Heslo aktualizováno',

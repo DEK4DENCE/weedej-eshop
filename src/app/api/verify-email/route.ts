@@ -35,18 +35,17 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    await prisma.$transaction([
-      prisma.user.update({
-        where: { id: verificationToken.userId },
-        data: { emailVerified: new Date() },
-      }),
-      prisma.emailVerificationToken.update({
-        where: { id: verificationToken.id },
-        data: { usedAt: new Date() },
-      }),
-    ])
+    // Mark email as verified (do NOT mark token as usedAt yet — kept for auto-login)
+    await prisma.user.update({
+      where: { id: verificationToken.userId },
+      data: { emailVerified: new Date() },
+    })
 
-    return NextResponse.json({ message: 'Email verified successfully.' })
+    // Return the token so the client can use it for auto-login
+    return NextResponse.json({
+      message: 'Email verified successfully.',
+      autoLoginToken: token,
+    })
   } catch (e) {
     console.error('Verify email error:', e)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

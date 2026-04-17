@@ -39,7 +39,8 @@ export async function POST(req: NextRequest) {
       },
     })
 
-    const verifyUrl = `${process.env.NEXT_PUBLIC_APP_URL}/verify-email?token=${token}`
+    const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? process.env.NEXTAUTH_URL ?? 'https://weedej.cz').replace(/\/$/, '')
+    const verifyUrl = `${appUrl}/verify-email?token=${token}`
     const firstName = name?.split(' ')[0] ?? 'there'
 
     await sendEmail({
