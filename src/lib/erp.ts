@@ -3,6 +3,7 @@
 // Eshop → ERP: čtení produktů, skladu, odesílání objednávek
 
 import { db } from '@/lib/db'
+import { decryptSetting } from '@/lib/encrypt'
 
 export interface ErpConfig {
   url: string
@@ -26,7 +27,10 @@ export async function getErpConfig(): Promise<ErpConfig | null> {
       db.setting.findUnique({ where: { key: 'erpApiKey' } }),
     ])
     if (urlRow?.value?.trim() && keyRow?.value?.trim()) {
-      return { url: urlRow.value.trim(), key: keyRow.value.trim() }
+      return {
+        url: decryptSetting(urlRow.value.trim()),
+        key: decryptSetting(keyRow.value.trim()),
+      }
     }
   } catch {
     // DB nedostupná — ignoruj

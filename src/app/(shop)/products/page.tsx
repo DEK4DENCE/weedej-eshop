@@ -8,11 +8,12 @@ import { ProductSearch } from "@/components/products/ProductSearch"
 import { Skeleton } from "@/components/ui/skeleton"
 import type { Metadata } from "next"
 import type { Product } from "@/types/product"
+import { BASE_URL } from "@/lib/config"
 
 export const metadata: Metadata = {
   title: "Produkty — Weedej",
   description: "Prémiové CBD produkty — květy, extrakty, edibles. Doručení po celé ČR. Laboratořemi testováno.",
-  alternates: { canonical: "https://weedej-cannabis-eshop-dek4dences-projects.vercel.app/products" },
+  alternates: { canonical: `${BASE_URL}/products` },
   openGraph: {
     title: "Produkty — Weedej",
     description: "Prohlédněte si kompletní nabídku prémiových CBD produktů.",

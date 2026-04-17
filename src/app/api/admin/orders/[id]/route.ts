@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
 import { sendEmail } from "@/lib/email/send"
 import { OrderShippedWithTracking } from "@/lib/email/templates/OrderShipped"
@@ -8,8 +8,8 @@ import { OrderDelivered } from "@/lib/email/templates/OrderDelivered"
 import React from "react"
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await auth()
-  if ((session?.user as any)?.role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
   const { id } = await params
   const { status } = await req.json()
 

@@ -31,8 +31,8 @@ export function useCart() {
       const res = await fetch('/api/cart')
       const data = await res.json()
       setServerItems(data?.items ?? [])
-    } catch {
-      // ignore fetch errors silently
+    } catch (err) {
+      console.error('[Cart] Failed to fetch cart:', err)
     }
   }, [session?.user, setServerItems])
 
@@ -91,12 +91,18 @@ export function useCart() {
 
   const updateQty = async (itemId: string, variantId: string, quantity: number) => {
     if (session?.user) {
-      await fetch(`/api/cart/${itemId}`, {
+      // PERF-3: Optimistic update — reflect change immediately, no full refetch
+      setServerItems(serverItems.map((i: any) =>
+        i.id === itemId ? { ...i, quantity } : i
+      ))
+      fetch(`/api/cart/${itemId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ quantity }),
+      }).catch((err) => {
+        console.error('[Cart] updateQty failed:', err)
+        fetchCart()  // re-sync on error
       })
-      await fetchCart()
     } else {
       guestCart.updateQty(variantId, quantity)
     }
@@ -104,8 +110,12 @@ export function useCart() {
 
   const removeItem = async (itemId: string, variantId: string) => {
     if (session?.user) {
-      await fetch(`/api/cart/${itemId}`, { method: 'DELETE' })
-      await fetchCart()
+      // PERF-3: Optimistic update — remove immediately, no full refetch
+      setServerItems(serverItems.filter((i: any) => i.id !== itemId))
+      fetch(`/api/cart/${itemId}`, { method: 'DELETE' }).catch((err) => {
+        console.error('[Cart] removeItem failed:', err)
+        fetchCart()  // re-sync on error
+      })
     } else {
       guestCart.removeItem(variantId)
     }

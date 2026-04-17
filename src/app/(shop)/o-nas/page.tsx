@@ -1,15 +1,16 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { Leaf, Shield, FlaskConical, Heart } from "lucide-react"
+import { BASE_URL } from "@/lib/config"
 
 export const metadata: Metadata = {
   title: "O nás — Weedej",
   description: "Jsme česká firma specializující se na prémiové CBD a konopné produkty. Laboratořemi testováno, přírodou inspirováno. Zjistěte více o naší misi.",
-  alternates: { canonical: 'https://weedej-cannabis-eshop-dek4dences-projects.vercel.app/o-nas' },
+  alternates: { canonical: `${BASE_URL}/o-nas` },
   openGraph: {
     title: "O nás — Weedej",
     description: "Jsme česká firma specializující se na prémiové CBD a konopné produkty.",
-    url: 'https://weedej-cannabis-eshop-dek4dences-projects.vercel.app/o-nas',
+    url: `${BASE_URL}/o-nas`,
     locale: 'cs_CZ',
   },
 }

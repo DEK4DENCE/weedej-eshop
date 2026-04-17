@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
 
 function toSlug(title: string) {
@@ -12,10 +12,8 @@ function toSlug(title: string) {
 }
 
 export async function GET() {
-  const session = await auth()
-  if ((session?.user as any)?.role !== "ADMIN") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-  }
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
   const posts = await db.blogPost.findMany({
     orderBy: { createdAt: "desc" },
@@ -25,14 +23,12 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await auth()
-  if ((session?.user as any)?.role !== "ADMIN") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-  }
+  const { session: adminSession, error: authError } = await requireAdmin()
+  if (authError) return authError
 
   const body = await req.json()
   const { title, excerpt, content, coverImage, published } = body
-  const authorId = (session?.user as any)?.id as string
+  const authorId = adminSession.user.id
 
   if (!title || !excerpt || !content) {
     return NextResponse.json({ error: "title, excerpt, and content are required" }, { status: 400 })

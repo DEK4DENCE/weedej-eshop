@@ -2,15 +2,13 @@
 // Diagnostika ERP integrace — zobrazí co funguje a co ne
 
 import { NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
 import { getErpConfig } from "@/lib/erp"
 
 export async function GET() {
-  const session = await auth()
-  if ((session?.user as any)?.role !== "ADMIN") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-  }
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
   const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 
@@ -21,14 +19,14 @@ export async function GET() {
 
   const result: Record<string, any> = {
     erpConfig: erpConfig
-      ? `✅ nakonfigurováno (URL: ${erpConfig.url})`
+      ? "✅ nakonfigurováno"
       : "❌ CHYBÍ — jdi do admin Nastavení → Propojení s ERP a ulož URL + API klíč",
     envVars: {
-      ERP_API_URL: process.env.ERP_API_URL ? `✅ env (${process.env.ERP_API_URL})` : "⚠️ není v env",
+      ERP_API_URL: process.env.ERP_API_URL ? "✅ env" : "⚠️ není v env",
       ERP_API_KEY: process.env.ERP_API_KEY ? "✅ env" : "⚠️ není v env",
     },
     dbSettings: {
-      erpApiUrl: erpUrlDb?.value ? `✅ DB: ${erpUrlDb.value}` : "❌ není v DB — ulož v admin Nastavení",
+      erpApiUrl: erpUrlDb?.value ? "✅ DB: uloženo" : "❌ není v DB — ulož v admin Nastavení",
       erpApiKey: erpKeyDb?.value ? "✅ DB: uloženo" : "❌ není v DB — ulož v admin Nastavení",
     },
     STRIPE_WEBHOOK_SECRET: stripeWebhookSecret ? "✅ nastaveno" : "❌ CHYBÍ v env vars",

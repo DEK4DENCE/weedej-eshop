@@ -80,111 +80,103 @@ export async function POST(req: NextRequest) {
     let variantsUpdated = 0
     let variantsDeleted = 0
 
-    for (const erp of erpProducts) {
+    // PERF-4: Collect all write operations, execute in parallel per product
+    // instead of sequential awaits (was 200+ round-trips for 100 products)
+    const productErpData = new Map<string, { erpStock: number; erpUnit: string }>()
+
+    await Promise.all(erpProducts.map(async (erp) => {
       const eshopVariantsList = byErpProduct.get(String(erp.id))
-      if (!eshopVariantsList?.length) continue
+      if (!eshopVariantsList?.length) return
 
       const productId = eshopVariantsList[0].productId
+      productErpData.set(productId, { erpStock: erp.stock ?? 0, erpUnit: erp.unit ?? 'ks' })
 
-      // Ulož ERP sklad na produkt (zdroj pravdy pro zobrazení v admin)
+      // Update product ERP data
       await db.product.update({
         where: { id: productId },
         data: { vatRate: erp.vatRate ?? 21, erpStock: erp.stock ?? 0, erpUnit: erp.unit ?? null },
       })
 
       if (erp.eshopVariants && erp.eshopVariants.length > 0) {
-        // Mapa: jméno varianty → eshop varianta
         const eshopByName = new Map(eshopVariantsList.map((v) => [v.name, v]))
         const erpNames = new Set(erp.eshopVariants.map((v) => v.name))
 
-        // Nejdřív smaž varianty které v ERP nejsou (včetně starých "Standardní" apod.)
-        for (const eshopVar of eshopVariantsList) {
-          if (!erpNames.has(eshopVar.name)) {
-            await db.productVariant.delete({ where: { id: eshopVar.id } }).catch(() => {})
-            variantsDeleted++
-          }
-        }
-
-        for (const erpVar of erp.eshopVariants) {
-          const varStock = calcVariantStock(erp.stock, erp.unit, erpVar.variantValue, erpVar.variantUnit)
-
-          const existing = eshopByName.get(erpVar.name)
-          if (existing) {
-            await db.productVariant.update({
-              where: { id: existing.id },
-              data: {
-                price: erpVar.price,
-                variantValue: erpVar.variantValue ?? null,
-                variantUnit: erpVar.variantUnit ?? null,
-                isDefault: erpVar.isDefault,
-                stock: varStock,
-              },
-            })
-            variantsUpdated++
-          } else {
-            await db.productVariant.create({
-              data: {
-                productId,
-                name: erpVar.name,
-                price: erpVar.price,
-                variantValue: erpVar.variantValue ?? null,
-                variantUnit: erpVar.variantUnit ?? null,
-                isDefault: erpVar.isDefault,
-                stock: varStock,
-                erpProductId: String(erp.id),
-              },
-            })
-            variantsCreated++
-          }
-        }
+        // Delete removed variants + update/create existing — all in parallel
+        await Promise.all([
+          // Deletes
+          ...eshopVariantsList
+            .filter((v) => !erpNames.has(v.name))
+            .map((v) =>
+              db.productVariant.delete({ where: { id: v.id } })
+                .then(() => { variantsDeleted++ })
+                .catch(() => {})
+            ),
+          // Updates and creates
+          ...erp.eshopVariants.map(async (erpVar) => {
+            const varStock = calcVariantStock(erp.stock, erp.unit, erpVar.variantValue, erpVar.variantUnit)
+            const existing = eshopByName.get(erpVar.name)
+            if (existing) {
+              await db.productVariant.update({
+                where: { id: existing.id },
+                data: {
+                  price: erpVar.price,
+                  variantValue: erpVar.variantValue ?? null,
+                  variantUnit: erpVar.variantUnit ?? null,
+                  isDefault: erpVar.isDefault,
+                  stock: varStock,
+                },
+              })
+              variantsUpdated++
+            } else {
+              await db.productVariant.create({
+                data: {
+                  productId,
+                  name: erpVar.name,
+                  price: erpVar.price,
+                  variantValue: erpVar.variantValue ?? null,
+                  variantUnit: erpVar.variantUnit ?? null,
+                  isDefault: erpVar.isDefault,
+                  stock: varStock,
+                  erpProductId: String(erp.id),
+                },
+              })
+              variantsCreated++
+            }
+          }),
+        ])
       } else {
-        // ERP produkt nemá varianty — aktualizuj cenu/sklad u všech propojených variant
-        for (const eshopVar of eshopVariantsList) {
-          await db.productVariant.update({
-            where: { id: eshopVar.id },
-            data: { price: erp.priceWithVat, stock: Math.max(0, Math.floor(erp.stock)) },
-          })
-          variantsUpdated++
-        }
+        // No ERP variants — update all linked variants in parallel
+        await Promise.all(
+          eshopVariantsList.map((eshopVar) =>
+            db.productVariant.update({
+              where: { id: eshopVar.id },
+              data: { price: erp.priceWithVat, stock: Math.max(0, Math.floor(erp.stock)) },
+            }).then(() => { variantsUpdated++ })
+          )
+        )
       }
-    }
+    }))
 
-    // ── Fallback pass: update unlinked variants using product.erpStock ───────────
-    // Variants without erpProductId are skipped by the main loop above.
-    // For each product that was updated, recalculate stock for ALL its variants
-    // so the eshop always reflects the ERP source of truth.
-    const updatedProductIds = [...new Set(
-      [...byErpProduct.values()].flat().map(v => v.productId)
-    )]
+    // ── Fallback pass: update unlinked variants using ERP data ───────────────────
+    const updatedProductIds = [...productErpData.keys()]
 
     if (updatedProductIds.length > 0) {
-      const updatedProducts = await db.product.findMany({
-        where: { id: { in: updatedProductIds } },
-        select: { id: true, erpStock: true, erpUnit: true },
-      })
       const allUnlinkedVariants = await db.productVariant.findMany({
-        where: {
-          productId: { in: updatedProductIds },
-          erpProductId: null,
-        },
+        where: { productId: { in: updatedProductIds }, erpProductId: null },
         select: { id: true, productId: true, variantValue: true, variantUnit: true },
       })
-      const productById = new Map(updatedProducts.map(p => [p.id, p]))
-      for (const v of allUnlinkedVariants) {
-        const prod = productById.get(v.productId)
-        if (!prod || !prod.erpStock) continue
-        const newStock = calcVariantStock(
-          Number(prod.erpStock),
-          prod.erpUnit ?? 'ks',
-          v.variantValue,
-          v.variantUnit,
-        )
-        await db.productVariant.update({
-          where: { id: v.id },
-          data: { stock: newStock },
+
+      await Promise.all(
+        allUnlinkedVariants.map((v) => {
+          const prod = productErpData.get(v.productId)
+          if (!prod || !prod.erpStock) return Promise.resolve()
+          const newStock = calcVariantStock(prod.erpStock, prod.erpUnit, v.variantValue, v.variantUnit)
+          return db.productVariant.update({
+            where: { id: v.id },
+            data: { stock: newStock },
+          }).then(() => { variantsUpdated++ })
         })
-        variantsUpdated++
-      }
+      )
     }
 
     return NextResponse.json({

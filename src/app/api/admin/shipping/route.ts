@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
 
 export async function GET() {
-  const session = await auth()
-  if ((session?.user as any)?.role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
   const methods = await db.shippingMethod.findMany({ orderBy: { sortOrder: "asc" } })
   return NextResponse.json(methods)
 }
 
 export async function POST(req: NextRequest) {
-  const session = await auth()
-  if ((session?.user as any)?.role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
   const body = await req.json()
   const method = await db.shippingMethod.create({
     data: {

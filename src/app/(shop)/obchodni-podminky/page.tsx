@@ -1,13 +1,14 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { BASE_URL } from "@/lib/config"
 
 export const metadata: Metadata = {
   title: "Obchodní podmínky — Weedej",
   description: "Obchodní podmínky e-shopu Weedej. Informace o nákupu, dodání, reklamacích a právech spotřebitele.",
-  alternates: { canonical: 'https://weedej-cannabis-eshop-dek4dences-projects.vercel.app/obchodni-podminky' },
+  alternates: { canonical: `${BASE_URL}/obchodni-podminky` },
   openGraph: {
     title: "Obchodní podmínky — Weedej",
-    url: 'https://weedej-cannabis-eshop-dek4dences-projects.vercel.app/obchodni-podminky',
+    url: `${BASE_URL}/obchodni-podminky`,
     locale: 'cs_CZ',
   },
 }

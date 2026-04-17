@@ -3,7 +3,7 @@
 // ERP je zdroj pravdy pro statusy: paid → shipped → delivered → cancelled
 
 import { NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
 import { getErpOrder, getErpConfig } from "@/lib/erp"
 
@@ -18,10 +18,8 @@ const ERP_TO_ESHOP_STATUS: Record<string, string> = {
 }
 
 export async function POST() {
-  const session = await auth()
-  if ((session?.user as any)?.role !== "ADMIN") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-  }
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
   const erpConfig = await getErpConfig()
   if (!erpConfig) {

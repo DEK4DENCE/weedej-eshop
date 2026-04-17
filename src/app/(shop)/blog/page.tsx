@@ -1,4 +1,5 @@
-export const dynamic = 'force-dynamic'
+// PERF-2: Blog list doesn't need real-time data — cache for 5 minutes
+export const revalidate = 300
 
 import { db } from "@/lib/db"
 import Link from "next/link"

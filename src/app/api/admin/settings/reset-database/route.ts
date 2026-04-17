@@ -4,16 +4,14 @@
 // Pořadí mazání respektuje FK constraints.
 
 import { NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
 
 export const dynamic = "force-dynamic"
 
 export async function POST() {
-  const session = await auth()
-  if ((session?.user as any)?.role !== "ADMIN") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-  }
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
   try {
     console.log("🗑️  Začínám reset e-shop databáze...")

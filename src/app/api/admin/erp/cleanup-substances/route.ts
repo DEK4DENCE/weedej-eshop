@@ -2,7 +2,7 @@
 // One-time: strip (THC-X)/(HHC)/(CBD)/(THC) from product names and assign activeSubstance
 
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
 
 const SUBSTANCE_PATTERN = /\s*\((THC-X|THC_X|THC|CBD|HHC)\)\s*/gi
@@ -19,10 +19,8 @@ function cleanName(name: string): string {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await auth()
-  if ((session?.user as any)?.role !== "ADMIN") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-  }
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
   const products = await db.product.findMany({
     select: { id: true, name: true, activeSubstance: true },

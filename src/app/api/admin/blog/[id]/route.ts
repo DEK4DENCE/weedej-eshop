@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
 
 function toSlug(title: string) {
@@ -14,10 +14,8 @@ function toSlug(title: string) {
 interface Context { params: Promise<{ id: string }> }
 
 export async function GET(_req: NextRequest, { params }: Context) {
-  const session = await auth()
-  if ((session?.user as any)?.role !== "ADMIN") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-  }
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
   const { id } = await params
   const post = await db.blogPost.findUnique({ where: { id } })
@@ -26,10 +24,8 @@ export async function GET(_req: NextRequest, { params }: Context) {
 }
 
 export async function PUT(req: NextRequest, { params }: Context) {
-  const session = await auth()
-  if ((session?.user as any)?.role !== "ADMIN") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-  }
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
   const { id } = await params
   const body = await req.json()
@@ -65,10 +61,8 @@ export async function PUT(req: NextRequest, { params }: Context) {
 }
 
 export async function DELETE(_req: NextRequest, { params }: Context) {
-  const session = await auth()
-  if ((session?.user as any)?.role !== "ADMIN") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-  }
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
   const { id } = await params
   const existing = await db.blogPost.findUnique({ where: { id } })

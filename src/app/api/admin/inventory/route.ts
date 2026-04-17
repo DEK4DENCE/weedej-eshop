@@ -9,16 +9,14 @@
  */
 
 import { NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { requireAdmin } from "@/lib/requireAdmin"
 import { getErpConfig, getErpInventory } from "@/lib/erp"
 
 export const dynamic = "force-dynamic"
 
 export async function GET() {
-  const session = await auth()
-  if ((session?.user as any)?.role !== "ADMIN") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-  }
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
   try {
     const erpConfig = await getErpConfig()

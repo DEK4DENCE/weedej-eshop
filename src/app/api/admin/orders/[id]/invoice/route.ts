@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
+import { requireAdmin } from '@/lib/requireAdmin'
 import { db } from '@/lib/db'
 import { getErpConfig } from '@/lib/erp'
 
@@ -34,10 +34,8 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const session = await auth()
-  if ((session?.user as any)?.role !== 'ADMIN') {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
   const { id } = await params
   const refresh = req.nextUrl.searchParams.get('refresh') === '1'

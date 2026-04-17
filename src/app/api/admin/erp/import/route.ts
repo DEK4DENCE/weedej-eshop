@@ -2,7 +2,7 @@
 // POST /api/admin/erp/import  — importuje produkty z ERP do eshop DB
 
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
 
 // Patterns like "(THC-X)", "(HHC)", "(CBD)", "(THC)" in product names
@@ -35,10 +35,8 @@ function calcVariantStock(
 // ─── Test připojení ───────────────────────────────────────────────────────────
 
 export async function GET(req: NextRequest) {
-  const session = await auth()
-  if (!session || (session.user as any)?.role !== "ADMIN") {
-    return NextResponse.json({ error: "Přístup odepřen" }, { status: 403 })
-  }
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
   const erpUrl = req.headers.get("x-erp-url")?.trim()
   const erpKey = req.headers.get("x-erp-key")?.trim()
@@ -71,10 +69,8 @@ export async function GET(req: NextRequest) {
 // ─── Import produktů ──────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
-  const session = await auth()
-  if (!session || (session.user as any)?.role !== "ADMIN") {
-    return NextResponse.json({ error: "Přístup odepřen" }, { status: 403 })
-  }
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
   const body = await req.json()
   const erpUrl: string = (body.erpUrl ?? "").trim()

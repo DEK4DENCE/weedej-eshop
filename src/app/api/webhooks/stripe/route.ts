@@ -13,7 +13,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { stripe } from '@/lib/stripe'
+import { stripe, getStripeWebhookSecret } from '@/lib/stripe'
 import { db } from '@/lib/db'
 import { sendEmail } from '@/lib/email/send'
 import { OrderConfirmationWithInvoice, OrderConfirmationAck } from '@/lib/email/templates/OrderConfirmation'
@@ -28,13 +28,21 @@ export async function POST(req: NextRequest) {
   const body      = await req.text()
   const signature = req.headers.get('stripe-signature')
 
-  if (!signature || !process.env.STRIPE_WEBHOOK_SECRET) {
+  if (!signature) {
     return NextResponse.json({ error: 'Missing signature' }, { status: 400 })
+  }
+
+  let webhookSecret: string
+  try {
+    webhookSecret = getStripeWebhookSecret()
+  } catch {
+    console.error('[Stripe] STRIPE_WEBHOOK_SECRET is not configured')
+    return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 })
   }
 
   let event: Stripe.Event
   try {
-    event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET)
+    event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
   } catch (err: any) {
     return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 })
   }
@@ -42,6 +50,9 @@ export async function POST(req: NextRequest) {
   if (event.type !== 'checkout.session.completed') {
     return NextResponse.json({ received: true })
   }
+
+  // From this point on: always return 200 to Stripe — retries are handled by our own cron
+  try {
 
   const session      = event.data.object as Stripe.Checkout.Session
   const userId       = session.metadata?.userId
@@ -362,4 +373,10 @@ export async function POST(req: NextRequest) {
   } catch {}
 
   return NextResponse.json({ received: true })
+
+  } catch (handlerErr: any) {
+    // Never let an uncaught error return a non-200 to Stripe — that would cause retries
+    console.error('[Stripe] Unhandled webhook error:', handlerErr?.message)
+    return NextResponse.json({ received: true })
+  }
 }

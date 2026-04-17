@@ -19,23 +19,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         // ── Auto-login after email verification ──────────────────────────────
         if (credentials?.autoLoginToken && typeof credentials.autoLoginToken === 'string') {
           const token = credentials.autoLoginToken as string
+
+          // SECURITY-7: Atomically claim the token — prevents replay attacks.
+          // updateMany with the validity conditions is a single SQL statement;
+          // only one concurrent request can advance count from 0 → 1.
+          const claimed = await db.emailVerificationToken.updateMany({
+            where: { token, usedAt: null, expiresAt: { gt: new Date() } },
+            data: { usedAt: new Date() },
+          })
+          if (claimed.count === 0) return null  // already used or expired
+
           const record = await db.emailVerificationToken.findUnique({ where: { token } })
-          if (
-            record &&
-            !record.usedAt &&
-            record.expiresAt > new Date()
-          ) {
-            const user = await db.user.findUnique({ where: { id: record.userId } })
-            if (user?.emailVerified) {
-              // Mark token as used
-              await db.emailVerificationToken.update({
-                where: { id: record.id },
-                data: { usedAt: new Date() },
-              }).catch(() => {})
-              return { id: user.id, email: user.email, name: user.name, role: user.role }
-            }
-          }
-          return null
+          if (!record) return null
+          const user = await db.user.findUnique({ where: { id: record.userId } })
+          if (!user?.emailVerified) return null
+
+          return { id: user.id, email: user.email, name: user.name, role: user.role }
         }
 
         // ── Normal credentials login ──────────────────────────────────────────

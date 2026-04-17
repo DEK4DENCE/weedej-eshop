@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
     }
 
     const shippingCents = deliveryType === "PICKUP_IN_STORE" ? 0
-      : items.reduce((s: number, i: any) => s + Number(i.price ?? i.variant?.price ?? 0) * i.quantity, 0) >= 1500
+      : items.reduce((s: number, i: any) => s + Number(variantMap.get(i.variantId ?? i.variant?.id)?.price ?? 0) * i.quantity, 0) >= 1500
       ? 0 : 9900
 
     const origin = req.headers.get("origin") ?? process.env.NEXTAUTH_URL ?? "http://localhost:3000"
@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
       const rawImage = item.product?.imageUrls?.[0] ?? item.imageUrl ?? item.variant?.product?.imageUrls?.[0]
       // Stripe requires absolute URLs — skip local/relative paths
       const image = rawImage && rawImage.startsWith('http') ? rawImage : undefined
-      const price = item.variant?.price ?? item.price ?? 0
+      const price = variantMap.get(item.variantId ?? item.variant?.id)?.price ?? 0
       return {
         price_data: {
           currency: "czk",

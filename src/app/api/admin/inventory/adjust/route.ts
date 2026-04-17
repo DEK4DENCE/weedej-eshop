@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
 
 export async function POST(req: NextRequest) {
-  const session = await auth()
-  if ((session?.user as any)?.role !== "ADMIN") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-  }
+  const { session: adminSession, error: authError } = await requireAdmin()
+  if (authError) return authError
 
   const { variantId, type, quantity, reason } = await req.json()
 
@@ -43,7 +41,7 @@ export async function POST(req: NextRequest) {
       type,
       quantity: qty,
       reason: reason ?? null,
-      adminId: (session!.user as any)?.id ?? null,
+      adminId: adminSession.user.id,
     },
   })
 

@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
 
 export async function POST(req: NextRequest) {
-  const session = await auth()
-  if ((session?.user as any)?.role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
   const body = await req.json()
   if (!body.name || typeof body.name !== 'string' || !body.name.trim()) {
     return NextResponse.json({ error: 'name is required' }, { status: 400 })

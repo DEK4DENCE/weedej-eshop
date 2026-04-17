@@ -16,6 +16,12 @@ export function getStripe(): Stripe {
   return instance
 }
 
+export function getStripeWebhookSecret(): string {
+  const secret = process.env.STRIPE_WEBHOOK_SECRET
+  if (!secret) throw new Error('STRIPE_WEBHOOK_SECRET is not set')
+  return secret
+}
+
 /** @deprecated use getStripe() */
 export const stripe = new Proxy({} as Stripe, {
   get(_target, prop) {

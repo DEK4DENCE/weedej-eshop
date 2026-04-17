@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
 import { generateToken } from "@/lib/utils/generateToken"
 import { sendEmail } from "@/lib/email/send"
 import { EmailVerification } from "@/lib/email/templates/EmailVerification"
 
-async function requireAdmin() {
-  const session = await auth()
-  if (!session || (session.user as any)?.role !== "ADMIN") return null
-  return session
-}
-
 export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  if (!await requireAdmin()) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
   const { id } = await params
 
   const user = await db.user.findUnique({ where: { id } })

@@ -4,6 +4,17 @@ import type { NextAuthConfig } from 'next-auth'
 // Used by middleware only. Full auth.ts extends this.
 export const authConfig: NextAuthConfig = {
   session: { strategy: 'jwt' },
+  // SECURITY-6: SameSite=Strict prevents CSRF — cookies not sent on cross-origin requests
+  cookies: {
+    sessionToken: {
+      options: {
+        httpOnly: true,
+        sameSite: 'strict',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
+  },
   pages: {
     signIn: '/login',
     error: '/login',
