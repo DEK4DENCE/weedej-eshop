@@ -15,17 +15,17 @@ import {
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: 'Prémiový CBD E-Shop — Weedej',
+  title: 'Weedej.cz — tested & trusted',
   description: 'Prémiové konopné produkty s doručením po celé ČR. Laboratořemi testováno, přírodou inspirováno.',
   alternates: { canonical: 'https://weedej.cz' },
   openGraph: {
-    title: 'Prémiový CBD E-Shop — Weedej',
+    title: 'Weedej.cz — tested & trusted',
     url: 'https://weedej.cz',
     locale: 'cs_CZ',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Prémiový CBD E-Shop — Weedej',
+    title: 'Weedej.cz — tested & trusted',
     description: 'Prémiové konopné produkty s doručením po celé ČR. Laboratořemi testováno, přírodou inspirováno.',
   },
 }

@@ -12,7 +12,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Weedej — Prémiový Cannabis E-Shop',
+    default: 'Weedej.cz — tested & trusted',
     template: '%s | Weedej',
   },
   description:

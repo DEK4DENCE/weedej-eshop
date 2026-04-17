@@ -6,6 +6,22 @@ import AddToCartButton from "@/components/cart/AddToCartButton"
 import { formatPrice } from "@/lib/utils/formatPrice"
 import type { Product } from "@/types/product"
 
+const EFFECT_ICONS: Record<string, string> = {
+  'Euforický': '😄', 'Kreativní': '✨', 'Energický': '⚡', 'Šťastný': '😊',
+  'Veselý': '😄', 'Uvolněný': '😌', 'Hovorný': '💬', 'Soustředěný': '🎯',
+  'Povznášející': '🚀', 'Ospalý': '😴', 'Hladový': '🍕',
+}
+const FLAVOUR_ICONS: Record<string, string> = {
+  'Citron': '🍋', 'Pomeranč': '🍊', 'Borůvka': '🫐', 'Borovice': '🌲',
+  'Dřevo': '🪵', 'Země': '🌿', 'Ananas': '🍍', 'Tropické': '🌴',
+  'Citrus': '🍋', 'Bobule': '🍇', 'Sladký': '🍯', 'Jahoda': '🍓',
+  'Vanilka': '🍦', 'Malina': '🫐', 'Broskev': '🍑', 'Koření': '🌶️',
+  'Hruška': '🍐', 'Banán': '🍌', 'Čokoláda': '🍫', 'Meloun': '🍈',
+  'Máslo': '🧈', 'Mentol': '🌿', 'Diesel': '⛽', 'Skunk': '💨',
+  'Pikantní': '🌶️', 'Meruňka': '🍊', 'Limetka': '🍋', 'Ovoce': '🍎',
+  'Květiny': '🌸',
+}
+
 const SUBSTANCE_STYLES: Record<string, string> = {
   THC_X: 'bg-blue-50 border-blue-300 text-blue-700',
   THC:   'bg-purple-50 border-purple-300 text-purple-700',
@@ -115,41 +131,50 @@ export function ProductDetailClient({ product }: { product: Product }) {
         </div>
       )}
 
-      {product.effects.length > 0 && (
-        <div>
-          <p className="text-sm font-medium text-[#515154] mb-2">Účinky</p>
-          <div className="flex flex-wrap gap-2">
-            {product.effects.map((effect) => (
-              <span key={effect} className="px-3 py-1 rounded-full text-xs font-medium bg-[#2E7D32]/10 border border-[#2E7D32]/20 text-[#2E7D32]">
-                {effect}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {product.flavours.length > 0 && (
-        <div>
-          <p className="text-sm font-medium text-[#515154] mb-2">Chutě</p>
-          <div className="flex flex-wrap gap-2">
-            {product.flavours.map((flavour) => (
-              <span key={flavour} className="px-3 py-1 rounded-full text-xs font-medium bg-[#b8860b]/10 border border-[#b8860b]/20 text-[#8B6914]">
-                {flavour}
-              </span>
-            ))}
-          </div>
+      {(product.effects.length > 0 || product.flavours.length > 0) && (
+        <div className="grid grid-cols-2 gap-6 pt-2 border-t border-[#F0F0F0]">
+          {product.effects.length > 0 && (
+            <div>
+              <p className="text-sm font-semibold text-[#1d1d1f] mb-3">Top účinky</p>
+              <div className="flex flex-col gap-2">
+                {product.effects.slice(0, 3).map((effect) => (
+                  <div key={effect} className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-[#2E7D32]/8 border border-[#2E7D32]/15">
+                    <span className="text-base">{EFFECT_ICONS[effect] ?? '✦'}</span>
+                    <span className="text-sm font-medium text-[#2E7D32]">{effect}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {product.flavours.length > 0 && (
+            <div>
+              <p className="text-sm font-semibold text-[#1d1d1f] mb-3">Top chutě</p>
+              <div className="flex flex-col gap-2">
+                {product.flavours.slice(0, 3).map((flavour) => (
+                  <div key={flavour} className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-[#b8860b]/8 border border-[#b8860b]/15">
+                    <span className="text-base">{FLAVOUR_ICONS[flavour] ?? '◆'}</span>
+                    <span className="text-sm font-medium text-[#8B6914]">{flavour}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
       {product.terpenes.length > 0 && (
-        <div>
-          <p className="text-sm font-medium text-[#515154] mb-2">Terpeny</p>
+        <div className="pt-2 border-t border-[#F0F0F0]">
+          <p className="text-sm font-semibold text-[#1d1d1f] mb-3">Terpeny</p>
           <div className="flex flex-wrap gap-2">
-            {product.terpenes.map((t) => (
-              <span key={t} className="px-3 py-1 rounded-full text-xs font-medium bg-[#F8F9FA] border border-[#DEE2E6] text-[#515154]">
-                {t}
-              </span>
-            ))}
+            {product.terpenes.map((t, i) => {
+              const dotColors = ['bg-blue-500', 'bg-purple-500', 'bg-green-500', 'bg-orange-500', 'bg-red-400']
+              return (
+                <div key={t} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#F8F9FA] border border-[#DEE2E6]">
+                  <span className={`w-2 h-2 rounded-full flex-shrink-0 ${dotColors[i % dotColors.length]}`} />
+                  <span className="text-xs font-medium text-[#515154]">{t}</span>
+                </div>
+              )
+            })}
           </div>
         </div>
       )}

@@ -3,56 +3,38 @@ export const dynamic = 'force-dynamic'
 import { db } from "@/lib/db"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { formatPrice } from "@/lib/utils/formatPrice"
-import { Pencil } from "lucide-react"
+import { Plus } from "lucide-react"
+import { AdminProductsTable } from "@/components/admin/AdminProductsTable"
 
-export const metadata = { title: "Products — Admin" }
+export const metadata = { title: "Produkty — Admin" }
 
 export default async function AdminProductsPage() {
-  const products = await db.product.findMany({
+  const raw = await db.product.findMany({
     include: { category: true, variants: true },
-    orderBy: { createdAt: "desc" },
+    orderBy: { name: 'asc' },
   })
+
+  const products = raw.map((p) => ({
+    id: p.id,
+    name: p.name,
+    categoryName: p.category?.name ?? null,
+    variantCount: p.variants.length,
+    isActive: p.isActive,
+    basePrice: Number(p.basePrice),
+  }))
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold font-playfair">Products</h1>
+        <h1 className="text-3xl font-bold font-playfair">Produkty</h1>
+        <Button asChild size="sm">
+          <Link href="/admin/products/new">
+            <Plus className="h-4 w-4 mr-1.5" />
+            Nový produkt
+          </Link>
+        </Button>
       </div>
-      <div className="rounded-md border border-border/40">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Variants</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {products.map((product) => (
-              <TableRow key={product.id}>
-                <TableCell className="font-medium">{product.name}</TableCell>
-                <TableCell>{product.category?.name ?? "—"}</TableCell>
-                <TableCell>{product.variants.length}</TableCell>
-                <TableCell>
-                  <Badge variant={product.isActive ? "default" : "secondary"}>
-                    {product.isActive ? "Active" : "Inactive"}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button asChild variant="ghost" size="sm">
-                    <Link href={`/admin/products/${product.id}`}><Pencil className="h-4 w-4" /></Link>
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      <AdminProductsTable products={products} />
     </div>
   )
 }

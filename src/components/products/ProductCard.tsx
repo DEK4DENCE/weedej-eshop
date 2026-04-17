@@ -151,6 +151,18 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
             </div>
           )}
 
+          {/* Effects + Flavours */}
+          {(product.effects.length > 0 || product.flavours.length > 0) && (
+            <div className="flex flex-wrap gap-1">
+              {product.effects.slice(0, 3).map((e) => (
+                <span key={e} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#2E7D32]/10 text-[#2E7D32]">{e}</span>
+              ))}
+              {product.flavours.slice(0, 3).map((f) => (
+                <span key={f} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#b8860b]/10 text-[#8B6914]">{f}</span>
+              ))}
+            </div>
+          )}
+
           {/* Stock status */}
           {defaultVariant && (
             <div>
