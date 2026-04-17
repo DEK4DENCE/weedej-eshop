@@ -172,29 +172,21 @@ export async function POST(req: NextRequest) {
       const subtotalCzk = subtotalAmount / 100
 
       const erpItems = items.map(item => {
-        // item.unitPrice is in haléře (price WITH VAT per pack)
+        // item.unitPrice is in haléře (price WITH VAT per pack).
+        // We always send quantity = ordered packs (e.g. 1) with unit "ks".
+        // The variant label is appended to the product name so the invoice reads
+        // "CBD Olej — 5g  ×1  @850 Kč" — clear and unambiguous.
+        // Physical units for stock deduction are handled by the delivery note.
         const unitPriceKc      = item.unitPrice / 100
         const vatRate          = item.vatRate
-        const priceExclVatPerPack = unitPriceKc / (1 + vatRate / 100)
-
-        // If the variant has a physical unit (e.g. 5g), send in that unit so
-        // ERP dispatch quantities and totals are correct (5g × price/g = pack total)
-        const physQty  = item.variantValue && item.variantValue > 0 && item.variantUnit
-          ? item.quantity * item.variantValue
-          : item.quantity
-        const unit     = item.variantValue && item.variantValue > 0 && item.variantUnit
-          ? item.variantUnit
-          : 'ks'
-        const unitPriceCzk = item.variantValue && item.variantValue > 0 && item.variantUnit
-          ? Math.round(priceExclVatPerPack / item.variantValue * 100) / 100
-          : Math.round(priceExclVatPerPack * 100) / 100
+        const unitPriceCzk     = Math.round((unitPriceKc / (1 + vatRate / 100)) * 100) / 100
 
         const erpName = item.variantLabel ? `${item.productName} — ${item.variantLabel}` : item.productName
         return {
           sku:          item.erpProductId ?? undefined,
           name:         erpName,
-          quantity:     physQty,
-          unit,
+          quantity:     item.quantity,   // počet balení (ks), nikdy fyzické gramy
+          unit:         'ks',
           unitPriceCzk,
           vatRate,
         }

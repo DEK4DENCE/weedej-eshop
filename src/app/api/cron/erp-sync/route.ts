@@ -84,41 +84,30 @@ export async function GET(req: NextRequest) {
         ? [addr.fullName, addr.line1, addr.line2].filter(Boolean).join(', ')
         : 'Neuvedena'
 
-      // Look up VAT rate + variant dimensions per product
+      // Look up VAT rate per variant (physical dimensions no longer needed — we send ks)
       const variantIds = items.map((i: any) => i.variantId).filter(Boolean)
-      const variantDataMap = new Map<string, { vatRate: number; variantValue: number | null; variantUnit: string | null }>()
+      const variantDataMap = new Map<string, { vatRate: number }>()
       if (variantIds.length > 0) {
         const variants = await db.productVariant.findMany({
           where:  { id: { in: variantIds } },
-          select: { id: true, variantValue: true, variantUnit: true, product: { select: { vatRate: true } } },
+          select: { id: true, product: { select: { vatRate: true } } },
         })
         for (const v of variants) variantDataMap.set(v.id, {
-          vatRate:      Number(v.product?.vatRate ?? 21),
-          variantValue: v.variantValue ? Number(v.variantValue) : null,
-          variantUnit:  v.variantUnit ?? null,
+          vatRate: Number(v.product?.vatRate ?? 21),
         })
       }
 
       const erpItems = items.map((item: any) => {
-        const vd              = item.variantId ? (variantDataMap.get(item.variantId) ?? { vatRate: 21, variantValue: null, variantUnit: null }) : { vatRate: 21, variantValue: null, variantUnit: null }
-        const vatRate         = vd.vatRate
-        const unitPriceKc     = (item.unitPrice as number) / 100
-        const priceExclPerPack = unitPriceKc / (1 + vatRate / 100)
-
-        const physQty      = vd.variantValue && vd.variantValue > 0 && vd.variantUnit
-          ? item.quantity * vd.variantValue
-          : item.quantity
-        const unit         = vd.variantValue && vd.variantValue > 0 && vd.variantUnit
-          ? vd.variantUnit
-          : 'ks'
-        const unitPriceCzk = vd.variantValue && vd.variantValue > 0 && vd.variantUnit
-          ? Math.round(priceExclPerPack / vd.variantValue * 100) / 100
-          : Math.round(priceExclPerPack * 100) / 100
+        const vd          = item.variantId ? (variantDataMap.get(item.variantId) ?? { vatRate: 21 }) : { vatRate: 21 }
+        const vatRate     = vd.vatRate
+        const unitPriceKc = (item.unitPrice as number) / 100
+        // Always send ordered packs (ks) with pack price — physical units handled by delivery note
+        const unitPriceCzk = Math.round((unitPriceKc / (1 + vatRate / 100)) * 100) / 100
 
         return {
           name:         `${item.productName}${item.variantLabel ? ' — ' + item.variantLabel : ''}`,
-          quantity:     physQty,
-          unit,
+          quantity:     item.quantity,   // počet balení
+          unit:         'ks',
           unitPriceCzk,
           vatRate,
         }
