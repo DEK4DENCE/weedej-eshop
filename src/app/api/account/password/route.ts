@@ -21,7 +21,11 @@ export async function PATCH(req: NextRequest) {
   if (!valid) return NextResponse.json({ error: "Current password is incorrect" }, { status: 400 })
   await db.user.update({
     where: { id: user.id },
-    data: { passwordHash: await hashPassword(parsed.data.newPassword) },
+    data: {
+      passwordHash:   await hashPassword(parsed.data.newPassword),
+      // Increment sessionVersion so any existing JWTs are rejected on next use
+      sessionVersion: { increment: 1 },
+    },
   })
   return NextResponse.json({ success: true })
 }

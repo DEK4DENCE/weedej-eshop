@@ -7,6 +7,46 @@ import { authConfig } from '@/lib/auth.config'
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
+  callbacks: {
+    // Override the base jwt callback to also store & validate sessionVersion.
+    // On sign-in: encode sessionVersion from DB into the token.
+    // On subsequent requests: re-check DB version; return null to force re-login if it changed.
+    async jwt({ token, user }) {
+      if (user) {
+        // Initial sign-in — populate token fields
+        token.id = user.id as string
+        token.role = (user as { role: string }).role
+        // Fetch and store the current sessionVersion
+        const dbUser = await db.user.findUnique({
+          where: { id: user.id as string },
+          select: { sessionVersion: true },
+        })
+        token.sessionVersion = dbUser?.sessionVersion ?? 1
+        return token
+      }
+
+      // Subsequent token refreshes — validate sessionVersion against DB
+      if (token.id) {
+        const dbUser = await db.user.findUnique({
+          where: { id: token.id as string },
+          select: { sessionVersion: true },
+        })
+        if (!dbUser || dbUser.sessionVersion !== (token.sessionVersion as number)) {
+          // Session invalidated (e.g. password changed) — force re-login
+          return null
+        }
+      }
+
+      return token
+    },
+    session({ session, token }) {
+      if (token && session.user) {
+        session.user.id = token.id as string
+        ;(session.user as any).role = token.role
+      }
+      return session
+    },
+  },
   providers: [
     Credentials({
       name: 'credentials',

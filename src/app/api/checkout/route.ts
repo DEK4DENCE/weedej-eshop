@@ -2,27 +2,20 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { stripe } from "@/lib/stripe"
 import { db } from "@/lib/db"
-
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
-function checkRateLimit(ip: string, limit = 10): boolean {
-  const now = Date.now()
-  const entry = rateLimitMap.get(ip)
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + 60_000 })
-    return true
-  }
-  if (entry.count >= limit) return false
-  entry.count++
-  return true
-}
+import { checkRateLimit } from "@/lib/rateLimit"
 
 export async function POST(req: NextRequest) {
   try {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"
-    if (!checkRateLimit(ip)) {
+    // 10 checkout attempts per IP per minute — DB-backed, survives serverless cold starts
+    const rl = await checkRateLimit(`checkout:${ip}`, 10, 60_000)
+    if (!rl.allowed) {
       return NextResponse.json(
         { error: "Příliš mnoho požadavků. Zkuste to znovu za chvíli." },
-        { status: 429 }
+        {
+          status: 429,
+          headers: rl.retryAfter ? { "Retry-After": String(rl.retryAfter) } : {},
+        }
       )
     }
 
@@ -36,24 +29,82 @@ export async function POST(req: NextRequest) {
 
     // Save phone to user profile if provided (works for all delivery types)
     if (contactPhone) {
-      await db.user.update({ where: { id: userId }, data: { phone: contactPhone } }).catch(() => {})
+      await db.user.update({ where: { id: userId }, data: { phone: contactPhone } }).catch((e) => console.error('[Silent error]', e))
     }
 
-    // Stock validation — batch fetch all variants in one query
+    // Atomically validate stock and build verified line items inside a transaction.
+    // Re-reading variants inside the transaction ensures we see the latest stock
+    // values and prevents two concurrent requests from both passing a stale check.
     const variantIds = items.map((i: any) => i.variantId ?? i.variant?.id).filter(Boolean)
-    const variants = await db.productVariant.findMany({ where: { id: { in: variantIds } } })
-    const variantMap = new Map(variants.map((v) => [v.id, v]))
-    for (const item of items) {
-      const variantId = item.variantId ?? item.variant?.id
-      if (!variantId) continue
-      const variant = variantMap.get(variantId)
-      if (!variant || variant.stock < item.quantity) {
-        return NextResponse.json(
-          { error: `${item.productName ?? item.product?.name ?? 'Produkt'} není skladem nebo nemá dostatečný počet kusů` },
-          { status: 400 }
-        )
+
+    const { lineItems, shippingCents } = await db.$transaction(async (tx) => {
+      // Re-fetch variants with their parent product inside the transaction
+      const variants = await tx.productVariant.findMany({
+        where: { id: { in: variantIds } },
+        include: { product: true },
+      })
+      const txVariantMap = new Map(variants.map((v) => [v.id, v]))
+
+      // H-5: validate each item against DB state (active product + sufficient stock)
+      // C-3: this read is inside the transaction so it is consistent with any
+      //       concurrent decrement that may follow in the Stripe webhook path.
+      for (const item of items) {
+        const variantId = item.variantId ?? item.variant?.id
+        if (!variantId) continue
+        const variant = txVariantMap.get(variantId)
+
+        // Variant must exist and its parent product must be active
+        if (!variant || !variant.product.isActive) {
+          throw Object.assign(
+            new Error(`${item.productName ?? item.product?.name ?? 'Produkt'} již není k dispozici`),
+            { status: 400 }
+          )
+        }
+        // Stock must be sufficient at the time of this atomic read
+        if (variant.stock < item.quantity) {
+          throw Object.assign(
+            new Error(`${variant.product.name} není skladem nebo nemá dostatečný počet kusů`),
+            { status: 400 }
+          )
+        }
       }
-    }
+
+      // H-5: build line items using DB prices, not client-supplied prices
+      const txLineItems = items.map((item: any) => {
+        const variantId = item.variantId ?? item.variant?.id
+        const variant = txVariantMap.get(variantId)
+        // Use product name from DB; fall back to client value only for display safety
+        const name = variant?.product.name ?? item.product?.name ?? item.productName ?? item.variant?.product?.name ?? "Product"
+        const rawImage = variant?.product.imageUrls?.[0] ?? item.product?.imageUrls?.[0] ?? item.imageUrl ?? item.variant?.product?.imageUrls?.[0]
+        // Stripe requires absolute URLs — skip local/relative paths
+        const image = rawImage && rawImage.startsWith('http') ? rawImage : undefined
+        // H-5: always use the authoritative DB price
+        const dbPrice = variant?.price ?? 0
+        return {
+          price_data: {
+            currency: "czk",
+            product_data: {
+              name,
+              ...(image ? { images: [image] } : {}),
+            },
+            unit_amount: Math.round(Number(dbPrice) * 100),
+          },
+          quantity: item.quantity,
+        }
+      })
+
+      // H-5: recalculate order subtotal using DB prices for the free-shipping threshold
+      const subtotalFromDb = items.reduce((s: number, i: any) => {
+        const variantId = i.variantId ?? i.variant?.id
+        const dbPrice = Number(txVariantMap.get(variantId)?.price ?? 0)
+        return s + dbPrice * i.quantity
+      }, 0)
+
+      const txShippingCents = deliveryType === "PICKUP_IN_STORE" ? 0
+        : subtotalFromDb >= 1500 ? 0 : 9900
+
+      return { lineItems: txLineItems, shippingCents: txShippingCents }
+    })
 
     // Handle address
     let resolvedAddressId: string | null = null
@@ -63,7 +114,7 @@ export async function POST(req: NextRequest) {
         resolvedAddressId = address.existingAddressId
         // Save phone to user even when using existing address
         if (address.phone) {
-          await db.user.update({ where: { id: userId }, data: { phone: address.phone } }).catch(() => {})
+          await db.user.update({ where: { id: userId }, data: { phone: address.phone } }).catch((e) => console.error('[Silent error]', e))
         }
       } else {
         // Create new address and optionally save
@@ -103,30 +154,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const shippingCents = deliveryType === "PICKUP_IN_STORE" ? 0
-      : items.reduce((s: number, i: any) => s + Number(variantMap.get(i.variantId ?? i.variant?.id)?.price ?? 0) * i.quantity, 0) >= 1500
-      ? 0 : 9900
-
     const origin = req.headers.get("origin") ?? process.env.NEXTAUTH_URL ?? "http://localhost:3000"
-
-    const lineItems = items.map((item: any) => {
-      const name = item.product?.name ?? item.productName ?? item.variant?.product?.name ?? "Product"
-      const rawImage = item.product?.imageUrls?.[0] ?? item.imageUrl ?? item.variant?.product?.imageUrls?.[0]
-      // Stripe requires absolute URLs — skip local/relative paths
-      const image = rawImage && rawImage.startsWith('http') ? rawImage : undefined
-      const price = variantMap.get(item.variantId ?? item.variant?.id)?.price ?? 0
-      return {
-        price_data: {
-          currency: "czk",
-          product_data: {
-            name,
-            ...(image ? { images: [image] } : {}),
-          },
-          unit_amount: Math.round(Number(price) * 100),
-        },
-        quantity: item.quantity,
-      }
-    })
 
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -176,6 +204,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ url: checkoutSession.url })
   } catch (error: any) {
+    // Validation errors thrown from inside the transaction carry a .status property
+    if (error?.status === 400) {
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
     console.error("Checkout error:", error)
     return NextResponse.json({ error: "Checkout failed. Please try again." }, { status: 500 })
   }

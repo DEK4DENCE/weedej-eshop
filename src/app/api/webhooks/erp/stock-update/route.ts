@@ -110,7 +110,7 @@ async function applyStockUpdate(
     await db.product.update({
       where: { id: productId },
       data:  { erpStock: upd.stock, erpUnit: upd.unit },
-    }).catch(() => {})
+    }).catch((e) => console.error('[Silent error]', e))
   }
 
   // Also update variants without erpProductId using product.erpStock as fallback

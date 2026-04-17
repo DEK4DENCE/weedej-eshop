@@ -53,15 +53,16 @@ enum StockMovementType {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  name          String?
-  phone         String?
-  passwordHash  String?
-  role          Role      @default(CUSTOMER)
-  emailVerified DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id             String    @id @default(cuid())
+  email          String    @unique
+  name           String?
+  phone          String?
+  passwordHash   String?
+  role           Role      @default(CUSTOMER)
+  emailVerified  DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  sessionVersion Int       @default(1)
 
   newsletter              Boolean   @default(false)
   dateOfBirth             DateTime?

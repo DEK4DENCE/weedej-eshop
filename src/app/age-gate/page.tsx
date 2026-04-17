@@ -1,24 +1,28 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Shield } from "lucide-react"
+import { Suspense } from "react"
 
-const STORAGE_KEY = "weedej_age_verified"
 const AGE_COOKIE = "age_verified"
 
-export function AgeGate() {
-  const [show, setShow] = useState(false)
+function AgeGatePage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [denied, setDenied] = useState(false)
 
-  useEffect(() => {
-    const cookieVerified = document.cookie
-      .split("; ")
-      .some((c) => c === `${AGE_COOKIE}=true`)
-    const storageVerified = localStorage.getItem(STORAGE_KEY)
-    if (!cookieVerified && !storageVerified) setShow(true)
-  }, [])
+  const handleConfirm = () => {
+    document.cookie = `${AGE_COOKIE}=true; path=/; max-age=31536000; SameSite=Lax`
+    const from = searchParams.get("from") || "/"
+    // Ensure the destination is a relative path to prevent open redirect
+    const destination = from.startsWith("/") ? from : "/"
+    router.replace(destination)
+  }
 
-  if (!show) return null
+  const handleDeny = () => {
+    setDenied(true)
+  }
 
   if (denied) {
     return (
@@ -66,21 +70,9 @@ export function AgeGate() {
     )
   }
 
-  const handleConfirm = () => {
-    // Set a cookie readable by the server-side middleware
-    document.cookie = `${AGE_COOKIE}=true; path=/; max-age=31536000; SameSite=Lax`
-    localStorage.setItem(STORAGE_KEY, "1")
-    setShow(false)
-  }
-
-  const handleDeny = () => {
-    setDenied(true)
-  }
-
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md">
       <div className="bg-white border border-[#DEE2E6] rounded-2xl p-10 max-w-md w-full mx-4 text-center shadow-2xl">
-        {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-8">
           <Shield className="h-6 w-6 text-[#2E7D32]" />
           <span className="text-xl font-bold text-[#2E7D32] tracking-tight">Weedej</span>
@@ -112,10 +104,18 @@ export function AgeGate() {
         </div>
 
         <p className="mt-6 text-[10px] text-[#aeaeb2] leading-relaxed">
-          Kliknutím na &ldquo;Ano, je mi 18+&rdquo; potvrzujete, že jste plnoletí a máte právo přistoupit k tomuto obsahu.
-          Ověření věku si zapamatujeme pomocí cookies.
+          Kliknutím na &ldquo;Ano, je mi 18+&rdquo; potvrzujete, že jste plnoletí a máte právo
+          přistoupit k tomuto obsahu. Ověření věku si zapamatujeme pomocí cookies.
         </p>
       </div>
     </div>
+  )
+}
+
+export default function AgeGateRoute() {
+  return (
+    <Suspense>
+      <AgeGatePage />
+    </Suspense>
   )
 }

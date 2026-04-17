@@ -53,6 +53,9 @@ export async function GET() {
   }
 
   // Test DB sloupců přes raw SQL
+  // Safe: $queryRaw with a tagged template literal — Prisma parameterizes all
+  // interpolated values automatically.  No user input is interpolated here;
+  // all values are compile-time string literals.  $queryRawUnsafe is NOT used.
   try {
     const cols = await db.$queryRaw<{ column_name: string }[]>`
       SELECT column_name FROM information_schema.columns

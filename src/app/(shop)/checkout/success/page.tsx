@@ -103,7 +103,7 @@ async function processOrder(sessionId: string): Promise<{ erpOrderNumber: string
           select: { id: true, erpOrderNumber: true, erpSyncStatus: true },
         })
         // Clear cart after creating order
-        await db.cartItem.deleteMany({ where: { cart: { userId } } }).catch(() => {})
+        await db.cartItem.deleteMany({ where: { cart: { userId } } }).catch((e) => console.error('[Silent error]', e))
       } catch {
         // Race condition: webhook created it between our check and create
         const raceOrder = await db.order.findUnique({
@@ -198,18 +198,18 @@ async function processOrder(sessionId: string): Promise<{ erpOrderNumber: string
         await db.productVariant.update({
           where: { id: item.variantId },
           data:  { stock: { decrement: item.quantity } },
-        }).catch(() => {})
+        }).catch((e) => console.error('[Silent error]', e))
         await db.stockMovement.create({
           data: { variantId: item.variantId, type: "RESERVED", quantity: item.quantity, orderId: order.id, reason: "Order paid" },
-        }).catch(() => {})
+        }).catch((e) => console.error('[Silent error]', e))
       }
     } catch (erpErr: any) {
       console.error(`[Success] ERP sync failed for orderId=${order.id}:`, erpErr?.message)
       await db.order.update({
         where: { id: order.id },
         data: { erpSyncAttempts: 1, erpSyncLastError: erpErr?.message ?? "Unknown error" },
-      }).catch(() => {})
-      await db.erpSyncAttempt.create({ data: { orderId: order.id, success: false, error: erpErr?.message } }).catch(() => {})
+      }).catch((e) => console.error('[Silent error]', e))
+      await db.erpSyncAttempt.create({ data: { orderId: order.id, success: false, error: erpErr?.message } }).catch((e) => console.error('[Silent error]', e))
     }
 
     // ── Send confirmation email ────────────────────────────────────────────

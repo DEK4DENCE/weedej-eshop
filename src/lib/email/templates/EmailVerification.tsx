@@ -55,7 +55,7 @@ export function EmailVerification({ name, verifyUrl }: EmailVerificationProps) {
           <Hr style={divider} />
 
           <Text style={footer}>
-            Tým Weedej &bull; support@weedej.com
+            Tým Weedej &bull; support@weedej.cz
           </Text>
         </Container>
       </Body>

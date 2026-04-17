@@ -159,7 +159,7 @@ async function sendShippingEmail(
           await db.order.update({
             where: { id: updatedOrder.id },
             data: { invoicePdfBase64 },
-          }).catch(() => {})
+          }).catch((e) => console.error('[Silent error]', e))
         }
       }
     } catch {

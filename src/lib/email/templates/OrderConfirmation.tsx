@@ -56,7 +56,7 @@ interface OrderConfirmationAckProps {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://weedej.com'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://weedej.cz'
 
 function formatPrice(cents: number) {
   return `${Math.round(cents / 100).toLocaleString('cs-CZ')} Kč`

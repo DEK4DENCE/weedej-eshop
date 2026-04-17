@@ -61,6 +61,25 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
           }),
         ])
       )
+    } else if (status === "REFUNDED") {
+      // Restore stock to each variant and create a RELEASED movement for audit trail
+      await db.$transaction(
+        order.items.flatMap((item) => [
+          db.productVariant.update({
+            where: { id: item.variantId },
+            data: { stock: { increment: item.quantity } },
+          }),
+          db.stockMovement.create({
+            data: {
+              variantId: item.variantId,
+              type: "RELEASED",
+              quantity: item.quantity,
+              orderId: id,
+              reason: "Order refunded",
+            },
+          }),
+        ])
+      )
     }
   } catch (stockError) {
     console.error("Failed to update stock on order status change:", stockError)

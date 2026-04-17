@@ -48,8 +48,8 @@ export function PasswordReset({ name, resetUrl }: PasswordResetProps) {
 
           <Text style={paragraph}>
             V případě jakýchkoli obav nás kontaktujte na{' '}
-            <Link href="mailto:support@weedej.com" style={link}>
-              support@weedej.com
+            <Link href="mailto:support@weedej.cz" style={link}>
+              support@weedej.cz
             </Link>
             .
           </Text>

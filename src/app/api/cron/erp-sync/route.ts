@@ -223,7 +223,7 @@ export async function GET(req: NextRequest) {
 
       if (isFinal) {
         console.error(`[ErpSync] SYNC FAILED permanently for orderId=${order.id} — alerting admin`)
-        await alertAdmin(order.id).catch(() => {})
+        await alertAdmin(order.id).catch((e) => console.error('[Silent error]', e))
       }
     }
   }

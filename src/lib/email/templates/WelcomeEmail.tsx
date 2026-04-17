@@ -14,7 +14,7 @@ interface WelcomeEmailProps {
   name: string
 }
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://weedej.com'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://weedej.cz'
 
 export function WelcomeEmail({ name }: WelcomeEmailProps) {
   return (
@@ -60,8 +60,8 @@ export function WelcomeEmail({ name }: WelcomeEmailProps) {
 
           <Text style={paragraph}>
             Máte-li jakékoli dotazy, náš tým podpory je k dispozici na{' '}
-            <Link href="mailto:support@weedej.com" style={link}>
-              support@weedej.com
+            <Link href="mailto:support@weedej.cz" style={link}>
+              support@weedej.cz
             </Link>{' '}
             nebo prostřednictvím živého chatu na webu.
           </Text>
@@ -77,8 +77,8 @@ export function WelcomeEmail({ name }: WelcomeEmailProps) {
           <Text style={footer}>
             Tento e-mail jste obdrželi, protože jste si vytvořili účet ve Weedej. Pokud jste si
             účet nevytvořili, kontaktujte nás neprodleně na{' '}
-            <Link href="mailto:support@weedej.com" style={footerLink}>
-              support@weedej.com
+            <Link href="mailto:support@weedej.cz" style={footerLink}>
+              support@weedej.cz
             </Link>
             .
           </Text>

@@ -4,18 +4,25 @@ import { NextResponse } from 'next/server'
 
 const { auth } = NextAuth(authConfig)
 
-// Rate limiting for admin API routes — 60 requests per minute per IP
+// NOTE: In-memory rate limiting does not persist across serverless cold starts.
+// Admin API routes are protected by requireAdmin() (session + role check) which
+// already prevents unauthenticated abuse.  The per-IP limit below is an additional
+// layer — kept simple here.  For production hardening, replace with Upstash Redis
+// using @upstash/ratelimit which is edge-compatible and survives cold starts.
 const adminRateLimitMap = new Map<string, { count: number; resetAt: number }>()
-function checkAdminRateLimit(ip: string): boolean {
+function checkAdminRateLimit(ip: string): { allowed: boolean; retryAfter?: number } {
   const now = Date.now()
   const entry = adminRateLimitMap.get(ip)
   if (!entry || now > entry.resetAt) {
     adminRateLimitMap.set(ip, { count: 1, resetAt: now + 60_000 })
-    return true
+    return { allowed: true }
   }
-  if (entry.count >= 60) return false
+  if (entry.count >= 60) {
+    const retryAfter = Math.ceil((entry.resetAt - now) / 1000)
+    return { allowed: false, retryAfter }
+  }
   entry.count++
-  return true
+  return { allowed: true }
 }
 
 export default auth((req) => {
@@ -27,8 +34,15 @@ export default auth((req) => {
     // Rate limit admin API endpoints
     if (pathname.startsWith('/api/admin')) {
       const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
-      if (!checkAdminRateLimit(ip)) {
-        return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+      const adminRl = checkAdminRateLimit(ip)
+      if (!adminRl.allowed) {
+        return NextResponse.json(
+          { error: 'Too many requests' },
+          {
+            status: 429,
+            headers: adminRl.retryAfter ? { 'Retry-After': String(adminRl.retryAfter) } : {},
+          }
+        )
       }
     }
 
