@@ -16,7 +16,7 @@
         { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
         { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" },
         { "key": "X-XSS-Protection", "value": "1; mode=block" },
-        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com https://www.googletagmanager.com https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self'; connect-src 'self' https://api.stripe.com https://www.google-analytics.com https://*.vercel-analytics.com; frame-src https://js.stripe.com; object-src 'none'; base-uri 'self';" }
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com https://www.googletagmanager.com https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; media-src 'self' https://d8j0ntlcm91z4.cloudfront.net https://stream.mux.com https://*.mux.com blob:; connect-src 'self' https://api.stripe.com https://www.google-analytics.com https://*.vercel-analytics.com https://stream.mux.com https://*.mux.com; frame-src https://js.stripe.com; object-src 'none'; base-uri 'self';" }
       ]
     }
   ]
