@@ -4,14 +4,7 @@ import { useState, useCallback } from "react"
 import { MapPin, Search, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-
-interface PickupPoint {
-  id: string
-  name: string
-  nameStreet: string
-  city: string
-  zip: string
-}
+import type { PickupPoint } from "@/components/checkout/PacketaWidget"
 
 interface Props {
   onSelect: (point: PickupPoint) => void

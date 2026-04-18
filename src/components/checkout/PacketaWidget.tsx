@@ -4,13 +4,12 @@ import { useEffect, useRef, useState } from "react"
 import { MapPin, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-interface PickupPoint {
+export interface PickupPoint {
   id: string | number
   name: string
   nameStreet: string
   city: string
   zip: string
-  [key: string]: unknown
 }
 
 interface Props {

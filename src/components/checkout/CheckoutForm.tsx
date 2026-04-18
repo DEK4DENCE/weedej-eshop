@@ -13,16 +13,8 @@ import { motion } from "framer-motion"
 import Link from "next/link"
 import Image from "next/image"
 import { DeliveryCarrierSelector, type DeliveryMethod } from "@/components/checkout/DeliveryCarrierSelector"
-import { PacketaWidget } from "@/components/checkout/PacketaWidget"
+import { PacketaWidget, type PickupPoint } from "@/components/checkout/PacketaWidget"
 import { DpdPickupSelector } from "@/components/checkout/DpdPickupSelector"
-
-interface PickupPoint {
-  id: string
-  name: string
-  nameStreet: string
-  city: string
-  zip: string
-}
 
 interface Address {
   id: string
@@ -120,7 +112,7 @@ export function CheckoutForm({ user, addresses }: Props) {
           deliveryType: deliveryMethod,
           address: addressPayload,
           phone,
-          pickupPointId: pickupPoint?.id ?? undefined,
+          pickupPointId: pickupPoint?.id != null ? String(pickupPoint.id) : undefined,
           pickupPointName: pickupPoint?.name ?? undefined,
           pickupPointAddress: pickupPoint ? `${pickupPoint.nameStreet}, ${pickupPoint.zip} ${pickupPoint.city}` : undefined,
           billingAddress: billingDifferent ? billingAddress : undefined,
