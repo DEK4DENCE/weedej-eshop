@@ -5,7 +5,6 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { SlidersHorizontal, RotateCcw, ChevronDown, Search, X } from 'lucide-react'
 import type { Category, StrainType, ActiveSubstance } from '@/types/product'
-import { Logo } from '@/components/ui/Logo'
 
 const STRAIN_TYPES: { value: StrainType; label: string }[] = [
   { value: 'INDICA', label: 'Indica' },
@@ -270,11 +269,6 @@ export function ProductFilters() {
 
   return (
     <aside className="flex flex-col gap-3 w-full">
-      {/* Logo — centered above search */}
-      <div className="flex justify-center pb-1">
-        <Logo variant="dark" size="md" />
-      </div>
-
       {/* Search */}
       <SidebarSearch />
 

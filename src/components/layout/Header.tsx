@@ -50,7 +50,7 @@ export function Header({ categories = [] }: HeaderProps) {
     <header className="sticky top-0 z-50 w-full border-b border-[#DEE2E6] bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
-        <div onClick={() => setMobileOpen(false)} className="flex-shrink-0">
+        <div onClick={() => setMobileOpen(false)} className="flex-shrink-0 ml-5">
           <Logo variant="dark" size="xl" />
         </div>
 
