@@ -13,10 +13,10 @@
         { "key": "X-Frame-Options", "value": "DENY" },
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(self)" },
         { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" },
         { "key": "X-XSS-Protection", "value": "1; mode=block" },
-        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com https://www.googletagmanager.com https://va.vercel-scripts.com https://widget.packeta.com; style-src 'self' 'unsafe-inline'; style-src-elem 'self' 'unsafe-inline' https://widget.packeta.com; img-src 'self' data: https: blob:; font-src 'self' data:; media-src 'self' https://d8j0ntlcm91z4.cloudfront.net https://stream.mux.com https://*.mux.com blob:; connect-src 'self' https://api.stripe.com https://www.google-analytics.com https://*.vercel-analytics.com https://stream.mux.com https://*.mux.com https://widget.packeta.com https://api.packeta.com; frame-src https://js.stripe.com https://widget.packeta.com; object-src 'none'; base-uri 'self';" }
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com https://www.googletagmanager.com https://va.vercel-scripts.com https://widget.packeta.com https://maps.googleapis.com https://maps.gstatic.com; style-src 'self' 'unsafe-inline'; style-src-elem 'self' 'unsafe-inline' https://widget.packeta.com https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' data: https://fonts.gstatic.com; media-src 'self' https://d8j0ntlcm91z4.cloudfront.net https://stream.mux.com https://*.mux.com blob:; connect-src 'self' https://api.stripe.com https://www.google-analytics.com https://*.vercel-analytics.com https://stream.mux.com https://*.mux.com https://widget.packeta.com https://api.packeta.com https://maps.googleapis.com https://maps.gstatic.com https://*.googleapis.com; frame-src https://js.stripe.com https://widget.packeta.com; worker-src blob:; object-src 'none'; base-uri 'self';" }
       ]
     }
   ]
