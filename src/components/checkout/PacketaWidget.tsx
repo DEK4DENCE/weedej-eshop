@@ -4,8 +4,8 @@
 // Requires NEXT_PUBLIC_PACKETA_API_KEY env var (get from app.packeta.com).
 // Widget docs: https://docs.packeta.com/docs/widget/
 
-import { useEffect, useRef } from "react"
-import { MapPin } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
+import { MapPin, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface PickupPoint {
@@ -41,31 +41,36 @@ const SCRIPT_ID = "packeta-widget-script"
 
 export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
   const apiKey = process.env.NEXT_PUBLIC_PACKETA_API_KEY ?? ""
-  const scriptLoaded = useRef(false)
+  const [scriptReady, setScriptReady] = useState(false)
 
   useEffect(() => {
-    if (scriptLoaded.current || document.getElementById(SCRIPT_ID)) {
-      scriptLoaded.current = true
+    // Already loaded from a previous mount
+    if (window.Packeta?.Widget) {
+      setScriptReady(true)
       return
+    }
+    const existing = document.getElementById(SCRIPT_ID)
+    if (existing) {
+      // Script tag exists but may still be loading — poll until ready
+      const poll = setInterval(() => {
+        if (window.Packeta?.Widget) {
+          setScriptReady(true)
+          clearInterval(poll)
+        }
+      }, 100)
+      return () => clearInterval(poll)
     }
     const script = document.createElement("script")
     script.id = SCRIPT_ID
     script.src = SCRIPT_SRC
     script.async = true
-    script.onload = () => {
-      scriptLoaded.current = true
-    }
+    script.onload = () => setScriptReady(true)
     document.body.appendChild(script)
   }, [])
 
   function openWidget() {
-    if (!window.Packeta?.Widget) {
-      console.warn("Packeta widget script not yet loaded")
-      return
-    }
+    if (!window.Packeta?.Widget) return
     // Remove any lingering Packeta overlay so the widget can be reopened
-    document.getElementById("packeta-widget")?.remove()
-    document.getElementById("packeta-widget-overlay")?.remove()
     document.querySelectorAll('[id^="packeta"]').forEach((el) => el.remove())
     window.Packeta.Widget.pick(
       apiKey,
@@ -115,10 +120,13 @@ export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
           variant="outline"
           className="w-full gap-2"
           onClick={openWidget}
-          disabled={!apiKey}
+          disabled={!apiKey || !scriptReady}
         >
-          <MapPin className="h-4 w-4" />
-          Vybrat výdejní místo
+          {!scriptReady ? (
+            <><Loader2 className="h-4 w-4 animate-spin" />Načítám mapu…</>
+          ) : (
+            <><MapPin className="h-4 w-4" />Vybrat výdejní místo</>
+          )}
         </Button>
       )}
     </div>
