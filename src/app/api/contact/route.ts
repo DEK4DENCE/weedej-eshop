@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { sendEmail } from '@/lib/email/send'
 import { checkRateLimit } from '@/lib/rateLimit'
 import React from 'react'
+export const dynamic = 'force-dynamic'
 
 /** Strip CR/LF characters to prevent email header injection */
 function sanitizeHeader(value: string): string {

@@ -4,6 +4,7 @@ import { stripe } from "@/lib/stripe"
 import { db } from "@/lib/db"
 import { checkRateLimit } from "@/lib/rateLimit"
 import { z } from "zod"
+export const dynamic = 'force-dynamic'
 
 const checkoutItemSchema = z.object({
   variantId: z.string().min(1).optional(),

@@ -7,6 +7,7 @@ import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
 import { calcVariantStock } from "@/lib/erp/calcVariantStock"
 import { generateSlug } from "@/lib/utils/slug"
+export const dynamic = 'force-dynamic'
 
 // ─── ERP payload schemas ──────────────────────────────────────────────────────
 

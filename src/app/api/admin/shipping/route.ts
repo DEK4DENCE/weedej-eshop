@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
+export const dynamic = 'force-dynamic'
 
 export async function GET() {
   const { error: authError } = await requireAdmin()

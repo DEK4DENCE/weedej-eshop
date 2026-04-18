@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
 import { revalidatePath } from "next/cache"
 import { logAdminAction } from "@/lib/audit"
+export const dynamic = 'force-dynamic'
 
 const ALLOWED_PRODUCT_FIELDS = new Set([
   "name", "slug", "description", "shortDescription", "imageUrls",

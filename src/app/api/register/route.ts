@@ -6,6 +6,7 @@ import { generateToken } from '@/lib/utils/generateToken'
 import { sendEmail } from '@/lib/email/send'
 import { WelcomeEmail } from '@/lib/email/templates/WelcomeEmail'
 import { EmailVerification } from '@/lib/email/templates/EmailVerification'
+export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   try {

@@ -5,6 +5,7 @@ import { invalidateEmailSettingsCache } from "@/lib/email/send"
 import { encryptSetting, decryptSetting, SENSITIVE_SETTING_KEYS } from "@/lib/encrypt"
 import { logAdminAction } from "@/lib/audit"
 import { z } from "zod"
+export const dynamic = 'force-dynamic'
 
 // Each setting value must be a string; keys are validated against an allowlist
 // to prevent mass-assignment of arbitrary DB keys.

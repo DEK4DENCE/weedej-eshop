@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
 import { revalidatePath } from "next/cache"
 import { generateSlug } from "@/lib/utils/slug"
+export const dynamic = 'force-dynamic'
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { error: authError } = await requireAdmin()

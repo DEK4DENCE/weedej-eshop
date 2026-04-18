@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
+export const dynamic = 'force-dynamic'
 
 const SUBSTANCE_PATTERN = /\s*\((THC-X|THC_X|THC|CBD|HHC)\)\s*/gi
 

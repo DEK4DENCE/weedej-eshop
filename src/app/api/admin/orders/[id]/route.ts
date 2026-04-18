@@ -9,6 +9,7 @@ import { OrderDelivered } from "@/lib/email/templates/OrderDelivered"
 import { logAdminAction } from "@/lib/audit"
 import React from "react"
 import { z } from "zod"
+export const dynamic = 'force-dynamic'
 
 // C3: Valid order state transitions — prevents illegal moves like DELIVERED → PAID
 const VALID_TRANSITIONS: Record<string, string[]> = {

@@ -9,6 +9,7 @@ import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { getErpProducts, isErpConfigured } from "@/lib/erp"
 import { calcVariantStock } from "@/lib/erp/calcVariantStock"
+export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   const session = await auth()

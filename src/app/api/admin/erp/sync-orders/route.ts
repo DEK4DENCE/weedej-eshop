@@ -6,6 +6,7 @@ import { NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
 import { getErpOrder, getErpConfig } from "@/lib/erp"
+export const dynamic = 'force-dynamic'
 
 // ERP status → Eshop OrderStatus
 const ERP_TO_ESHOP_STATUS: Record<string, string> = {

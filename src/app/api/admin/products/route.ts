@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
 import { revalidatePath } from "next/cache"
 import { logAdminAction } from "@/lib/audit"
+export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   const { session, error: authError } = await requireAdmin()
