@@ -4,6 +4,7 @@ import { generateToken } from '@/lib/utils/generateToken'
 import { sendEmail } from '@/lib/email/send'
 import { PasswordReset } from '@/lib/email/templates/PasswordReset'
 import { forgotPasswordSchema } from '@/lib/validations/auth'
+import { checkRateLimit } from '@/lib/rateLimit'
 export const dynamic = 'force-dynamic'
 
 // Always return the same message to prevent email enumeration
@@ -11,6 +12,15 @@ const SAFE_RESPONSE = { message: 'If that email exists, you will receive a reset
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+    const rl = await checkRateLimit(`forgot:${ip}`, 3, 900_000)
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: 'Příliš mnoho požadavků. Zkuste to znovu za chvíli.' },
+        { status: 429, headers: rl.retryAfter ? { 'Retry-After': String(rl.retryAfter) } : {} }
+      )
+    }
+
     const body = await req.json()
     const parsed = forgotPasswordSchema.safeParse(body)
     if (!parsed.success) {

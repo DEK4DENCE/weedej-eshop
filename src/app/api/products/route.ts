@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
     const search = searchParams.get('search')
     const featured = searchParams.get('featured')
     const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '12')
+    const limit = Math.min(parseInt(searchParams.get('limit') || '12') || 12, 100)
 
     const where: any = { isActive: true }
 

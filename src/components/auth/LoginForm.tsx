@@ -15,7 +15,11 @@ import { Label } from '@/components/ui/label'
 export function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') ?? '/products'
+  const rawCallback = searchParams.get('callbackUrl') ?? '/products'
+  // Only allow relative paths — reject absolute URLs (open redirect prevention)
+  const callbackUrl = rawCallback.startsWith('/') && !rawCallback.startsWith('//')
+    ? rawCallback
+    : '/products'
   const [showPassword, setShowPassword] = useState(false)
   const [serverError, setServerError] = useState('')
   const [notVerified, setNotVerified] = useState(false)

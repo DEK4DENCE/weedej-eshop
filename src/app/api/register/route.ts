@@ -6,10 +6,20 @@ import { generateToken } from '@/lib/utils/generateToken'
 import { sendEmail } from '@/lib/email/send'
 import { WelcomeEmail } from '@/lib/email/templates/WelcomeEmail'
 import { EmailVerification } from '@/lib/email/templates/EmailVerification'
+import { checkRateLimit } from '@/lib/rateLimit'
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+    const rl = await checkRateLimit(`register:${ip}`, 5, 600_000)
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: 'Příliš mnoho požadavků. Zkuste to znovu za chvíli.' },
+        { status: 429, headers: rl.retryAfter ? { 'Retry-After': String(rl.retryAfter) } : {} }
+      )
+    }
+
     const body = await req.json()
     const parsed = registerSchema.safeParse(body)
     if (!parsed.success) {
