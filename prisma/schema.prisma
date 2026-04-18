@@ -26,8 +26,12 @@ enum OrderStatus {
 }
 
 enum DeliveryType {
-  COURIER
-  PICKUP_IN_STORE
+  COURIER          // legacy
+  PICKUP_IN_STORE  // legacy
+  DPD_HOME         // DPD doručení na adresu
+  DPD_PICKUP       // DPD doručení do výdejního místa
+  ZASILKOVNA_HOME  // Zásilkovna doručení na adresu
+  ZASILKOVNA_PICKUP // Zásilkovna doručení na výdejní místo / Z-BOX
 }
 
 enum StrainType {
@@ -302,6 +306,9 @@ model Order {
   // Shipping
   trackingNumber        String?
   carrier               String?
+  pickupPointId         String?   // Zásilkovna/DPD pickup point ID
+  pickupPointName       String?   // Human-readable pickup point name
+  pickupPointAddress    String?   // Full address of pickup point
   shippedAt             DateTime?
   deliveredAt           DateTime?
   createdAt             DateTime    @default(now())
@@ -314,6 +321,7 @@ model Order {
 
   @@index([userId])
   @@index([status])
+  @@index([userId, status])
   @@index([stripeSessionId])
   @@index([erpSyncStatus])
   @@index([createdAt(sort: Desc)])
@@ -372,6 +380,7 @@ model OrderItem {
   variant ProductVariant @relation(fields: [variantId], references: [id])
 
   @@index([orderId])
+  @@index([variantId])
 }
 
 model ShippingMethod {

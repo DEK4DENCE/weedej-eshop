@@ -12,6 +12,7 @@ const BASELINE = [
   '20260416000000_add_paid_at',
   '20260417000000_add_active_substance',
   '20260418000000_idempotency_and_stock_constraint',
+  '20260418100000_add_carrier_delivery_types',
 ]
 
 for (const name of BASELINE) {

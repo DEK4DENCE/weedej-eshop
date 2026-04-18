@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
 
   const userId       = session.metadata?.userId
   const itemsRaw     = session.metadata?.items
-  const deliveryType = (session.metadata?.deliveryType ?? 'COURIER') as 'COURIER' | 'PICKUP_IN_STORE'
+  const deliveryType = (session.metadata?.deliveryType ?? 'COURIER') as 'COURIER' | 'PICKUP_IN_STORE' | 'DPD_HOME' | 'DPD_PICKUP' | 'ZASILKOVNA_HOME' | 'ZASILKOVNA_PICKUP'
   const addressId    = session.metadata?.addressId || null
 
   if (!userId || !itemsRaw) return NextResponse.json({ received: true })
@@ -133,6 +133,8 @@ export async function POST(req: NextRequest) {
         totalAmount,
         subtotalAmount,
         shippingAmount,
+        pickupPointId:   session.metadata?.pickupPointId || null,
+        pickupPointName: session.metadata?.pickupPointName || null,
         items: {
           create: items.map(item => ({
             productId:    item.productId,

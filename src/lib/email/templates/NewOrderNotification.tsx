@@ -17,7 +17,7 @@ interface NewOrderNotificationProps {
   subtotalAmount: number
   shippingAmount: number
   totalAmount: number
-  deliveryType: 'COURIER' | 'PICKUP_IN_STORE'
+  deliveryType: 'COURIER' | 'PICKUP_IN_STORE' | 'DPD_HOME' | 'DPD_PICKUP' | 'ZASILKOVNA_HOME' | 'ZASILKOVNA_PICKUP'
   shippingAddress?: {
     fullName: string
     line1: string
@@ -57,7 +57,14 @@ export function NewOrderNotification({
             <Text style={infoLabel}>Zákazník</Text>
             <Text style={infoValue}>{customerName} ({customerEmail})</Text>
             <Text style={infoLabel}>Doručení</Text>
-            <Text style={infoValue}>{deliveryType === 'PICKUP_IN_STORE' ? 'Osobní odběr' : 'Kurýr'}</Text>
+            <Text style={infoValue}>{
+              deliveryType === 'DPD_HOME'          ? 'DPD – Doručení na adresu'          :
+              deliveryType === 'DPD_PICKUP'         ? 'DPD – Výdejní místo'               :
+              deliveryType === 'ZASILKOVNA_HOME'    ? 'Zásilkovna – Doručení na adresu'   :
+              deliveryType === 'ZASILKOVNA_PICKUP'  ? 'Zásilkovna – Výdejní místo / Z-BOX':
+              deliveryType === 'PICKUP_IN_STORE'    ? 'Osobní odběr'                      :
+                                                      'Kurýrní doručení'
+            }</Text>
           </Section>
 
           {shippingAddress && (

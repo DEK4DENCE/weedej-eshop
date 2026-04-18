@@ -30,6 +30,8 @@ interface ShippingAddress {
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
+type DeliveryTypeValue = 'COURIER' | 'PICKUP_IN_STORE' | 'DPD_HOME' | 'DPD_PICKUP' | 'ZASILKOVNA_HOME' | 'ZASILKOVNA_PICKUP'
+
 interface OrderConfirmationWithInvoiceProps {
   name:              string
   orderNumber:       string   // ESH{YYYY}{XXXX}
@@ -37,7 +39,7 @@ interface OrderConfirmationWithInvoiceProps {
   subtotalAmount:    number   // haléře
   shippingAmount:    number   // haléře
   totalAmount:       number   // haléře
-  deliveryType:      'COURIER' | 'PICKUP_IN_STORE'
+  deliveryType:      DeliveryTypeValue
   shippingAddress?:  ShippingAddress
   invoiceNumber?:    string   // VF{YYYY}{XXXX} — shown in email body
   invoiceAttached?:  boolean  // true = PDF is actually attached; false = available in account
@@ -50,7 +52,7 @@ interface OrderConfirmationAckProps {
   subtotalAmount:   number
   shippingAmount:   number
   totalAmount:      number
-  deliveryType:     'COURIER' | 'PICKUP_IN_STORE'
+  deliveryType:     DeliveryTypeValue
   shippingAddress?: ShippingAddress
 }
 
@@ -106,20 +108,29 @@ function ItemsTable({ items, subtotalAmount, shippingAmount, totalAmount }: {
 }
 
 function DeliveryBlock({ deliveryType, shippingAddress }: {
-  deliveryType:     'COURIER' | 'PICKUP_IN_STORE'
+  deliveryType:     DeliveryTypeValue
   shippingAddress?: ShippingAddress
 }) {
+  const isPickup = deliveryType === 'PICKUP_IN_STORE' || deliveryType === 'DPD_PICKUP' || deliveryType === 'ZASILKOVNA_PICKUP'
+  const label =
+    deliveryType === 'PICKUP_IN_STORE' ? 'Osobní odběr'
+    : deliveryType === 'DPD_HOME' ? 'DPD — doručení na adresu'
+    : deliveryType === 'DPD_PICKUP' ? 'DPD — výdejní místo'
+    : deliveryType === 'ZASILKOVNA_HOME' ? 'Zásilkovna — doručení na adresu'
+    : deliveryType === 'ZASILKOVNA_PICKUP' ? 'Zásilkovna — výdejní místo / Z-BOX'
+    : 'Doručení kurýrem'
+
   return (
     <>
       <Text style={sectionTitle}>Doručení</Text>
-      {deliveryType === 'PICKUP_IN_STORE' ? (
+      {isPickup && deliveryType === 'PICKUP_IN_STORE' ? (
         <Text style={paragraph}>
           <strong style={{ color: '#1d1d1f' }}>Osobní odběr</strong> — Vaše objednávka bude
           připravena k vyzvednutí na naší prodejně. Kontaktujeme vás, jakmile bude připravena.
         </Text>
       ) : shippingAddress ? (
         <Text style={paragraph}>
-          <strong style={{ color: '#1d1d1f' }}>Doručení kurýrem</strong>
+          <strong style={{ color: '#1d1d1f' }}>{label}</strong>
           <br />
           {shippingAddress.fullName}<br />
           {shippingAddress.line1}<br />
@@ -127,7 +138,7 @@ function DeliveryBlock({ deliveryType, shippingAddress }: {
           {shippingAddress.country}
         </Text>
       ) : (
-        <Text style={paragraph}>Doručení kurýrem</Text>
+        <Text style={paragraph}>{label}</Text>
       )}
     </>
   )

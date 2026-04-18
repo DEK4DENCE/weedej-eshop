@@ -30,9 +30,12 @@ const checkoutAddressSchema = z.object({
 
 const checkoutBodySchema = z.object({
   items: z.array(checkoutItemSchema).min(1).max(100),
-  deliveryType: z.enum(["COURIER", "PICKUP_IN_STORE"]),
+  deliveryType: z.enum(["COURIER", "PICKUP_IN_STORE", "DPD_HOME", "DPD_PICKUP", "ZASILKOVNA_HOME", "ZASILKOVNA_PICKUP"]),
   address: checkoutAddressSchema,
   phone: z.string().max(30).optional(),
+  pickupPointId: z.string().max(100).optional(),
+  pickupPointName: z.string().max(200).optional(),
+  pickupPointAddress: z.string().max(300).optional(),
 })
 
 export async function POST(req: NextRequest) {
@@ -59,7 +62,7 @@ export async function POST(req: NextRequest) {
     if (!parsedBody.success) {
       return NextResponse.json({ error: "Invalid request body", issues: parsedBody.error.flatten() }, { status: 400 })
     }
-    const { items, deliveryType, address, phone: contactPhone } = parsedBody.data
+    const { items, deliveryType, address, phone: contactPhone, pickupPointId, pickupPointName, pickupPointAddress } = parsedBody.data
 
     if (!items?.length) return NextResponse.json({ error: "Cart is empty" }, { status: 400 })
 
@@ -136,7 +139,9 @@ export async function POST(req: NextRequest) {
         return s + dbPrice * i.quantity
       }, 0)
 
-      const txShippingCents = deliveryType === "PICKUP_IN_STORE" ? 0
+      const txShippingCents =
+        deliveryType === "PICKUP_IN_STORE" ? 0
+        : deliveryType === "ZASILKOVNA_PICKUP" || deliveryType === "DPD_PICKUP" ? 9900
         : subtotalFromDb >= 1500 ? 0 : 9900
 
       return { lineItems: txLineItems, shippingCents: txShippingCents }
@@ -209,6 +214,8 @@ export async function POST(req: NextRequest) {
           }))
         ),
         shippingAmount: String(shippingCents),
+        pickupPointId: pickupPointId ?? "",
+        pickupPointName: pickupPointName ?? "",
       },
       ...(shippingCents > 0
         ? {
