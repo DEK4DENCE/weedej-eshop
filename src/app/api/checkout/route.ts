@@ -28,6 +28,16 @@ const checkoutAddressSchema = z.object({
   phone: z.string().max(30).optional(),
 }).optional()
 
+const billingAddressSchema = z.object({
+  fullName: z.string().min(1).max(100),
+  company: z.string().max(100).optional(),
+  ico: z.string().max(20).optional(),
+  line1: z.string().min(3).max(200),
+  city: z.string().min(1).max(100),
+  postalCode: z.string().min(3).max(20),
+  country: z.string().length(2),
+}).optional()
+
 const checkoutBodySchema = z.object({
   items: z.array(checkoutItemSchema).min(1).max(100),
   deliveryType: z.enum(["COURIER", "PICKUP_IN_STORE", "DPD_HOME", "DPD_PICKUP", "ZASILKOVNA_HOME", "ZASILKOVNA_PICKUP"]),
@@ -36,6 +46,7 @@ const checkoutBodySchema = z.object({
   pickupPointId: z.string().max(100).optional(),
   pickupPointName: z.string().max(200).optional(),
   pickupPointAddress: z.string().max(300).optional(),
+  billingAddress: billingAddressSchema,
 })
 
 export async function POST(req: NextRequest) {
@@ -62,7 +73,7 @@ export async function POST(req: NextRequest) {
     if (!parsedBody.success) {
       return NextResponse.json({ error: "Invalid request body", issues: parsedBody.error.flatten() }, { status: 400 })
     }
-    const { items, deliveryType, address, phone: contactPhone, pickupPointId, pickupPointName, pickupPointAddress } = parsedBody.data
+    const { items, deliveryType, address, phone: contactPhone, pickupPointId, pickupPointName, pickupPointAddress, billingAddress } = parsedBody.data
 
     if (!items?.length) return NextResponse.json({ error: "Cart is empty" }, { status: 400 })
 
@@ -148,9 +159,10 @@ export async function POST(req: NextRequest) {
     })
 
     // Handle address
+    const isHomeDelivery = deliveryType === "COURIER" || deliveryType === "DPD_HOME" || deliveryType === "ZASILKOVNA_HOME"
     let resolvedAddressId: string | null = null
     let resolvedAddr: Awaited<ReturnType<typeof db.address.create>> | null = null
-    if (deliveryType === "COURIER" && address) {
+    if (isHomeDelivery && address) {
       if (address.existingAddressId) {
         resolvedAddressId = address.existingAddressId
         // Save phone to user even when using existing address
@@ -216,6 +228,13 @@ export async function POST(req: NextRequest) {
         shippingAmount: String(shippingCents),
         pickupPointId: pickupPointId ?? "",
         pickupPointName: pickupPointName ?? "",
+        billingName: billingAddress?.fullName ?? "",
+        billingCompany: billingAddress?.company ?? "",
+        billingIco: billingAddress?.ico ?? "",
+        billingLine1: billingAddress?.line1 ?? "",
+        billingCity: billingAddress?.city ?? "",
+        billingPostal: billingAddress?.postalCode ?? "",
+        billingCountry: billingAddress?.country ?? "",
       },
       ...(shippingCents > 0
         ? {
@@ -228,7 +247,7 @@ export async function POST(req: NextRequest) {
             }],
           }
         : {}),
-      ...(deliveryType === "COURIER" && shippingLine1
+      ...(isHomeDelivery && shippingLine1
         ? {
             payment_intent_data: {
               shipping: {
@@ -240,6 +259,11 @@ export async function POST(req: NextRequest) {
                   country: shippingCountry,
                 },
               },
+              ...(billingAddress
+                ? {
+                    receipt_email: session.user.email ?? undefined,
+                  }
+                : {}),
             },
           }
         : {}),

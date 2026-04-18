@@ -77,6 +77,16 @@ export function CheckoutForm({ user, addresses }: Props) {
     country: "CZ",
     phone: user?.phone ?? "",
   })
+  const [billingDifferent, setBillingDifferent] = useState(false)
+  const [billingAddress, setBillingAddress] = useState({
+    fullName: "",
+    company: "",
+    ico: "",
+    line1: "",
+    city: "",
+    postalCode: "",
+    country: "CZ",
+  })
 
   const isPickup = deliveryMethod === "DPD_PICKUP" || deliveryMethod === "ZASILKOVNA_PICKUP"
   const isHome = deliveryMethod === "DPD_HOME" || deliveryMethod === "ZASILKOVNA_HOME"
@@ -113,6 +123,7 @@ export function CheckoutForm({ user, addresses }: Props) {
           pickupPointId: pickupPoint?.id ?? undefined,
           pickupPointName: pickupPoint?.name ?? undefined,
           pickupPointAddress: pickupPoint ? `${pickupPoint.nameStreet}, ${pickupPoint.zip} ${pickupPoint.city}` : undefined,
+          billingAddress: billingDifferent ? billingAddress : undefined,
         }),
       })
       const data = await res.json()
@@ -368,6 +379,67 @@ export function CheckoutForm({ user, addresses }: Props) {
                 </CardContent>
               </Card>
             )}
+
+            {/* Billing address */}
+            <Card>
+              <CardContent className="pt-5">
+                <label className="flex items-center gap-3 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={billingDifferent}
+                    onChange={(e) => setBillingDifferent(e.target.checked)}
+                    className="h-4 w-4 accent-[#2E7D32] cursor-pointer"
+                  />
+                  <span className="text-sm font-medium text-[#1d1d1f]">Fakturační adresa je jiná než doručovací</span>
+                </label>
+
+                {billingDifferent && (
+                  <div className="mt-4 space-y-3 border-t border-[#DEE2E6] pt-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1 col-span-2">
+                        <Label>Jméno a příjmení / Název firmy *</Label>
+                        <Input value={billingAddress.fullName} onChange={(e) => setBillingAddress((p) => ({ ...p, fullName: e.target.value }))} placeholder="Jan Novák nebo Firma s.r.o." required={billingDifferent} />
+                      </div>
+                      <div className="space-y-1">
+                        <Label>Firma (nepovinné)</Label>
+                        <Input value={billingAddress.company} onChange={(e) => setBillingAddress((p) => ({ ...p, company: e.target.value }))} placeholder="Název firmy" />
+                      </div>
+                      <div className="space-y-1">
+                        <Label>IČO (nepovinné)</Label>
+                        <Input value={billingAddress.ico} onChange={(e) => setBillingAddress((p) => ({ ...p, ico: e.target.value }))} placeholder="12345678" maxLength={12} />
+                      </div>
+                      <div className="space-y-1 col-span-2">
+                        <Label>Ulice a číslo domu *</Label>
+                        <Input value={billingAddress.line1} onChange={(e) => setBillingAddress((p) => ({ ...p, line1: e.target.value }))} placeholder="Ulice a číslo domu" required={billingDifferent} />
+                      </div>
+                      <div className="space-y-1">
+                        <Label>PSČ *</Label>
+                        <Input value={billingAddress.postalCode} onChange={(e) => setBillingAddress((p) => ({ ...p, postalCode: e.target.value }))} placeholder="110 00" required={billingDifferent} />
+                      </div>
+                      <div className="space-y-1">
+                        <Label>Město *</Label>
+                        <Input value={billingAddress.city} onChange={(e) => setBillingAddress((p) => ({ ...p, city: e.target.value }))} placeholder="Praha" required={billingDifferent} />
+                      </div>
+                      <div className="space-y-1 col-span-2">
+                        <Label>Země *</Label>
+                        <select
+                          value={billingAddress.country}
+                          onChange={(e) => setBillingAddress((p) => ({ ...p, country: e.target.value }))}
+                          className="w-full h-10 px-3 rounded-md border border-[#DEE2E6] bg-[#F8F9FA] text-[#1d1d1f] text-sm outline-none focus:border-[#2E7D32]"
+                          required={billingDifferent}
+                        >
+                          <option value="CZ">Česká republika</option>
+                          <option value="SK">Slovensko</option>
+                          <option value="DE">Německo</option>
+                          <option value="AT">Rakousko</option>
+                          <option value="PL">Polsko</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
             {error && (
               <p className="text-sm text-destructive bg-destructive/10 px-4 py-3 rounded-xl">{error}</p>
