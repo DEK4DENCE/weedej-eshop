@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react"
 import {
   RefreshCw,
-  ChevronDown,
-  ChevronRight,
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
@@ -59,19 +57,6 @@ function statusOrder(s: "empty" | "low" | "ok"): number {
 
 // ─── Badges ───────────────────────────────────────────────────────────────────
 
-function StockBadge({ value, unit, status }: { value: number; unit: string; status: "empty" | "low" | "ok" }) {
-  const color =
-    status === "empty"
-      ? "bg-red-100 text-red-700"
-      : status === "low"
-      ? "bg-amber-100 text-amber-700"
-      : "bg-green-100 text-[#2E7D32]"
-  return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${color}`}>
-      {formatStock(value, unit)}
-    </span>
-  )
-}
 
 function StatusBadge({ status }: { status: "empty" | "low" | "ok" }) {
   if (status === "empty")
@@ -93,8 +78,7 @@ function StatusBadge({ status }: { status: "empty" | "low" | "ok" }) {
   )
 }
 
-// Shared grid template — 6 equal columns after the chevron
-const COLS = "grid-cols-[28px_2fr_1fr_1fr_1fr_1fr_1fr]"
+const COLS = "grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr]"
 
 // ─── Komponenta ───────────────────────────────────────────────────────────────
 
@@ -103,8 +87,6 @@ export default function InventoryPage() {
   const [meta, setMeta] = useState<Meta | null>(null)
   const [loading, setLoading] = useState(true)
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
-  const [expanded, setExpanded] = useState<Set<string>>(new Set())
-
   // Filters
   const [search, setSearch] = useState("")
   const [filterStatus, setFilterStatus] = useState<"all" | "empty" | "low" | "ok">("all")
@@ -132,14 +114,6 @@ export default function InventoryPage() {
   }
 
   useEffect(() => { fetchData() }, [])
-
-  function toggleExpand(id: string) {
-    setExpanded(prev => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      return next
-    })
-  }
 
   function toggleSort(field: SortField) {
     if (sortField === field) {
@@ -293,7 +267,6 @@ export default function InventoryPage() {
 
         {/* Hlavička */}
         <div className={`grid ${COLS} items-center gap-4 px-4 py-3 bg-[#F8F9FA] border-b border-[#DEE2E6] text-xs font-semibold text-[#515154] select-none`}>
-          <div />
           <button className="flex items-center gap-1 hover:text-[#212121]" onClick={() => toggleSort("name")}>
             Produkt <SortIcon field="name" />
           </button>
@@ -325,30 +298,16 @@ export default function InventoryPage() {
           </div>
         ) : (
           sorted.map((item) => {
-            const isOpen = expanded.has(item.productId)
-
             return (
               <div key={item.productId} className="border-b border-[#DEE2E6] last:border-0">
-
-                {/* Hlavní řádek */}
-                <div
-                  className={`grid ${COLS} items-center gap-4 px-4 py-3 cursor-pointer hover:bg-[#F8F9FA] transition-colors`}
-                  onClick={() => toggleExpand(item.productId)}
-                >
-                  <div className="text-[#9e9e9e]">
-                    {isOpen
-                      ? <ChevronDown className="h-4 w-4" />
-                      : <ChevronRight className="h-4 w-4" />
-                    }
-                  </div>
-
+                <div className={`grid ${COLS} items-center gap-4 px-4 py-3 hover:bg-[#F8F9FA] transition-colors`}>
                   <div className="font-medium text-[#212121] text-sm truncate pr-2">{item.productName}</div>
 
                   <div className="text-sm text-[#515154] text-center truncate">
                     {item.category?.name ?? <span className="text-[#c0c0c0]">—</span>}
                   </div>
 
-                  <div className="text-right text-sm font-medium text-[#212121]">
+                  <div className="text-right text-sm font-medium text-blue-600">
                     {formatStock(item.physicalStock, item.unit)}
                   </div>
 
@@ -368,56 +327,6 @@ export default function InventoryPage() {
                     <StatusBadge status={item.stockStatus} />
                   </div>
                 </div>
-
-                {/* Rozbalený detail — stavy skladu jako řada badges */}
-                {isOpen && (
-                  <div className="bg-[#F8F9FA] border-t border-[#DEE2E6] px-8 py-3 flex flex-wrap items-center gap-6">
-
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-[#6e6e73]">Skladem:</span>
-                      <StockBadge value={item.physicalStock} unit={item.unit} status={item.stockStatus} />
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-[#6e6e73]">Rezervováno:</span>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                        item.reservedStock > 0 ? "bg-orange-100 text-orange-700" : "bg-gray-100 text-gray-400"
-                      }`}>
-                        {formatStock(item.reservedStock, item.unit)}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-[#6e6e73]">Dostupné:</span>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                        item.availableStock > 0 ? "bg-blue-100 text-blue-700" : "bg-red-100 text-red-700"
-                      }`}>
-                        {formatStock(Math.max(0, item.availableStock), item.unit)}
-                      </span>
-                    </div>
-
-                    {item.expectedQuantity > 0 && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-[#6e6e73]">Očekáváno:</span>
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">
-                          +{formatStock(item.expectedQuantity, item.unit)}
-                        </span>
-                      </div>
-                    )}
-
-                    {erpUrl && (
-                      <a
-                        href={`${erpUrl}/inventory`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="ml-auto flex items-center gap-1 text-xs text-[#2E7D32] hover:underline"
-                      >
-                        <ExternalLink className="h-3 w-3" />
-                        Pohyby v ERP
-                      </a>
-                    )}
-                  </div>
-                )}
               </div>
             )
           })
@@ -426,7 +335,6 @@ export default function InventoryPage() {
         {/* Footer součty */}
         {!loading && sorted.length > 0 && (
           <div className={`grid ${COLS} items-center gap-4 px-4 py-3 bg-[#F8F9FA] border-t border-[#DEE2E6] text-xs font-semibold text-[#515154]`}>
-            <div />
             <div className="text-[#9e9e9e] font-normal">{sorted.length} produktů</div>
             <div />
             <div className="text-right text-[#9e9e9e]">—</div>
