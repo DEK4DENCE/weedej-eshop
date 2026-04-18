@@ -4,6 +4,7 @@ import { generateToken } from '@/lib/utils/generateToken'
 import { sendEmail } from '@/lib/email/send'
 import { PasswordReset } from '@/lib/email/templates/PasswordReset'
 import { forgotPasswordSchema } from '@/lib/validations/auth'
+export const dynamic = 'force-dynamic'
 
 // Always return the same message to prevent email enumeration
 const SAFE_RESPONSE = { message: 'If that email exists, you will receive a reset link.' }

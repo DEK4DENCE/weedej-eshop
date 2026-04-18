@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db'
 import { generateToken } from '@/lib/utils/generateToken'
 import { sendEmail } from '@/lib/email/send'
 import { EmailVerification } from '@/lib/email/templates/EmailVerification'
+export const dynamic = 'force-dynamic'
 
 const RATE_LIMIT_MS = 5 * 60 * 1000 // 5 minutes
 

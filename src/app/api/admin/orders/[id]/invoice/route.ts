@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/requireAdmin'
 import { db } from '@/lib/db'
 import { getErpConfig } from '@/lib/erp'
+export const dynamic = 'force-dynamic'
 
 async function tryFetchInvoice(url: string, apiKey: string): Promise<ArrayBuffer | null> {
   try {

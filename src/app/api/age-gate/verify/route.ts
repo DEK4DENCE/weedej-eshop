@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+export const dynamic = 'force-dynamic'
 
 const AGE_COOKIE    = 'age_verified'
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 365 // 1 year in seconds

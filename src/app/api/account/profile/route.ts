@@ -5,6 +5,7 @@ import { z } from "zod"
 import crypto from "crypto"
 import { sendEmail } from "@/lib/email/send"
 import { EmailVerification } from "@/lib/email/templates/EmailVerification"
+export const dynamic = 'force-dynamic'
 
 const schema = z.object({
   name:      z.string().min(1).max(100).optional(),

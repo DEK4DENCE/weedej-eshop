@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { comparePassword, hashPassword } from "@/lib/utils/hashPassword"
 import { z } from "zod"
+export const dynamic = 'force-dynamic'
 
 const schema = z.object({
   currentPassword: z.string().min(1),
