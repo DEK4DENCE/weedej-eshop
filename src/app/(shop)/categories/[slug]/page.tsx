@@ -16,8 +16,12 @@ interface Props {
 }
 
 export async function generateStaticParams() {
-  const categories = await db.category.findMany({ select: { slug: true } })
-  return categories.map((c) => ({ slug: c.slug }))
+  try {
+    const categories = await db.category.findMany({ select: { slug: true } })
+    return categories.map((c) => ({ slug: c.slug }))
+  } catch {
+    return []
+  }
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {

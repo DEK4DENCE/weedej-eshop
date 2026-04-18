@@ -14,8 +14,12 @@ import { BASE_URL } from "@/lib/config"
 interface Props { params: Promise<{ slug: string }> }
 
 export async function generateStaticParams() {
-  const posts = await db.blogPost.findMany({ where: { published: true }, select: { slug: true } })
-  return posts.map((p) => ({ slug: p.slug }))
+  try {
+    const posts = await db.blogPost.findMany({ where: { published: true }, select: { slug: true } })
+    return posts.map((p) => ({ slug: p.slug }))
+  } catch {
+    return []
+  }
 }
 
 function formatDate(date: Date) {
