@@ -1,19 +1,16 @@
 "use client"
 
-// Loads Packeta Widget to let user select a Zásilkovna pick-up point or Z-BOX.
-// Requires NEXT_PUBLIC_PACKETA_API_KEY env var (get from app.packeta.com).
-// Widget docs: https://docs.packeta.com/docs/widget/
-
 import { useEffect, useRef, useState } from "react"
 import { MapPin, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface PickupPoint {
-  id: string
+  id: string | number
   name: string
   nameStreet: string
   city: string
   zip: string
+  [key: string]: unknown
 }
 
 interface Props {
@@ -28,9 +25,11 @@ declare global {
       Widget: {
         pick: (
           apiKey: string,
-          options: { country: string; language: string; vendors?: string[] },
-          callback: (point: PickupPoint | null) => void
+          options: object,
+          callback: (point: PickupPoint | null) => void,
+          containerId?: string
         ) => void
+        close?: () => void
       }
     }
   }
@@ -42,21 +41,16 @@ const SCRIPT_ID = "packeta-widget-script"
 export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
   const apiKey = process.env.NEXT_PUBLIC_PACKETA_API_KEY ?? ""
   const [scriptReady, setScriptReady] = useState(false)
+  // Use ref so the callback always sees the latest onSelect without stale closure
+  const onSelectRef = useRef(onSelect)
+  useEffect(() => { onSelectRef.current = onSelect }, [onSelect])
 
   useEffect(() => {
-    // Already loaded from a previous mount
-    if (window.Packeta?.Widget) {
-      setScriptReady(true)
-      return
-    }
+    if (window.Packeta?.Widget) { setScriptReady(true); return }
     const existing = document.getElementById(SCRIPT_ID)
     if (existing) {
-      // Script tag exists but may still be loading — poll until ready
       const poll = setInterval(() => {
-        if (window.Packeta?.Widget) {
-          setScriptReady(true)
-          clearInterval(poll)
-        }
+        if (window.Packeta?.Widget) { setScriptReady(true); clearInterval(poll) }
       }, 100)
       return () => clearInterval(poll)
     }
@@ -70,13 +64,13 @@ export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
 
   function openWidget() {
     if (!window.Packeta?.Widget) return
-    // Remove any lingering Packeta overlay so the widget can be reopened
-    document.querySelectorAll('[id^="packeta"]').forEach((el) => el.remove())
+    // Close any previously open widget before reopening
+    try { window.Packeta.Widget.close?.() } catch {}
     window.Packeta.Widget.pick(
       apiKey,
       { country: "cz", language: "cs" },
       (point) => {
-        if (point) onSelect(point)
+        if (point) onSelectRef.current(point)
       }
     )
   }
@@ -95,21 +89,12 @@ export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
             <div className="flex items-start gap-2">
               <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#2E7D32]" />
               <div>
-                <p className="text-sm font-semibold text-[#1d1d1f]">{selectedPoint.name}</p>
-                <p className="text-xs text-gray-500">{selectedPoint.nameStreet}</p>
-                <p className="text-xs text-gray-500">
-                  {selectedPoint.zip} {selectedPoint.city}
-                </p>
+                <p className="text-sm font-semibold text-[#1d1d1f]">{String(selectedPoint.name)}</p>
+                <p className="text-xs text-gray-500">{String(selectedPoint.nameStreet ?? "")}</p>
+                <p className="text-xs text-gray-500">{String(selectedPoint.zip ?? "")} {String(selectedPoint.city ?? "")}</p>
               </div>
             </div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="shrink-0 text-xs"
-              onClick={openWidget}
-              disabled={!apiKey}
-            >
+            <Button type="button" variant="outline" size="sm" className="shrink-0 text-xs" onClick={openWidget} disabled={!apiKey}>
               Změnit
             </Button>
           </div>
@@ -122,11 +107,9 @@ export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
           onClick={openWidget}
           disabled={!apiKey || !scriptReady}
         >
-          {!scriptReady ? (
-            <><Loader2 className="h-4 w-4 animate-spin" />Načítám mapu…</>
-          ) : (
-            <><MapPin className="h-4 w-4" />Vybrat výdejní místo</>
-          )}
+          {!scriptReady
+            ? <><Loader2 className="h-4 w-4 animate-spin" />Načítám mapu…</>
+            : <><MapPin className="h-4 w-4" />Vybrat výdejní místo</>}
         </Button>
       )}
     </div>
