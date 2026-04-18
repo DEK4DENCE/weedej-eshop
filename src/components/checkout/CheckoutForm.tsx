@@ -250,9 +250,14 @@ export function CheckoutForm({ user, addresses }: Props) {
 
             {/* Pickup point selector — shown for pickup delivery types */}
             {deliveryMethod === "ZASILKOVNA_PICKUP" && (
-              <Card>
+              <Card className={!pickupPoint ? "border-orange-300" : ""}>
                 <CardHeader><CardTitle className="flex items-center gap-2"><MapPin className="h-5 w-5 text-green-400" />Výdejní místo Zásilkovny</CardTitle></CardHeader>
-                <CardContent>
+                <CardContent className="space-y-3">
+                  {!pickupPoint && (
+                    <p className="text-sm text-orange-600 bg-orange-50 border border-orange-200 rounded-lg px-3 py-2">
+                      Klikněte na tlačítko níže a vyberte konkrétní výdejní místo nebo Z-BOX na mapě.
+                    </p>
+                  )}
                   <PacketaWidget
                     onSelect={setPickupPoint}
                     selectedPoint={pickupPoint}
@@ -262,9 +267,14 @@ export function CheckoutForm({ user, addresses }: Props) {
             )}
 
             {deliveryMethod === "DPD_PICKUP" && (
-              <Card>
+              <Card className={!pickupPoint ? "border-orange-300" : ""}>
                 <CardHeader><CardTitle className="flex items-center gap-2"><MapPin className="h-5 w-5 text-green-400" />DPD Výdejní místo</CardTitle></CardHeader>
-                <CardContent>
+                <CardContent className="space-y-3">
+                  {!pickupPoint && (
+                    <p className="text-sm text-orange-600 bg-orange-50 border border-orange-200 rounded-lg px-3 py-2">
+                      Vyhledejte a vyberte DPD výdejní místo ve vašem okolí.
+                    </p>
+                  )}
                   <DpdPickupSelector
                     onSelect={setPickupPoint}
                     selectedPoint={pickupPoint}
@@ -505,7 +515,7 @@ export function CheckoutForm({ user, addresses }: Props) {
 
                 <Button
                   type="submit"
-                  disabled={loading || !deliveryMethod}
+                  disabled={loading || !deliveryMethod || (isPickup && !pickupPoint)}
                   className="w-full bg-[#2E7D32] hover:bg-[#1a9020] text-white font-bold"
                   size="lg"
                 >
@@ -513,6 +523,8 @@ export function CheckoutForm({ user, addresses }: Props) {
                     ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Přesměrování na platbu...</>
                     : !deliveryMethod
                     ? "Vyberte způsob doručení"
+                    : isPickup && !pickupPoint
+                    ? "Vyberte výdejní místo"
                     : `Zaplatit ${formatPrice(total)}`}
                 </Button>
                 <p className="text-xs text-center text-muted-foreground">
