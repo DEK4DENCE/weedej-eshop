@@ -77,20 +77,12 @@ export async function POST() {
         const unitPriceKc     = (item.unitPrice as number) / 100
         const priceExclPerPack = unitPriceKc / (1 + vatRate / 100)
 
-        const physQty      = vd.variantValue && vd.variantValue > 0 && vd.variantUnit
-          ? item.quantity * vd.variantValue
-          : item.quantity
-        const unit         = vd.variantValue && vd.variantValue > 0 && vd.variantUnit
-          ? vd.variantUnit
-          : 'ks'
-        const unitPriceCzk = vd.variantValue && vd.variantValue > 0 && vd.variantUnit
-          ? Math.round(priceExclPerPack / vd.variantValue * 100) / 100
-          : Math.round(priceExclPerPack * 100) / 100
+        const unitPriceCzk = Math.round(priceExclPerPack * 100) / 100
 
         return {
           name:         `${item.productName}${item.variantLabel ? " — " + item.variantLabel : ""}`,
-          quantity:     physQty,
-          unit,
+          quantity:     item.quantity,
+          unit:         'ks',
           unitPriceCzk,
           vatRate,
         }

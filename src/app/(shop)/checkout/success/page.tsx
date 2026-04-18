@@ -142,13 +142,12 @@ async function processOrder(sessionId: string): Promise<{ erpOrderNumber: string
       const vatRate          = item.vatRate
       const unitPriceKc      = item.unitPrice / 100
       const unitPriceExclVat = Math.round((unitPriceKc / (1 + vatRate / 100)) * 100) / 100
-      const erpQty  = item.variantValue ? item.quantity * (item.variantValue as number) : item.quantity
       const erpName = item.variantLabel ? `${item.productName} — ${item.variantLabel}` : item.productName
       return {
         sku:          item.erpProductId ?? undefined,
         name:         erpName,
-        quantity:     erpQty,
-        unit:         item.variantUnit ?? 'ks',
+        quantity:     item.quantity,
+        unit:         'ks',
         unitPriceCzk: unitPriceExclVat,
         vatRate,
       }
