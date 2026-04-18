@@ -85,6 +85,8 @@ export async function POST() {
           unit:         'ks',
           unitPriceCzk,
           vatRate,
+          variantValue: vd.variantValue ?? undefined,
+          variantUnit:  vd.variantUnit  ?? undefined,
         }
       })
 

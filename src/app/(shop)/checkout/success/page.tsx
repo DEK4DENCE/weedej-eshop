@@ -148,6 +148,8 @@ async function processOrder(sessionId: string): Promise<{ erpOrderNumber: string
         name:         erpName,
         quantity:     item.quantity,
         unit:         'ks',
+        variantValue: (item.variantValue as number | null) ?? undefined,
+        variantUnit:  (item.variantUnit  as string | null) ?? undefined,
         unitPriceCzk: unitPriceExclVat,
         vatRate,
       }
