@@ -26,11 +26,13 @@ declare global {
           apiKey: string,
           options: object,
           callback: (point: PickupPoint | null) => void,
-          containerId?: string
+          containerEl?: HTMLElement | null
         ) => void
         close?: () => void
       }
     }
+    // Global callback slot required by some Packeta v6 builds
+    __packetaWidgetCallback?: (point: PickupPoint | null) => void
   }
 }
 
@@ -40,10 +42,10 @@ const SCRIPT_ID = "packeta-widget-script"
 export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
   const apiKey = process.env.NEXT_PUBLIC_PACKETA_API_KEY ?? ""
   const [scriptReady, setScriptReady] = useState(false)
-  // Use ref so the callback always sees the latest onSelect without stale closure
   const onSelectRef = useRef(onSelect)
   useEffect(() => { onSelectRef.current = onSelect }, [onSelect])
 
+  // Load Packeta script
   useEffect(() => {
     if (window.Packeta?.Widget) { setScriptReady(true); return }
     const existing = document.getElementById(SCRIPT_ID)
@@ -61,16 +63,32 @@ export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
     document.body.appendChild(script)
   }, [])
 
+  // Backup: listen for postMessage from Packeta iframe directly
+  useEffect(() => {
+    function handleMessage(event: MessageEvent) {
+      if (typeof event.origin !== "string") return
+      if (!event.origin.includes("packeta.com") && !event.origin.includes("zasilkovna.cz")) return
+      const data = event.data
+      if (!data) return
+      // Packeta may send the point as { point: {...} } or directly as the point object
+      const point: PickupPoint | null = data.point ?? (data.id ? data : null)
+      if (point) onSelectRef.current(point)
+    }
+    window.addEventListener("message", handleMessage)
+    return () => window.removeEventListener("message", handleMessage)
+  }, [])
+
   function openWidget() {
     if (!window.Packeta?.Widget) return
-    // Close any previously open widget before reopening
-    try { window.Packeta.Widget.close?.() } catch {}
+    // Register callback globally — some Packeta v6 builds call via window reference
+    window.__packetaWidgetCallback = (point: PickupPoint | null) => {
+      if (point) onSelectRef.current(point)
+      delete window.__packetaWidgetCallback
+    }
     window.Packeta.Widget.pick(
       apiKey,
       { country: "cz", language: "cs" },
-      (point) => {
-        if (point) onSelectRef.current(point)
-      }
+      window.__packetaWidgetCallback
     )
   }
 
