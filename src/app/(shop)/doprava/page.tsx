@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 import { Truck, CreditCard, Package, Clock, Shield } from "lucide-react"
 import Link from "next/link"
-import { db } from "@/lib/db"
 
 export const metadata: Metadata = {
   title: "Doprava a platba — Weedej",
@@ -15,17 +14,51 @@ export const metadata: Metadata = {
   },
 }
 
+interface ShippingOption {
+  name: string
+  description: string
+  price: number
+  freeThreshold: number
+  estimatedDays: string
+}
+
+const SHIPPING_OPTIONS: ShippingOption[] = [
+  {
+    name: "DPD – Doručení na adresu",
+    description: "Doručení přímo k vašim dveřím kurýrem DPD",
+    price: 99,
+    freeThreshold: 1500,
+    estimatedDays: "2–3 pracovní dny",
+  },
+  {
+    name: "DPD – Výdejní místo",
+    description: "Vyzvednutí na DPD Pickup místě dle vašeho výběru",
+    price: 99,
+    freeThreshold: 1500,
+    estimatedDays: "2–3 pracovní dny",
+  },
+  {
+    name: "Zásilkovna – Doručení na adresu",
+    description: "Doručení přímo k vašim dveřím přepravcem Zásilkovna",
+    price: 99,
+    freeThreshold: 1500,
+    estimatedDays: "2–3 pracovní dny",
+  },
+  {
+    name: "Zásilkovna – Výdejní místo / Z-BOX",
+    description: "Vyzvednutí na výdejním místě nebo Z-BOXu Zásilkovny",
+    price: 99,
+    freeThreshold: 1500,
+    estimatedDays: "2–3 pracovní dny",
+  },
+]
+
 function formatPrice(price: number): string {
   if (price === 0) return "Zdarma"
   return `${price.toLocaleString("cs-CZ")} Kč`
 }
 
-export default async function DopravaPage() {
-  const shippingMethods = await db.shippingMethod.findMany({
-    where: { isActive: true },
-    orderBy: { sortOrder: "asc" },
-  })
-
+export default function DopravaPage() {
   return (
     <div className="container mx-auto px-4 py-12 max-w-3xl">
       <p className="text-xs font-semibold uppercase tracking-widest text-[#2E7D32] mb-2">Informace</p>
@@ -39,43 +72,27 @@ export default async function DopravaPage() {
           <h2 className="text-xl font-semibold text-[#1d1d1f]">Možnosti dopravy</h2>
         </div>
         <div className="grid gap-4">
-          {shippingMethods.map((method) => {
-            const price = Number(method.price)
-            const freeThreshold = method.freeThreshold ? Number(method.freeThreshold) : null
-            const isFree = price === 0
-
-            return (
-              <div
-                key={method.id}
-                className={`flex items-start justify-between p-4 rounded-2xl border ${
-                  isFree
-                    ? "border-[#2E7D32] bg-[#E8F5E9]"
-                    : "border-[#DEE2E6] bg-white"
-                }`}
-              >
-                <div>
-                  <p className="font-semibold text-sm text-[#1d1d1f]">{method.name}</p>
-                  <p className="text-xs text-[#6e6e73] mt-0.5">{method.description}</p>
-                  {freeThreshold && freeThreshold > 0 && !isFree && (
-                    <p className="text-xs text-[#2E7D32] mt-0.5">
-                      Zdarma při objednávce nad {freeThreshold.toLocaleString("cs-CZ")} Kč
-                    </p>
-                  )}
-                  <div className="flex items-center gap-1.5 mt-1.5">
-                    <Clock className="h-3 w-3 text-[#aeaeb2]" />
-                    <span className="text-xs text-[#aeaeb2]">{method.estimatedDays}</span>
-                  </div>
+          {SHIPPING_OPTIONS.map((option) => (
+            <div
+              key={option.name}
+              className="flex items-start justify-between p-4 rounded-2xl border border-[#DEE2E6] bg-white"
+            >
+              <div>
+                <p className="font-semibold text-sm text-[#1d1d1f]">{option.name}</p>
+                <p className="text-xs text-[#6e6e73] mt-0.5">{option.description}</p>
+                <p className="text-xs text-[#2E7D32] mt-0.5">
+                  Doprava zdarma při objednávce nad {option.freeThreshold.toLocaleString("cs-CZ")} Kč
+                </p>
+                <div className="flex items-center gap-1.5 mt-1.5">
+                  <Clock className="h-3 w-3 text-[#aeaeb2]" />
+                  <span className="text-xs text-[#aeaeb2]">{option.estimatedDays}</span>
                 </div>
-                <span className={`text-sm font-bold font-mono shrink-0 ml-4 ${isFree ? "text-[#2E7D32]" : "text-[#8B6914]"}`}>
-                  {formatPrice(price)}
-                </span>
               </div>
-            )
-          })}
-
-          {shippingMethods.length === 0 && (
-            <p className="text-sm text-[#6e6e73]">Momentálně nejsou dostupné žádné způsoby dopravy.</p>
-          )}
+              <span className="text-sm font-bold font-mono shrink-0 ml-4 text-[#8B6914]">
+                {formatPrice(option.price)}
+              </span>
+            </div>
+          ))}
         </div>
       </section>
 

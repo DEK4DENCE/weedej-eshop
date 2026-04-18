@@ -9,7 +9,7 @@ interface OrderShippedWithTrackingProps {
   orderNumber:     string
   items:           { productName: string; variantLabel: string; quantity: number }[]
   totalAmount:     number   // haléře
-  deliveryType:    'COURIER' | 'PICKUP_IN_STORE'
+  deliveryType:    'COURIER' | 'PICKUP_IN_STORE' | 'DPD_HOME' | 'DPD_PICKUP' | 'ZASILKOVNA_HOME' | 'ZASILKOVNA_PICKUP'
   trackingNumber?: string
   carrier?:        string
   invoiceNumber?:  string
@@ -43,9 +43,9 @@ export function OrderShippedWithTracking({
           <Text style={paragraph}>Dobrý den, {name},</Text>
           <Text style={paragraph}>
             Skvělá zpráva! Vaše objednávka {orderNumber} byla právě odeslána.
-            {deliveryType === 'COURIER'
-              ? ` Doručení kurýrem proběhne zpravidla do ${estimatedDays ?? '2–3 pracovních dnů'}.`
-              : ' Objednávka je připravena k osobnímu vyzvednutí.'}
+            {deliveryType === 'PICKUP_IN_STORE'
+              ? ' Objednávka je připravena k osobnímu vyzvednutí.'
+              : ` Doručení proběhne zpravidla do ${estimatedDays ?? '2–3 pracovních dnů'}.`}
           </Text>
 
           <Section style={orderBox}>
@@ -138,9 +138,9 @@ export function OrderShipped({ name, orderNumber, items, totalAmount, deliveryTy
           <Text style={paragraph}>Dobrý den, {name},</Text>
           <Text style={paragraph}>
             Skvělá zpráva! Vaše objednávka byla právě odeslána a míří k vám.
-            {deliveryType === 'COURIER'
-              ? ' Doručení kurýrem proběhne zpravidla do 1–2 pracovních dnů.'
-              : ' Objednávka je připravena k osobnímu vyzvednutí.'}
+            {deliveryType === 'PICKUP_IN_STORE'
+              ? ' Objednávka je připravena k osobnímu vyzvednutí.'
+              : ' Doručení proběhne zpravidla do 1–2 pracovních dnů.'}
           </Text>
 
           <Section style={orderBox}>

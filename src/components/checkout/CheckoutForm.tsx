@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useCart } from "@/hooks/useCart"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -8,20 +8,20 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { formatPrice } from "@/lib/utils/formatPrice"
-import { Loader2, Truck, Store, MapPin, Plus, Shield, Lock, Phone } from "lucide-react"
+import { Loader2, MapPin, Plus, Shield, Lock, Phone, Truck } from "lucide-react"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import Image from "next/image"
+import { DeliveryCarrierSelector, type DeliveryMethod } from "@/components/checkout/DeliveryCarrierSelector"
+import { PacketaWidget } from "@/components/checkout/PacketaWidget"
+import { DpdPickupSelector } from "@/components/checkout/DpdPickupSelector"
 
-type DeliveryType = "COURIER" | "PICKUP_IN_STORE"
-
-interface ShippingMethod {
+interface PickupPoint {
   id: string
   name: string
-  description: string
-  price: number
-  freeThreshold: number | null
-  estimatedDays: string
+  nameStreet: string
+  city: string
+  zip: string
 }
 
 interface Address {
@@ -46,14 +46,25 @@ interface Props {
   addresses: Address[]
 }
 
+const SHIPPING_PRICE = 99
+const FREE_THRESHOLD = 1500
+
+function calcShipping(delivery: DeliveryMethod | null, subtotal: number): number {
+  if (!delivery) return SHIPPING_PRICE
+  if (delivery === "DPD_PICKUP" || delivery === "ZASILKOVNA_PICKUP") return SHIPPING_PRICE
+  // Home delivery: free above threshold
+  return subtotal >= FREE_THRESHOLD ? 0 : SHIPPING_PRICE
+}
+
 export function CheckoutForm({ user, addresses }: Props) {
   const { items, totalPrice } = useCart()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [postalError, setPostalError] = useState<string | null>(null)
-  const [deliveryType, setDeliveryType] = useState<DeliveryType>("COURIER")
-  const [shippingMethods, setShippingMethods] = useState<ShippingMethod[]>([])
-  const [selectedShippingId, setSelectedShippingId] = useState<string | null>(null)
+
+  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod | null>(null)
+  const [pickupPoint, setPickupPoint] = useState<PickupPoint | null>(null)
+
   const defaultAddr = addresses.find((a) => a.isDefault) ?? addresses[0] ?? null
   const [selectedAddressId, setSelectedAddressId] = useState<string>(defaultAddr?.id ?? "new")
   const [phone, setPhone] = useState(user?.phone ?? "")
@@ -67,37 +78,28 @@ export function CheckoutForm({ user, addresses }: Props) {
     phone: user?.phone ?? "",
   })
 
-  useEffect(() => {
-    fetch("/api/shipping")
-      .then((r) => r.json())
-      .then((data: any[]) => {
-        const methods = data.map((m) => ({ ...m, price: Number(m.price), freeThreshold: m.freeThreshold != null ? Number(m.freeThreshold) : null }))
-        setShippingMethods(methods)
-        if (methods.length > 0) setSelectedShippingId(methods[0].id)
-      })
-      .catch(() => {})
-  }, [])
-
-  const selectedMethod = shippingMethods.find((m) => m.id === selectedShippingId) ?? null
-  const methodPrice = deliveryType === "PICKUP_IN_STORE"
-    ? 0
-    : selectedMethod
-      ? (selectedMethod.freeThreshold != null && totalPrice >= selectedMethod.freeThreshold ? 0 : selectedMethod.price)
-      : (totalPrice >= 1500 ? 0 : 99)
-  const total = totalPrice + methodPrice
+  const isPickup = deliveryMethod === "DPD_PICKUP" || deliveryMethod === "ZASILKOVNA_PICKUP"
+  const isHome = deliveryMethod === "DPD_HOME" || deliveryMethod === "ZASILKOVNA_HOME"
+  const shippingCost = calcShipping(deliveryMethod, totalPrice)
+  const total = totalPrice + shippingCost
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (items.length === 0) return
+    if (items.length === 0 || !deliveryMethod) return
+
+    if (isPickup && !pickupPoint) {
+      setError("Prosím vyberte výdejní místo.")
+      return
+    }
+
     setLoading(true)
     setError(null)
 
-    const addressPayload =
-      deliveryType === "PICKUP_IN_STORE"
-        ? { pickupName: newAddress.fullName || user?.name || "" }
-        : selectedAddressId === "new"
+    const addressPayload = isHome
+      ? selectedAddressId === "new"
         ? { ...newAddress, phone: newAddress.phone || phone, saveAddress: true }
         : { existingAddressId: selectedAddressId, phone }
+      : undefined
 
     try {
       const res = await fetch("/api/checkout", {
@@ -105,10 +107,12 @@ export function CheckoutForm({ user, addresses }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           items,
-          deliveryType,
+          deliveryType: deliveryMethod,
           address: addressPayload,
           phone,
-          shippingMethodId: deliveryType === "COURIER" ? selectedShippingId : null,
+          pickupPointId: pickupPoint?.id ?? undefined,
+          pickupPointName: pickupPoint?.name ?? undefined,
+          pickupPointAddress: pickupPoint ? `${pickupPoint.nameStreet}, ${pickupPoint.zip} ${pickupPoint.city}` : undefined,
         }),
       })
       const data = await res.json()
@@ -168,21 +172,13 @@ export function CheckoutForm({ user, addresses }: Props) {
                       step.number
                     )}
                   </div>
-                  <span
-                    className={[
-                      "text-xs font-medium whitespace-nowrap",
-                      isCurrent ? "text-[#2E7D32]" : isDone ? "text-[#1d1d1f]" : "text-[#aeaeb2]",
-                    ].join(" ")}
-                  >
+                  <span className={["text-xs font-medium whitespace-nowrap", isCurrent ? "text-[#2E7D32]" : isDone ? "text-[#1d1d1f]" : "text-[#aeaeb2]"].join(" ")}>
                     {step.label}
                   </span>
                 </div>
                 {index < checkoutSteps.length - 1 && (
                   <div
-                    className={[
-                      "h-0.5 w-16 mx-2 mb-5 rounded",
-                      isDone ? "bg-[#2E7D32]" : "bg-[#DEE2E6]",
-                    ].join(" ")}
+                    className={["h-0.5 w-16 mx-2 mb-5 rounded", isDone ? "bg-[#2E7D32]" : "bg-[#DEE2E6]"].join(" ")}
                     aria-hidden="true"
                   />
                 )}
@@ -191,293 +187,251 @@ export function CheckoutForm({ user, addresses }: Props) {
           })}
         </ol>
       </nav>
+
       <form onSubmit={handleSubmit}>
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-        {/* Left: form */}
-        <div className="lg:col-span-3 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          {/* Left: form */}
+          <div className="lg:col-span-3 space-y-6">
 
-          {/* Contact info — always shown */}
-          <Card>
-            <CardHeader><CardTitle className="flex items-center gap-2"><Phone className="h-5 w-5 text-green-400" />Kontaktní údaje</CardTitle></CardHeader>
-            <CardContent className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1 col-span-2">
-                  <Label>Jméno a příjmení *</Label>
-                  <Input
-                    value={newAddress.fullName || user?.name || ""}
-                    onChange={(e) => setNewAddress((p) => ({ ...p, fullName: e.target.value }))}
-                    placeholder="Jan Novák"
-                    required
-                  />
-                </div>
-                <div className="space-y-1">
-                  <Label>Telefon *</Label>
-                  <Input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => { setPhone(e.target.value); setNewAddress((p) => ({ ...p, phone: e.target.value })) }}
-                    placeholder="+420 ..."
-                    required
-                  />
-                </div>
-                <div className="space-y-1">
-                  <Label>E-mail</Label>
-                  <Input value={user?.email ?? ""} readOnly className="opacity-60 cursor-not-allowed" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Delivery type */}
-          <Card>
-            <CardHeader><CardTitle className="flex items-center gap-2"><Truck className="h-5 w-5 text-green-400" />Způsob doručení</CardTitle></CardHeader>
-            <CardContent className="space-y-3">
-              {/* Dynamic shipping methods */}
-              {shippingMethods.map((method) => {
-                const isFree = method.freeThreshold != null && totalPrice >= method.freeThreshold
-                const displayPrice = isFree ? "Zdarma" : `${method.price} Kč`
-                const isSelected = deliveryType === "COURIER" && selectedShippingId === method.id
-                return (
-                  <motion.label
-                    key={method.id}
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.99 }}
-                    className={`w-full flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-colors cursor-pointer ${
-                      isSelected
-                        ? "border-[#2E7D32] bg-[#f0faf0]"
-                        : "border-[#DEE2E6] hover:border-[#2E7D32]"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="delivery"
-                      value={method.id}
-                      checked={isSelected}
-                      onChange={() => { setDeliveryType("COURIER"); setSelectedShippingId(method.id) }}
-                      className="sr-only"
-                    />
-                    <Truck className={`h-5 w-5 mt-0.5 shrink-0 ${isSelected ? "text-[#2E7D32]" : "text-[#6e6e73]"}`} />
-                    <div className="flex-1">
-                      <p className="font-medium text-sm">{method.name}</p>
-                      <p className="text-xs text-muted-foreground">{method.description}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{method.estimatedDays}</p>
-                    </div>
-                    <span className={`text-sm font-semibold shrink-0 ${isFree ? "text-green-600" : ""}`}>{displayPrice}</span>
-                  </motion.label>
-                )
-              })}
-
-              {/* Always show PICKUP_IN_STORE */}
-              <motion.label
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
-                className={`w-full flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-colors cursor-pointer ${
-                  deliveryType === "PICKUP_IN_STORE"
-                    ? "border-[#2E7D32] bg-[#f0faf0]"
-                    : "border-[#DEE2E6] hover:border-[#2E7D32]"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="delivery"
-                  value="PICKUP_IN_STORE"
-                  checked={deliveryType === "PICKUP_IN_STORE"}
-                  onChange={() => setDeliveryType("PICKUP_IN_STORE")}
-                  className="sr-only"
-                />
-                <Store className={`h-5 w-5 mt-0.5 shrink-0 ${deliveryType === "PICKUP_IN_STORE" ? "text-[#2E7D32]" : "text-[#6e6e73]"}`} />
-                <div className="flex-1">
-                  <p className="font-medium text-sm">Vyzvednutí v prodejně</p>
-                  <p className="text-xs text-muted-foreground">Vyzvedněte objednávku osobně v naší prodejně</p>
-                </div>
-                <span className="text-sm font-semibold shrink-0 text-green-600">Zdarma</span>
-              </motion.label>
-            </CardContent>
-          </Card>
-
-          {/* Address — only for courier */}
-          {deliveryType === "COURIER" && (
+            {/* Contact info */}
             <Card>
-              <CardHeader><CardTitle className="flex items-center gap-2"><MapPin className="h-5 w-5 text-green-400" />Dodací adresa</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
-                {addresses.length > 0 && (
-                  <div className="space-y-2">
-                    {addresses.map((addr) => (
+              <CardHeader><CardTitle className="flex items-center gap-2"><Phone className="h-5 w-5 text-green-400" />Kontaktní údaje</CardTitle></CardHeader>
+              <CardContent className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1 col-span-2">
+                    <Label>Jméno a příjmení *</Label>
+                    <Input
+                      value={newAddress.fullName || user?.name || ""}
+                      onChange={(e) => setNewAddress((p) => ({ ...p, fullName: e.target.value }))}
+                      placeholder="Jan Novák"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Telefon *</Label>
+                    <Input
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => { setPhone(e.target.value); setNewAddress((p) => ({ ...p, phone: e.target.value })) }}
+                      placeholder="+420 ..."
+                      required
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label>E-mail</Label>
+                    <Input value={user?.email ?? ""} readOnly className="opacity-60 cursor-not-allowed" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Delivery carrier selector */}
+            <Card>
+              <CardHeader><CardTitle className="flex items-center gap-2"><Truck className="h-5 w-5 text-green-400" />Způsob doručení</CardTitle></CardHeader>
+              <CardContent>
+                <DeliveryCarrierSelector
+                  selected={deliveryMethod}
+                  onSelect={(m) => { setDeliveryMethod(m); setPickupPoint(null) }}
+                  subtotal={totalPrice}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Pickup point selector — shown for pickup delivery types */}
+            {deliveryMethod === "ZASILKOVNA_PICKUP" && (
+              <Card>
+                <CardHeader><CardTitle className="flex items-center gap-2"><MapPin className="h-5 w-5 text-green-400" />Výdejní místo Zásilkovny</CardTitle></CardHeader>
+                <CardContent>
+                  <PacketaWidget
+                    onSelect={setPickupPoint}
+                    selectedPoint={pickupPoint}
+                  />
+                </CardContent>
+              </Card>
+            )}
+
+            {deliveryMethod === "DPD_PICKUP" && (
+              <Card>
+                <CardHeader><CardTitle className="flex items-center gap-2"><MapPin className="h-5 w-5 text-green-400" />DPD Výdejní místo</CardTitle></CardHeader>
+                <CardContent>
+                  <DpdPickupSelector
+                    onSelect={setPickupPoint}
+                    selectedPoint={pickupPoint}
+                  />
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Address form — shown for home delivery types */}
+            {isHome && (
+              <Card>
+                <CardHeader><CardTitle className="flex items-center gap-2"><MapPin className="h-5 w-5 text-green-400" />Dodací adresa</CardTitle></CardHeader>
+                <CardContent className="space-y-4">
+                  {addresses.length > 0 && (
+                    <div className="space-y-2">
+                      {addresses.map((addr) => (
+                        <button
+                          key={addr.id}
+                          type="button"
+                          onClick={() => setSelectedAddressId(addr.id)}
+                          className={`w-full flex items-start gap-3 p-3 rounded-xl border-2 text-left transition-colors ${
+                            selectedAddressId === addr.id
+                              ? "border-[#2E7D32] bg-[#f0faf0]"
+                              : "border-[#DEE2E6] hover:border-[#2E7D32]"
+                          }`}
+                        >
+                          <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-muted-foreground" />
+                          <div className="text-sm">
+                            <p className="font-medium">{addr.fullName}</p>
+                            <p className="text-muted-foreground">{addr.line1}{addr.line2 ? `, ${addr.line2}` : ""}</p>
+                            <p className="text-muted-foreground">{addr.postalCode} {addr.city}, {addr.country}</p>
+                          </div>
+                          {addr.isDefault && <span className="ml-auto text-xs text-green-400 shrink-0">Výchozí</span>}
+                        </button>
+                      ))}
                       <button
-                        key={addr.id}
                         type="button"
-                        onClick={() => setSelectedAddressId(addr.id)}
-                        className={`w-full flex items-start gap-3 p-3 rounded-xl border-2 text-left transition-colors ${
-                          selectedAddressId === addr.id
+                        onClick={() => setSelectedAddressId("new")}
+                        className={`w-full flex items-center gap-2 p-3 rounded-xl border-2 text-left text-sm transition-colors ${
+                          selectedAddressId === "new"
                             ? "border-[#2E7D32] bg-[#f0faf0]"
                             : "border-[#DEE2E6] hover:border-[#2E7D32]"
                         }`}
                       >
-                        <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-muted-foreground" />
-                        <div className="text-sm">
-                          <p className="font-medium">{addr.fullName}</p>
-                          <p className="text-muted-foreground">{addr.line1}{addr.line2 ? `, ${addr.line2}` : ""}</p>
-                          <p className="text-muted-foreground">{addr.postalCode} {addr.city}, {addr.country}</p>
-                        </div>
-                        {addr.isDefault && <span className="ml-auto text-xs text-green-400 shrink-0">Výchozí</span>}
+                        <Plus className="h-4 w-4" />Zadat novou adresu
                       </button>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={() => setSelectedAddressId("new")}
-                      className={`w-full flex items-center gap-2 p-3 rounded-xl border-2 text-left text-sm transition-colors ${
-                        selectedAddressId === "new"
-                          ? "border-[#2E7D32] bg-[#f0faf0]"
-                          : "border-[#DEE2E6] hover:border-[#2E7D32]"
-                      }`}
-                    >
-                      <Plus className="h-4 w-4" />Zadat novou adresu
-                    </button>
-                  </div>
-                )}
+                    </div>
+                  )}
 
-                {(selectedAddressId === "new" || addresses.length === 0) && (
-                  <div className="space-y-3 pt-2">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1 col-span-2">
-                        <Label>Ulice a číslo domu</Label>
-                        <Input value={newAddress.line1} onChange={(e) => setNewAddress((p) => ({ ...p, line1: e.target.value }))} required placeholder="Ulice a číslo domu" />
-                      </div>
-                      <div className="space-y-1">
-                        <Label>PSČ</Label>
-                        <Input
-                          value={newAddress.postalCode}
-                          onChange={(e) => { setNewAddress((p) => ({ ...p, postalCode: e.target.value })); setPostalError(null) }}
-                          onBlur={(e) => {
-                            const val = e.target.value.replace(/\s/g, '')
-                            if (val && !/^\d{5}$/.test(val)) setPostalError('PSČ musí mít 5 číslic (např. 11000)')
-                          }}
-                          required
-                          placeholder="110 00"
-                        />
-                        {postalError && <p className="text-xs text-red-600 mt-1">{postalError}</p>}
-                      </div>
-                      <div className="space-y-1">
-                        <Label>Město</Label>
-                        <Input value={newAddress.city} onChange={(e) => setNewAddress((p) => ({ ...p, city: e.target.value }))} required />
-                      </div>
-                      <div className="space-y-1 col-span-2">
-                        <Label>Země</Label>
-                        <select
-                          value={newAddress.country}
-                          onChange={(e) => setNewAddress((p) => ({ ...p, country: e.target.value }))}
-                          className="w-full h-10 px-3 rounded-md border border-[#DEE2E6] bg-[#F8F9FA] text-[#1d1d1f] text-sm outline-none focus:border-[#2E7D32]"
-                          required
-                        >
-                          <option value="CZ">Česká republika</option>
-                          <option value="SK">Slovensko</option>
-                          <option value="DE">Německo</option>
-                          <option value="AT">Rakousko</option>
-                          <option value="PL">Polsko</option>
-                        </select>
+                  {(selectedAddressId === "new" || addresses.length === 0) && (
+                    <div className="space-y-3 pt-2">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1 col-span-2">
+                          <Label>Ulice a číslo domu</Label>
+                          <Input value={newAddress.line1} onChange={(e) => setNewAddress((p) => ({ ...p, line1: e.target.value }))} required placeholder="Ulice a číslo domu" />
+                        </div>
+                        <div className="space-y-1">
+                          <Label>PSČ</Label>
+                          <Input
+                            value={newAddress.postalCode}
+                            onChange={(e) => { setNewAddress((p) => ({ ...p, postalCode: e.target.value })); setPostalError(null) }}
+                            onBlur={(e) => {
+                              const val = e.target.value.replace(/\s/g, '')
+                              if (val && !/^\d{5}$/.test(val)) setPostalError('PSČ musí mít 5 číslic (např. 11000)')
+                            }}
+                            required
+                            placeholder="110 00"
+                          />
+                          {postalError && <p className="text-xs text-red-600 mt-1">{postalError}</p>}
+                        </div>
+                        <div className="space-y-1">
+                          <Label>Město</Label>
+                          <Input value={newAddress.city} onChange={(e) => setNewAddress((p) => ({ ...p, city: e.target.value }))} required />
+                        </div>
+                        <div className="space-y-1 col-span-2">
+                          <Label>Země</Label>
+                          <select
+                            value={newAddress.country}
+                            onChange={(e) => setNewAddress((p) => ({ ...p, country: e.target.value }))}
+                            className="w-full h-10 px-3 rounded-md border border-[#DEE2E6] bg-[#F8F9FA] text-[#1d1d1f] text-sm outline-none focus:border-[#2E7D32]"
+                            required
+                          >
+                            <option value="CZ">Česká republika</option>
+                            <option value="SK">Slovensko</option>
+                            <option value="DE">Německo</option>
+                            <option value="AT">Rakousko</option>
+                            <option value="PL">Polsko</option>
+                          </select>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
-          {/* Pickup info */}
-          {deliveryType === "PICKUP_IN_STORE" && (
-            <Card>
-              <CardHeader><CardTitle className="flex items-center gap-2"><Store className="h-5 w-5 text-green-400" />Místo vyzvednutí</CardTitle></CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p className="font-medium text-foreground">Prodejna Weedej</p>
-                <p>Benešovská 432/3, 405 02 Děčín 2</p>
-                <p>Po–Pá: 11:00–19:00 | So: 11:00–17:00</p>
-                <p className="text-green-400 text-xs mt-2">✓ Vyzvednutí zdarma — bez poplatku za dopravu</p>
-              </CardContent>
-            </Card>
-          )}
+            {error && (
+              <p className="text-sm text-destructive bg-destructive/10 px-4 py-3 rounded-xl">{error}</p>
+            )}
+          </div>
 
-          {error && (
-            <p className="text-sm text-destructive bg-destructive/10 px-4 py-3 rounded-xl">{error}</p>
-          )}
-        </div>
-
-        {/* Right: order summary */}
-        <div className="lg:col-span-2">
-          <Card className="sticky top-24">
-            <CardHeader><CardTitle>Shrnutí objednávky</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
-              {items.map((item: any) => {
-                const productName = item.product?.name ?? item.productName ?? ""
-                const variantName = item.variant?.name ?? item.variantName ?? ""
-                const price = item.variant?.price ?? item.price ?? 0
-                const image = item.product?.imageUrls?.[0] ?? item.imageUrl
-                const displayName = productName
-                  ? variantName
-                    ? `${productName} — ${variantName}`
-                    : productName
-                  : variantName
-                return (
-                  <div key={item.id ?? item.variantId} className="flex items-center gap-3">
-                    {image && (
-                      <Image src={image} alt={displayName} width={48} height={48} className="h-12 w-12 rounded-lg object-cover shrink-0 bg-muted" unoptimized={!image.includes('vercel-storage.com') && !image.includes('blob.vercel.app')} />
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{displayName}</p>
-                      <p className="text-xs text-muted-foreground">× {item.quantity}</p>
+          {/* Right: order summary */}
+          <div className="lg:col-span-2">
+            <Card className="sticky top-24">
+              <CardHeader><CardTitle>Shrnutí objednávky</CardTitle></CardHeader>
+              <CardContent className="space-y-4">
+                {items.map((item: any) => {
+                  const productName = item.product?.name ?? item.productName ?? ""
+                  const variantName = item.variant?.name ?? item.variantName ?? ""
+                  const price = item.variant?.price ?? item.price ?? 0
+                  const image = item.product?.imageUrls?.[0] ?? item.imageUrl
+                  const displayName = productName
+                    ? variantName ? `${productName} — ${variantName}` : productName
+                    : variantName
+                  return (
+                    <div key={item.id ?? item.variantId} className="flex items-center gap-3">
+                      {image && (
+                        <Image src={image} alt={displayName} width={48} height={48} className="h-12 w-12 rounded-lg object-cover shrink-0 bg-muted" unoptimized={!image.includes('vercel-storage.com') && !image.includes('blob.vercel.app')} />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{displayName}</p>
+                        <p className="text-xs text-muted-foreground">× {item.quantity}</p>
+                      </div>
+                      <p className="text-sm font-medium shrink-0">{formatPrice(Number(price) * item.quantity)}</p>
                     </div>
-                    <p className="text-sm font-medium shrink-0">{formatPrice(Number(price) * item.quantity)}</p>
-                  </div>
-                )
-              })}
+                  )
+                })}
 
-              <Separator />
-
-              <div className="space-y-1.5 text-sm">
-                <div className="flex justify-between text-muted-foreground">
-                  <span>Mezisoučet</span><span>{formatPrice(totalPrice)}</span>
-                </div>
-                <div className="flex justify-between text-muted-foreground">
-                  <span>Doprava</span>
-                  <span>{methodPrice === 0 ? <span className="text-green-400">Zdarma</span> : formatPrice(methodPrice)}</span>
-                </div>
                 <Separator />
-                <div className="flex justify-between font-semibold text-base pt-1">
-                  <span>Celkem</span>
-                  <motion.span
-                    key={total}
-                    initial={{ scale: 1.08, color: '#2E7D32' }}
-                    animate={{ scale: 1, color: '#1d1d1f' }}
-                    transition={{ duration: 0.3 }}
-                    className="font-mono"
-                  >
-                    {formatPrice(total)}
-                  </motion.span>
+
+                <div className="space-y-1.5 text-sm">
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Mezisoučet</span><span>{formatPrice(totalPrice)}</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Doprava</span>
+                    <span>{shippingCost === 0 ? <span className="text-green-400">Zdarma</span> : formatPrice(shippingCost)}</span>
+                  </div>
+                  <Separator />
+                  <div className="flex justify-between font-semibold text-base pt-1">
+                    <span>Celkem</span>
+                    <motion.span
+                      key={total}
+                      initial={{ scale: 1.08, color: '#2E7D32' }}
+                      animate={{ scale: 1, color: '#1d1d1f' }}
+                      transition={{ duration: 0.3 }}
+                      className="font-mono"
+                    >
+                      {formatPrice(total)}
+                    </motion.span>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex items-center justify-center gap-4 py-2 text-xs text-[#6e6e73]">
-                <span className="flex items-center gap-1"><Shield className="h-3.5 w-3.5 text-[#2E7D32]" />SSL šifrování</span>
-                <span className="flex items-center gap-1"><Lock className="h-3.5 w-3.5 text-[#2E7D32]" />Bezpečná platba</span>
-              </div>
+                <div className="flex items-center justify-center gap-4 py-2 text-xs text-[#6e6e73]">
+                  <span className="flex items-center gap-1"><Shield className="h-3.5 w-3.5 text-[#2E7D32]" />SSL šifrování</span>
+                  <span className="flex items-center gap-1"><Lock className="h-3.5 w-3.5 text-[#2E7D32]" />Bezpečná platba</span>
+                </div>
 
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-[#2E7D32] hover:bg-[#1a9020] text-white font-bold"
-                size="lg"
-              >
-                {loading
-                  ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Přesměrování na platbu...</>
-                  : `Zaplatit ${formatPrice(total)}`}
-              </Button>
-              <p className="text-xs text-center text-muted-foreground">
-                🔒 Bezpečná platba přes Stripe
-              </p>
-            </CardContent>
-          </Card>
+                <Button
+                  type="submit"
+                  disabled={loading || !deliveryMethod}
+                  className="w-full bg-[#2E7D32] hover:bg-[#1a9020] text-white font-bold"
+                  size="lg"
+                >
+                  {loading
+                    ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Přesměrování na platbu...</>
+                    : !deliveryMethod
+                    ? "Vyberte způsob doručení"
+                    : `Zaplatit ${formatPrice(total)}`}
+                </Button>
+                <p className="text-xs text-center text-muted-foreground">
+                  🔒 Bezpečná platba přes Stripe
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
     </>
   )
 }

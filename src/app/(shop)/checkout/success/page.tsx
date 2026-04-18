@@ -40,7 +40,7 @@ async function processOrder(sessionId: string): Promise<{ erpOrderNumber: string
 
     const userId       = session.metadata?.userId
     const itemsRaw     = session.metadata?.items
-    const deliveryType = (session.metadata?.deliveryType ?? "COURIER") as "COURIER" | "PICKUP_IN_STORE"
+    const deliveryType = (session.metadata?.deliveryType ?? "COURIER") as "COURIER" | "PICKUP_IN_STORE" | "DPD_HOME" | "DPD_PICKUP" | "ZASILKOVNA_HOME" | "ZASILKOVNA_PICKUP"
     const addressId    = session.metadata?.addressId || null
     if (!userId || !itemsRaw) return null
 
