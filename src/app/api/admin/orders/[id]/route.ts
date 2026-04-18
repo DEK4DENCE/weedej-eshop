@@ -34,7 +34,7 @@ const patchOrderSchema = z.object({
 })
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { session, error: authError } = await requireAdmin()
+  const { session, error: authError } = await requireAdmin(req)
   if (authError) return authError
   const { id } = await params
   const rawBody = await req.json()

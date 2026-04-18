@@ -15,8 +15,8 @@ function toSlug(title: string) {
 
 interface Context { params: Promise<{ id: string }> }
 
-export async function GET(_req: NextRequest, { params }: Context) {
-  const { error: authError } = await requireAdmin()
+export async function GET(req: NextRequest, { params }: Context) {
+  const { error: authError } = await requireAdmin(req)
   if (authError) return authError
 
   const { id } = await params
@@ -26,7 +26,7 @@ export async function GET(_req: NextRequest, { params }: Context) {
 }
 
 export async function PUT(req: NextRequest, { params }: Context) {
-  const { error: authError } = await requireAdmin()
+  const { error: authError } = await requireAdmin(req)
   if (authError) return authError
 
   const { id } = await params
@@ -74,8 +74,8 @@ export async function PUT(req: NextRequest, { params }: Context) {
   return NextResponse.json(post)
 }
 
-export async function DELETE(_req: NextRequest, { params }: Context) {
-  const { error: authError } = await requireAdmin()
+export async function DELETE(req: NextRequest, { params }: Context) {
+  const { error: authError } = await requireAdmin(req)
   if (authError) return authError
 
   const { id } = await params

@@ -4,7 +4,7 @@ import { db } from "@/lib/db"
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
-  const { session: adminSession, error: authError } = await requireAdmin()
+  const { session: adminSession, error: authError } = await requireAdmin(req)
   if (authError) return authError
 
   const { variantId, type, quantity, reason } = await req.json()

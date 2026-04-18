@@ -3,14 +3,14 @@
 // Zachová: uživatele, nastavení, produkty, varianty, kategorie.
 // Pořadí mazání respektuje FK constraints.
 
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
 
 export const dynamic = "force-dynamic"
 
-export async function POST() {
-  const { error: authError } = await requireAdmin()
+export async function POST(req: NextRequest) {
+  const { error: authError } = await requireAdmin(req)
   if (authError) return authError
 
   try {

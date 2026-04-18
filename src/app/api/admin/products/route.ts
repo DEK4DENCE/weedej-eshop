@@ -6,7 +6,7 @@ import { logAdminAction } from "@/lib/audit"
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
-  const { session, error: authError } = await requireAdmin()
+  const { session, error: authError } = await requireAdmin(req)
   if (authError) return authError
   const body = await req.json()
   if (!body.name || typeof body.name !== 'string' || !body.name.trim()) {

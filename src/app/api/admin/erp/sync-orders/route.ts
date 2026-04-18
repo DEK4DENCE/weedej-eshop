@@ -2,7 +2,7 @@
 // Synchronizuje statusy objednávek z ERP zpět do eshopu
 // ERP je zdroj pravdy pro statusy: paid → shipped → delivered → cancelled
 
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
 import { getErpOrder, getErpConfig } from "@/lib/erp"
@@ -18,8 +18,8 @@ const ERP_TO_ESHOP_STATUS: Record<string, string> = {
   storno:     "CANCELLED",
 }
 
-export async function POST() {
-  const { error: authError } = await requireAdmin()
+export async function POST(req: NextRequest) {
+  const { error: authError } = await requireAdmin(req)
   if (authError) return authError
 
   const erpConfig = await getErpConfig()

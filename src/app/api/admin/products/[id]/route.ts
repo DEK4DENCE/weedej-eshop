@@ -13,7 +13,7 @@ const ALLOWED_PRODUCT_FIELDS = new Set([
 ])
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { session, error: authError } = await requireAdmin()
+  const { session, error: authError } = await requireAdmin(req)
   if (authError) return authError
   const { id } = await params
   const body = await req.json()
@@ -50,7 +50,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { session, error: authError } = await requireAdmin()
+  const { session, error: authError } = await requireAdmin(req)
   if (authError) return authError
   const { id } = await params
   await db.product.update({ where: { id }, data: { isActive: false } })

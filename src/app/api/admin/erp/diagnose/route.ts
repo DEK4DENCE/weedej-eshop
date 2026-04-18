@@ -1,14 +1,14 @@
 // GET /api/admin/erp/diagnose
 // Diagnostika ERP integrace — zobrazí co funguje a co ne
 
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
 import { getErpConfig } from "@/lib/erp"
 export const dynamic = 'force-dynamic'
 
-export async function GET() {
-  const { error: authError } = await requireAdmin()
+export async function GET(req: NextRequest) {
+  const { error: authError } = await requireAdmin(req)
   if (authError) return authError
 
   const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET

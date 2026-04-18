@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache"
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
-  const { error: authError } = await requireAdmin()
+  const { error: authError } = await requireAdmin(req)
   if (authError) return authError
   const body = await req.json()
   const name = typeof body.name === "string" ? body.name.trim() : ""

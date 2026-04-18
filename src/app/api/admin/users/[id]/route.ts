@@ -4,8 +4,8 @@ import { db } from "@/lib/db"
 import { logAdminAction } from "@/lib/audit"
 export const dynamic = 'force-dynamic'
 
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { error: authError, session } = await requireAdmin()
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { error: authError, session } = await requireAdmin(req)
   if (authError) return authError
   const { id } = await params
 

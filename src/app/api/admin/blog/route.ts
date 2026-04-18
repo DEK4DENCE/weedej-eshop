@@ -13,8 +13,8 @@ function toSlug(title: string) {
     .replace(/^-|-$/g, "")
 }
 
-export async function GET() {
-  const { error: authError } = await requireAdmin()
+export async function GET(req: NextRequest) {
+  const { error: authError } = await requireAdmin(req)
   if (authError) return authError
 
   const posts = await db.blogPost.findMany({
@@ -26,7 +26,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const { session: adminSession, error: authError } = await requireAdmin()
+  const { session: adminSession, error: authError } = await requireAdmin(req)
   if (authError) return authError
 
   const body = await req.json()

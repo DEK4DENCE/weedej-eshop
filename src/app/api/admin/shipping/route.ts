@@ -3,15 +3,15 @@ import { requireAdmin } from "@/lib/requireAdmin"
 import { db } from "@/lib/db"
 export const dynamic = 'force-dynamic'
 
-export async function GET() {
-  const { error: authError } = await requireAdmin()
+export async function GET(req: NextRequest) {
+  const { error: authError } = await requireAdmin(req)
   if (authError) return authError
   const methods = await db.shippingMethod.findMany({ orderBy: { sortOrder: "asc" } })
   return NextResponse.json(methods)
 }
 
 export async function POST(req: NextRequest) {
-  const { error: authError } = await requireAdmin()
+  const { error: authError } = await requireAdmin(req)
   if (authError) return authError
   const body = await req.json()
   const name = typeof body.name === "string" ? body.name.trim() : ""

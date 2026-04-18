@@ -4,7 +4,7 @@ import { db } from "@/lib/db"
 export const dynamic = 'force-dynamic'
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { error: authError } = await requireAdmin()
+  const { error: authError } = await requireAdmin(req)
   if (authError) return authError
   const { id } = await params
   const body = await req.json()
@@ -27,8 +27,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   return NextResponse.json(method)
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { error: authError } = await requireAdmin()
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { error: authError } = await requireAdmin(req)
   if (authError) return authError
   const { id } = await params
   await db.shippingMethod.delete({ where: { id } })

@@ -7,7 +7,7 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { error: authError } = await requireAdmin()
+  const { error: authError } = await requireAdmin(req)
   if (authError) return authError
 
   const { id } = await params
@@ -59,7 +59,7 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { error: authError } = await requireAdmin()
+  const { error: authError } = await requireAdmin(req)
   if (authError) return authError
 
   const { id } = await params

@@ -6,8 +6,8 @@ import { sendEmail } from "@/lib/email/send"
 import { EmailVerification } from "@/lib/email/templates/EmailVerification"
 export const dynamic = 'force-dynamic'
 
-export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { error: authError } = await requireAdmin()
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { error: authError } = await requireAdmin(req)
   if (authError) return authError
   const { id } = await params
 

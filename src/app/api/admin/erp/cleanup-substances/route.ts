@@ -20,7 +20,7 @@ function cleanName(name: string): string {
 }
 
 export async function POST(req: NextRequest) {
-  const { error: authError } = await requireAdmin()
+  const { error: authError } = await requireAdmin(req)
   if (authError) return authError
 
   const products = await db.product.findMany({

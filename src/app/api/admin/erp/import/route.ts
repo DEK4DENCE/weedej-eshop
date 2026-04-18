@@ -60,7 +60,7 @@ function cleanName(name: string): string {
 // ─── Test připojení ───────────────────────────────────────────────────────────
 
 export async function GET(req: NextRequest) {
-  const { error: authError } = await requireAdmin()
+  const { error: authError } = await requireAdmin(req)
   if (authError) return authError
 
   const erpUrl = req.headers.get("x-erp-url")?.trim()
@@ -94,7 +94,7 @@ export async function GET(req: NextRequest) {
 // ─── Import produktů ──────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
-  const { error: authError } = await requireAdmin()
+  const { error: authError } = await requireAdmin(req)
   if (authError) return authError
 
   const body = await req.json()
