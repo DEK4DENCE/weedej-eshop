@@ -164,6 +164,8 @@ async function processOrder(sessionId: string): Promise<{ erpOrderNumber: string
         name:         'Doprava',
         quantity:     1,
         unit:         'ks',
+        variantValue: undefined,
+        variantUnit:  undefined,
         unitPriceCzk: Math.round(shippingCzk / 1.21 * 100) / 100,
         vatRate:      21,
       })
