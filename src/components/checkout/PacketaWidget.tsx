@@ -1,8 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { flushSync } from "react-dom"
-import { MapPin, Loader2 } from "lucide-react"
+import { MapPin, Loader2, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export interface PickupPoint {
@@ -32,7 +31,6 @@ declare global {
         close?: () => void
       }
     }
-    __packetaHandler?: (point: Record<string, unknown> | null) => void
   }
 }
 
@@ -52,6 +50,8 @@ function normalizePoint(raw: Record<string, unknown>): PickupPoint {
 export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
   const apiKey = process.env.NEXT_PUBLIC_PACKETA_API_KEY ?? ""
   const [scriptReady, setScriptReady] = useState(false)
+  const [widgetOpen, setWidgetOpen] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
   const onSelectRef = useRef(onSelect)
   useEffect(() => { onSelectRef.current = onSelect }, [onSelect])
 
@@ -73,37 +73,33 @@ export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
     document.body.appendChild(script)
   }, [])
 
-  // Backup: catch ALL postMessages and look for Packeta point data
-  useEffect(() => {
-    function handleMessage(event: MessageEvent) {
-      const d = event.data
-      if (!d || typeof d !== "object") return
-      // Packeta may send {point: {...}} or the point object directly
-      const raw: Record<string, unknown> | null =
-        (d.point && typeof d.point === "object" ? d.point as Record<string, unknown> : null) ??
-        (d.id && d.name ? d as Record<string, unknown> : null)
-      if (raw?.name) {
-        flushSync(() => { onSelectRef.current(normalizePoint(raw)) })
-      }
-    }
-    window.addEventListener("message", handleMessage)
-    return () => window.removeEventListener("message", handleMessage)
-  }, [])
-
   function openWidget() {
     if (!window.Packeta?.Widget) return
+    setWidgetOpen(true)
+  }
 
-    // Register as global — some Packeta builds resolve callback by name
-    window.__packetaHandler = (raw) => {
-      if (!raw) return
-      flushSync(() => { onSelectRef.current(normalizePoint(raw)) })
-    }
+  // Once the container div is visible in the DOM, launch the inline widget
+  useEffect(() => {
+    if (!widgetOpen || !containerRef.current || !window.Packeta?.Widget) return
 
     window.Packeta.Widget.pick(
       apiKey,
       { country: "cz", language: "cs" },
-      window.__packetaHandler
+      (raw) => {
+        if (!raw) {
+          setWidgetOpen(false)
+          return
+        }
+        onSelectRef.current(normalizePoint(raw))
+        setWidgetOpen(false)
+      },
+      containerRef.current
     )
+  }, [widgetOpen, apiKey])
+
+  function closeWidget() {
+    window.Packeta?.Widget?.close?.()
+    setWidgetOpen(false)
   }
 
   return (
@@ -114,7 +110,23 @@ export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
         </div>
       )}
 
-      {selectedPoint ? (
+      {/* Inline widget container */}
+      {widgetOpen && (
+        <div className="relative rounded-lg border border-gray-200 overflow-hidden">
+          <button
+            type="button"
+            onClick={closeWidget}
+            className="absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md hover:bg-gray-100"
+            aria-label="Zavřít"
+          >
+            <X className="h-4 w-4" />
+          </button>
+          <div ref={containerRef} style={{ width: "100%", minHeight: 500 }} />
+        </div>
+      )}
+
+      {/* Selected point display */}
+      {!widgetOpen && selectedPoint && (
         <div className="rounded-lg border border-[#2E7D32] bg-[#2E7D32]/5 p-4">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-2">
@@ -130,7 +142,10 @@ export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
             </Button>
           </div>
         </div>
-      ) : (
+      )}
+
+      {/* Open button */}
+      {!widgetOpen && !selectedPoint && (
         <Button
           type="button"
           variant="outline"
