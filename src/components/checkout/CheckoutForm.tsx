@@ -14,7 +14,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { DeliveryCarrierSelector, type DeliveryMethod } from "@/components/checkout/DeliveryCarrierSelector"
 import type { PickupPoint } from "@/components/checkout/PacketaWidget"
-import { PacketaPickupSelector } from "@/components/checkout/PacketaPickupSelector"
+import { PacketaWidget } from "@/components/checkout/PacketaWidget"
 import { DpdPickupSelector } from "@/components/checkout/DpdPickupSelector"
 
 interface Address {
@@ -251,7 +251,7 @@ export function CheckoutForm({ user, addresses }: Props) {
                       Klikněte na tlačítko níže a vyberte konkrétní výdejní místo nebo Z-BOX na mapě.
                     </p>
                   )}
-                  <PacketaPickupSelector
+                  <PacketaWidget
                     onSelect={setPickupPoint}
                     selectedPoint={pickupPoint}
                   />

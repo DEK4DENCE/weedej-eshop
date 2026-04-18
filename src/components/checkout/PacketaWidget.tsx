@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { flushSync } from "react-dom"
 import { MapPin, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -25,19 +26,28 @@ declare global {
         pick: (
           apiKey: string,
           options: object,
-          callback: (point: PickupPoint | null) => void,
+          callback: (point: Record<string, unknown> | null) => void,
           containerEl?: HTMLElement | null
         ) => void
         close?: () => void
       }
     }
-    // Global callback slot required by some Packeta v6 builds
-    __packetaWidgetCallback?: (point: PickupPoint | null) => void
+    __packetaHandler?: (point: Record<string, unknown> | null) => void
   }
 }
 
 const SCRIPT_SRC = "https://widget.packeta.com/v6/www/js/library.js"
 const SCRIPT_ID = "packeta-widget-script"
+
+function normalizePoint(raw: Record<string, unknown>): PickupPoint {
+  return {
+    id: String(raw.id ?? ""),
+    name: String(raw.name ?? ""),
+    nameStreet: String(raw.nameStreet ?? raw.street ?? raw.name ?? ""),
+    city: String(raw.city ?? ""),
+    zip: String(raw.zip ?? raw.zipCode ?? ""),
+  }
+}
 
 export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
   const apiKey = process.env.NEXT_PUBLIC_PACKETA_API_KEY ?? ""
@@ -63,16 +73,18 @@ export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
     document.body.appendChild(script)
   }, [])
 
-  // Backup: listen for postMessage from Packeta iframe directly
+  // Backup: catch ALL postMessages and look for Packeta point data
   useEffect(() => {
     function handleMessage(event: MessageEvent) {
-      if (typeof event.origin !== "string") return
-      if (!event.origin.includes("packeta.com") && !event.origin.includes("zasilkovna.cz")) return
-      const data = event.data
-      if (!data) return
-      // Packeta may send the point as { point: {...} } or directly as the point object
-      const point: PickupPoint | null = data.point ?? (data.id ? data : null)
-      if (point) onSelectRef.current(point)
+      const d = event.data
+      if (!d || typeof d !== "object") return
+      // Packeta may send {point: {...}} or the point object directly
+      const raw: Record<string, unknown> | null =
+        (d.point && typeof d.point === "object" ? d.point as Record<string, unknown> : null) ??
+        (d.id && d.name ? d as Record<string, unknown> : null)
+      if (raw?.name) {
+        flushSync(() => { onSelectRef.current(normalizePoint(raw)) })
+      }
     }
     window.addEventListener("message", handleMessage)
     return () => window.removeEventListener("message", handleMessage)
@@ -80,15 +92,17 @@ export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
 
   function openWidget() {
     if (!window.Packeta?.Widget) return
-    // Register callback globally — some Packeta v6 builds call via window reference
-    window.__packetaWidgetCallback = (point: PickupPoint | null) => {
-      if (point) onSelectRef.current(point)
-      delete window.__packetaWidgetCallback
+
+    // Register as global — some Packeta builds resolve callback by name
+    window.__packetaHandler = (raw) => {
+      if (!raw) return
+      flushSync(() => { onSelectRef.current(normalizePoint(raw)) })
     }
+
     window.Packeta.Widget.pick(
       apiKey,
       { country: "cz", language: "cs" },
-      window.__packetaWidgetCallback
+      window.__packetaHandler
     )
   }
 
