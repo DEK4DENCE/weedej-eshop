@@ -82,19 +82,25 @@ export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
   useEffect(() => {
     if (!widgetOpen || !containerRef.current || !window.Packeta?.Widget) return
 
-    window.Packeta.Widget.pick(
-      apiKey,
-      { country: "cz", language: "cs" },
-      (raw) => {
-        if (!raw) {
+    const el = containerRef.current
+    // Small delay to ensure the DOM is fully painted and container has dimensions
+    const timer = setTimeout(() => {
+      window.Packeta!.Widget.pick(
+        apiKey,
+        { country: "cz", language: "cs" },
+        (raw) => {
+          if (!raw) {
+            setWidgetOpen(false)
+            return
+          }
+          onSelectRef.current(normalizePoint(raw))
           setWidgetOpen(false)
-          return
-        }
-        onSelectRef.current(normalizePoint(raw))
-        setWidgetOpen(false)
-      },
-      containerRef.current
-    )
+        },
+        el
+      )
+    }, 100)
+
+    return () => clearTimeout(timer)
   }, [widgetOpen, apiKey])
 
   function closeWidget() {
@@ -112,16 +118,8 @@ export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
 
       {/* Inline widget container */}
       {widgetOpen && (
-        <div className="relative rounded-lg border border-gray-200 overflow-hidden">
-          <button
-            type="button"
-            onClick={closeWidget}
-            className="absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md hover:bg-gray-100"
-            aria-label="Zavřít"
-          >
-            <X className="h-4 w-4" />
-          </button>
-          <div ref={containerRef} style={{ width: "100%", minHeight: 500 }} />
+        <div className="relative rounded-lg border border-gray-200">
+          <div ref={containerRef} style={{ width: "100%", height: "520px" }} />
         </div>
       )}
 
