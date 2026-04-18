@@ -40,7 +40,7 @@ interface Meta {
   error?: string
 }
 
-type SortField = "name" | "category" | "physical" | "purchaseValue" | "salesValue" | "status"
+type SortField = "name" | "category" | "physical" | "reserved" | "available" | "status"
 type SortDir = "asc" | "desc"
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -52,9 +52,6 @@ function formatStock(value: number, unit: string): string {
   return `${rounded} ${unit}`
 }
 
-function formatCzk(value: number): string {
-  return value.toLocaleString("cs-CZ", { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + " Kč"
-}
 
 function statusOrder(s: "empty" | "low" | "ok"): number {
   return s === "empty" ? 0 : s === "low" ? 1 : 2
@@ -180,9 +177,9 @@ export default function InventoryPage() {
     switch (sortField) {
       case "name":          cmp = a.productName.localeCompare(b.productName, "cs"); break
       case "category":      cmp = (a.category?.name ?? "").localeCompare(b.category?.name ?? "", "cs"); break
-      case "physical":      cmp = a.physicalStock - b.physicalStock; break
-      case "purchaseValue": cmp = a.totalPurchaseValue - b.totalPurchaseValue; break
-      case "salesValue":    cmp = a.totalSalesValue - b.totalSalesValue; break
+      case "physical":   cmp = a.physicalStock - b.physicalStock; break
+      case "reserved":   cmp = a.reservedStock - b.reservedStock; break
+      case "available":  cmp = a.availableStock - b.availableStock; break
       case "status":        cmp = statusOrder(a.stockStatus) - statusOrder(b.stockStatus); break
     }
     return sortDir === "asc" ? cmp : -cmp
@@ -303,14 +300,14 @@ export default function InventoryPage() {
           <button className="flex items-center gap-1 justify-center hover:text-[#212121]" onClick={() => toggleSort("category")}>
             Kategorie <SortIcon field="category" />
           </button>
-          <button className="flex items-center gap-1 justify-center hover:text-[#212121]" onClick={() => toggleSort("physical")}>
+          <button className="flex items-center gap-1 justify-end hover:text-[#212121]" onClick={() => toggleSort("physical")}>
             Skladem <SortIcon field="physical" />
           </button>
-          <button className="flex items-center gap-1 justify-center hover:text-[#212121]" onClick={() => toggleSort("purchaseValue")}>
-            Nák. hodnota <SortIcon field="purchaseValue" />
+          <button className="flex items-center gap-1 justify-end hover:text-[#212121]" onClick={() => toggleSort("reserved")}>
+            Rezervováno <SortIcon field="reserved" />
           </button>
-          <button className="flex items-center gap-1 justify-center hover:text-[#212121]" onClick={() => toggleSort("salesValue")}>
-            Prod. hodnota <SortIcon field="salesValue" />
+          <button className="flex items-center gap-1 justify-end hover:text-[#212121]" onClick={() => toggleSort("available")}>
+            Dostupné <SortIcon field="available" />
           </button>
           <button className="flex items-center gap-1 justify-center hover:text-[#212121]" onClick={() => toggleSort("status")}>
             Status <SortIcon field="status" />
@@ -351,16 +348,20 @@ export default function InventoryPage() {
                     {item.category?.name ?? <span className="text-[#c0c0c0]">—</span>}
                   </div>
 
-                  <div className="flex justify-center">
-                    <StockBadge value={item.physicalStock} unit={item.unit} status={item.stockStatus} />
+                  <div className="text-right text-sm font-medium text-[#212121]">
+                    {formatStock(item.physicalStock, item.unit)}
                   </div>
 
-                  <div className="text-center text-sm text-[#212121]">
-                    {item.totalPurchaseValue > 0 ? formatCzk(item.totalPurchaseValue) : <span className="text-[#c0c0c0]">—</span>}
+                  <div className="text-right text-sm">
+                    {item.reservedStock > 0
+                      ? <span className="text-orange-600 font-medium">{formatStock(item.reservedStock, item.unit)}</span>
+                      : <span className="text-[#c0c0c0]">—</span>}
                   </div>
 
-                  <div className="text-center text-sm font-medium text-[#2E7D32]">
-                    {item.totalSalesValue > 0 ? formatCzk(item.totalSalesValue) : <span className="text-[#c0c0c0] font-normal">—</span>}
+                  <div className="text-right text-sm font-medium">
+                    {item.availableStock > 0
+                      ? <span className="text-[#2E7D32]">{formatStock(Math.max(0, item.availableStock), item.unit)}</span>
+                      : <span className="text-red-600">{formatStock(Math.max(0, item.availableStock), item.unit)}</span>}
                   </div>
 
                   <div className="flex justify-center">
@@ -428,12 +429,16 @@ export default function InventoryPage() {
             <div />
             <div className="text-[#9e9e9e] font-normal">{sorted.length} produktů</div>
             <div />
-            <div />
-            <div className="text-center">
-              {formatCzk(sorted.reduce((s, i) => s + i.totalPurchaseValue, 0))}
+            <div className="text-right text-[#9e9e9e]">—</div>
+            <div className="text-right">
+              {sorted.some(i => i.reservedStock > 0)
+                ? <span className="text-orange-600">{sorted.filter(i => i.reservedStock > 0).length} s rezervací</span>
+                : <span className="text-[#9e9e9e]">—</span>}
             </div>
-            <div className="text-center text-[#2E7D32]">
-              {formatCzk(sorted.reduce((s, i) => s + i.totalSalesValue, 0))}
+            <div className="text-right">
+              <span className={sorted.filter(i => i.availableStock > 0).length === sorted.length ? "text-[#2E7D32]" : "text-[#9e9e9e]"}>
+                {sorted.filter(i => i.availableStock > 0).length} dostupných
+              </span>
             </div>
             <div />
           </div>
