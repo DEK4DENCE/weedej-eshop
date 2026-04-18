@@ -25,6 +25,19 @@ function verifySignature(rawBody: string, sigHeader: string | null): boolean {
   } catch { return false }
 }
 
+// ─── Timestamp freshness check (replay-attack prevention) ────────────────────
+// Requires the ERP to send the Unix epoch seconds of the request as
+// x-erp-timestamp header. Requests older than 5 minutes are rejected.
+// NOTE: The ERP system MUST be updated to send this header with every request.
+
+function isTimestampFresh(timestampHeader: string | null): boolean {
+  if (!timestampHeader) return false
+  const ts = parseInt(timestampHeader, 10)
+  if (isNaN(ts)) return false
+  const ageMs = Date.now() - ts * 1000
+  return ageMs >= 0 && ageMs < 5 * 60 * 1000 // 5-minute window
+}
+
 export async function POST(req: NextRequest) {
   const rawBody   = await req.text()
   const sigHeader = req.headers.get('x-erp-signature')
@@ -32,6 +45,13 @@ export async function POST(req: NextRequest) {
   if (!verifySignature(rawBody, sigHeader)) {
     console.warn('[OrderDelivered] Invalid signature')
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
+  }
+
+  // Timestamp check AFTER HMAC so forged timestamps cannot bypass HMAC
+  const tsHeader = req.headers.get('x-erp-timestamp')
+  if (!isTimestampFresh(tsHeader)) {
+    console.warn('[ERPWebhook] Stale or missing timestamp')
+    return NextResponse.json({ error: 'Request expired' }, { status: 400 })
   }
 
   let payload: { eshopOrderId?: string; erpOrderNumber?: string; deliveredAt?: string }
