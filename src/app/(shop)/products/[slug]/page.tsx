@@ -127,7 +127,7 @@ export default async function ProductDetailPage({ params }: Props) {
     { '@type': 'ListItem', position: 2, name: 'Produkty', item: `${BASE_URL}/products` },
   ]
   if (product.category) {
-    breadcrumbItems.push({ '@type': 'ListItem', position: 3, name: product.category.name, item: `${BASE_URL}/kategorie/${product.category.slug}` })
+    breadcrumbItems.push({ '@type': 'ListItem', position: 3, name: product.category.name, item: `${BASE_URL}/categories/${product.category.slug}` })
   }
   breadcrumbItems.push({ '@type': 'ListItem', position: breadcrumbItems.length + 1, name: product.name, item: `${BASE_URL}/products/${product.slug}` })
 
@@ -156,7 +156,7 @@ export default async function ProductDetailPage({ params }: Props) {
             {product.category && (
               <>
                 <li aria-hidden="true">/</li>
-                <li><Link href={`/kategorie/${product.category.slug}`} className="hover:text-[#2E7D32] transition-colors">{product.category.name}</Link></li>
+                <li><Link href={`/categories/${product.category.slug}`} className="hover:text-[#2E7D32] transition-colors">{product.category.name}</Link></li>
               </>
             )}
             <li aria-hidden="true">/</li>
