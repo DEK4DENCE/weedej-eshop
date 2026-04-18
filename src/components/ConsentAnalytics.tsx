@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Analytics } from "@vercel/analytics/react"
 import { GoogleAnalytics } from "@next/third-parties/google"
 
-const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? ""
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? "G-M62GQCVK7V"
 
 function getCookieValue(name: string): string | null {
   if (typeof document === "undefined") return null
