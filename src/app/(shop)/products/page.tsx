@@ -149,10 +149,13 @@ export default async function ProductsPage({ searchParams }: Props) {
           }>
             <ProductFilters />
           </Suspense>
+          <p className="text-xs text-[#aeaeb2] mt-4 hidden md:block">
+            Nalezeno <span className="font-medium text-[#6e6e73]">{products.length}</span> produktů
+          </p>
         </aside>
         <div className="flex-1 min-w-0">
-          <p className="text-sm text-[#6e6e73] mb-3">
-            Nalezeno <span className="font-semibold text-[#1d1d1f]">{products.length}</span> produktů
+          <p className="text-xs text-[#aeaeb2] mb-3 md:hidden">
+            Nalezeno <span className="font-medium text-[#6e6e73]">{products.length}</span> produktů
           </p>
           <ProductGrid products={products} />
         </div>
