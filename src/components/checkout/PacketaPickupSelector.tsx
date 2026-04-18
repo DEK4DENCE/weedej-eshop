@@ -1,0 +1,151 @@
+"use client"
+
+import { useState, useCallback } from "react"
+import { MapPin, Search, Loader2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import type { PickupPoint } from "@/components/checkout/PacketaWidget"
+
+interface Props {
+  onSelect: (point: PickupPoint) => void
+  selectedPoint: PickupPoint | null
+  className?: string
+}
+
+export function PacketaPickupSelector({ onSelect, selectedPoint, className }: Props) {
+  const [query, setQuery] = useState("")
+  const [results, setResults] = useState<PickupPoint[]>([])
+  const [loading, setLoading] = useState(false)
+  const [searched, setSearched] = useState(false)
+  const [showSearch, setShowSearch] = useState(false)
+  const [apiError, setApiError] = useState("")
+
+  const search = useCallback(async (q: string) => {
+    setLoading(true)
+    setSearched(true)
+    setApiError("")
+    try {
+      const res = await fetch(`/api/shipping/packeta-pickup?q=${encodeURIComponent(q)}`)
+      const data = await res.json()
+      if (data.error) setApiError(data.error)
+      setResults(data.points ?? [])
+    } catch {
+      setApiError("Chyba při načítání výdejních míst.")
+      setResults([])
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault()
+    search(query)
+  }
+
+  function handleSelect(point: PickupPoint) {
+    onSelect(point)
+    setShowSearch(false)
+    setResults([])
+    setSearched(false)
+  }
+
+  function openSearch() {
+    setShowSearch(true)
+    setQuery("")
+    setResults([])
+    setSearched(false)
+    search("")
+  }
+
+  if (selectedPoint && !showSearch) {
+    return (
+      <div className={className}>
+        <div className="rounded-lg border border-[#2E7D32] bg-[#2E7D32]/5 p-4">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-2">
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#2E7D32]" />
+              <div>
+                <p className="text-sm font-semibold text-[#1d1d1f]">{String(selectedPoint.name)}</p>
+                <p className="text-xs text-gray-500">{String(selectedPoint.nameStreet ?? "")}</p>
+                <p className="text-xs text-gray-500">{String(selectedPoint.zip ?? "")} {String(selectedPoint.city ?? "")}</p>
+              </div>
+            </div>
+            <Button type="button" variant="outline" size="sm" className="shrink-0 text-xs" onClick={openSearch}>
+              Změnit
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className={className}>
+      {!showSearch && (
+        <Button type="button" variant="outline" className="w-full gap-2" onClick={openSearch}>
+          <MapPin className="h-4 w-4" />
+          Vybrat výdejní místo / Z-BOX
+        </Button>
+      )}
+
+      {showSearch && (
+        <div className="rounded-lg border border-gray-200 bg-white p-4 space-y-3">
+          <form onSubmit={handleSearch} className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Input
+                type="text"
+                placeholder="Město nebo PSČ…"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className="pl-9"
+                autoFocus
+              />
+            </div>
+            <Button type="submit" size="sm" disabled={loading}>
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Hledat"}
+            </Button>
+          </form>
+
+          {apiError && (
+            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{apiError}</p>
+          )}
+
+          {loading && (
+            <div className="flex justify-center py-4">
+              <Loader2 className="h-5 w-5 animate-spin text-[#2E7D32]" />
+            </div>
+          )}
+
+          {!loading && searched && results.length === 0 && !apiError && (
+            <p className="text-center text-sm text-gray-500 py-2">Žádná výdejní místa nebyla nalezena.</p>
+          )}
+
+          {!loading && results.length > 0 && (
+            <ul className="max-h-64 divide-y divide-gray-100 overflow-y-auto rounded-md border border-gray-100">
+              {results.map((point) => (
+                <li key={point.id}>
+                  <button
+                    type="button"
+                    className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-[#2E7D32]/5"
+                    onClick={() => handleSelect(point)}
+                  >
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#2E7D32]" />
+                    <div>
+                      <p className="text-sm font-medium text-[#1d1d1f]">{String(point.name)}</p>
+                      <p className="text-xs text-gray-500">{String(point.nameStreet ?? "")}, {String(point.zip ?? "")} {String(point.city ?? "")}</p>
+                    </div>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <Button type="button" variant="ghost" size="sm" className="w-full text-xs text-gray-500" onClick={() => setShowSearch(false)}>
+            Zrušit
+          </Button>
+        </div>
+      )}
+    </div>
+  )
+}
