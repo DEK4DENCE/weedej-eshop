@@ -262,6 +262,25 @@ export function CheckoutForm({ user, addresses }: Props) {
               </Card>
             )}
 
+            {/* Pickup point delivery address — shown after pickup point is selected */}
+            {isPickup && pickupPoint && (
+              <Card>
+                <CardHeader><CardTitle className="flex items-center gap-2"><MapPin className="h-5 w-5 text-green-400" />Adresa doručení</CardTitle></CardHeader>
+                <CardContent>
+                  <div className="rounded-lg border border-[#2E7D32] bg-[#2E7D32]/5 p-4">
+                    <div className="flex items-start gap-2">
+                      <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#2E7D32]" />
+                      <div>
+                        <p className="text-sm font-semibold text-[#1d1d1f]">{pickupPoint.name}</p>
+                        <p className="text-sm text-gray-600">{pickupPoint.nameStreet}</p>
+                        <p className="text-sm text-gray-600">{pickupPoint.zip} {pickupPoint.city}</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Address form — shown for home delivery types */}
             {isHome && (
               <Card>

@@ -63,6 +63,10 @@ export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
       console.warn("Packeta widget script not yet loaded")
       return
     }
+    // Remove any lingering Packeta overlay so the widget can be reopened
+    document.getElementById("packeta-widget")?.remove()
+    document.getElementById("packeta-widget-overlay")?.remove()
+    document.querySelectorAll('[id^="packeta"]').forEach((el) => el.remove())
     window.Packeta.Widget.pick(
       apiKey,
       { country: "cz", language: "cs" },
