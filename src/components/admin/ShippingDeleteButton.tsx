@@ -39,7 +39,7 @@ export function ShippingDeleteButton({ id, name, onDeleted }: Props) {
   }
 
   return (
-    <Button size="sm" variant="outline" onClick={() => setConfirm(true)} className="text-red-500 border-red-200 hover:bg-red-50 h-7 px-2">
+    <Button size="sm" variant="outline" onClick={() => setConfirm(true)} className="text-red-500 border-red-200 hover:bg-red-50 h-7 px-2" aria-label={`Smazat metodu dopravy ${name}`}>
       <Trash2 className="h-3 w-3" />
     </Button>
   )

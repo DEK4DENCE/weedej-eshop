@@ -100,29 +100,37 @@ async function applyStockUpdate(updates: StockUpdateItem[]): Promise<void> {
     const linked = variants.filter(v => v.erpProductId === upd.erpProductId)
     if (!linked.length) continue
 
-    for (const variant of linked) {
-      const newErpStock = calcVariantStock(upd.stock, upd.unit, variant.variantValue, variant.variantUnit)
-      const currentErpStock = variant.erpStock ?? 0
+    // Wrap all variant + product updates for this ERP product in one transaction
+    // so a partial failure never leaves some variants updated and others stale.
+    try {
+      await db.$transaction(async (tx) => {
+        for (const variant of linked) {
+          const newErpStock = calcVariantStock(upd.stock, upd.unit, variant.variantValue, variant.variantUnit)
+          const currentErpStock = variant.erpStock ?? 0
 
-      // M15: Only overwrite stock if no manual admin adjustment has been made.
-      // A manual adjustment is detected when stock !== erpStock (last known ERP value).
-      const hasManualOverride = variant.stock !== currentErpStock
-      await db.productVariant.update({
-        where: { id: variant.id },
-        data: {
-          erpStock: newErpStock,
-          ...(hasManualOverride ? {} : { stock: newErpStock }),
-        },
+          // M15: Only overwrite stock if no manual admin adjustment has been made.
+          // A manual adjustment is detected when stock !== erpStock (last known ERP value).
+          const hasManualOverride = variant.stock !== currentErpStock
+          await tx.productVariant.update({
+            where: { id: variant.id },
+            data: {
+              erpStock: newErpStock,
+              ...(hasManualOverride ? {} : { stock: newErpStock }),
+            },
+          })
+          updated++
+        }
+
+        // Update erpStock on the parent product (for admin inventory view)
+        const productId = linked[0].productId
+        await tx.product.update({
+          where: { id: productId },
+          data:  { erpStock: upd.stock, erpUnit: upd.unit },
+        })
       })
-      updated++
+    } catch (e: any) {
+      console.error('[StockWebhook] transaction error for erpProductId=' + upd.erpProductId + ':', e?.message)
     }
-
-    // Update erpStock on the parent product (for admin inventory view)
-    const productId = linked[0].productId
-    await db.product.update({
-      where: { id: productId },
-      data:  { erpStock: upd.stock, erpUnit: upd.unit },
-    }).catch((e) => console.error('[StockWebhook] product erpStock update error:', e?.message))
   }
 
   // Also update variants without erpProductId using product.erpStock as fallback

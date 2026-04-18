@@ -25,18 +25,21 @@ export async function POST(req: NextRequest) {
     }
 
     const passwordHash = await hashPassword(password)
-    const user = await prisma.user.create({
-      data: { name, email, passwordHash, dateOfBirth: new Date(dateOfBirth) },
-    })
-
-    // Create email verification token valid for 24 hours
+    // Create user and verification token atomically so a token-creation failure
+    // never leaves a user record without a verification token.
     const token = generateToken()
-    await prisma.emailVerificationToken.create({
-      data: {
-        token,
-        userId: user.id,
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-      },
+    const { user } = await prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: { name, email, passwordHash, dateOfBirth: new Date(dateOfBirth) },
+      })
+      await tx.emailVerificationToken.create({
+        data: {
+          token,
+          userId: user.id,
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        },
+      })
+      return { user }
     })
 
     const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? process.env.NEXTAUTH_URL ?? 'https://weedej.cz').replace(/\/$/, '')

@@ -137,7 +137,7 @@ export function ProductImages({ productId, initialImages, initialAdjustments }: 
                   <button
                     type="button"
                     onClick={() => setEditingUrl(url)}
-                    title="Adjust position & zoom"
+                    aria-label="Upravit pozici a zoom obrázku"
                     className="p-1.5 bg-white/90 text-[#1d1d1f] rounded-lg hover:bg-white transition-colors"
                   >
                     <Move size={13} />
@@ -146,7 +146,7 @@ export function ProductImages({ productId, initialImages, initialAdjustments }: 
                     <button
                       type="button"
                       onClick={() => handleSetFirst(url)}
-                      title="Set as main image"
+                      aria-label="Nastavit jako hlavní obrázek"
                       className="p-1.5 bg-[#2E7D32] text-white rounded-lg hover:bg-[#1a9020] transition-colors"
                     >
                       <Star size={13} />
@@ -155,7 +155,7 @@ export function ProductImages({ productId, initialImages, initialAdjustments }: 
                   <button
                     type="button"
                     onClick={() => handleDelete(url)}
-                    title="Delete image"
+                    aria-label="Smazat obrázek"
                     className="p-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
                   >
                     <Trash2 size={13} />

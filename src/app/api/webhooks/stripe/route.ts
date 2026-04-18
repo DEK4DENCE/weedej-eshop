@@ -426,7 +426,9 @@ export async function POST(req: NextRequest) {
   // ── Clear cart ──────────────────────────────────────────────────────────────
   try {
     await db.cartItem.deleteMany({ where: { cart: { userId } } })
-  } catch {}
+  } catch (cartErr) {
+    console.error(`[Cart] Failed to clear cart for userId=${userId}:`, cartErr instanceof Error ? cartErr.message : String(cartErr))
+  }
 
   return NextResponse.json({ received: true })
 

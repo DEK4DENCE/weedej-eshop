@@ -129,11 +129,13 @@ export function RegisterForm() {
             type="text"
             placeholder="Adam Smith"
             autoComplete="name"
+            aria-describedby={errors.name ? 'name-error' : undefined}
+            aria-invalid={errors.name ? true : undefined}
             className="bg-[#F8F9FA] border border-[#DEE2E6] focus:border-[#2E7D32] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#1d1d1f] placeholder:text-[#aeaeb2] rounded-xl h-11"
             {...register('name')}
           />
           {errors.name && (
-            <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
+            <p id="name-error" role="alert" className="text-red-500 text-xs mt-1">{errors.name.message}</p>
           )}
         </div>
 
@@ -146,11 +148,13 @@ export function RegisterForm() {
             type="email"
             placeholder="you@example.com"
             autoComplete="email"
+            aria-describedby={errors.email ? 'reg-email-error' : undefined}
+            aria-invalid={errors.email ? true : undefined}
             className="bg-[#F8F9FA] border border-[#DEE2E6] focus:border-[#2E7D32] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#1d1d1f] placeholder:text-[#aeaeb2] rounded-xl h-11"
             {...register('email')}
           />
           {errors.email && (
-            <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+            <p id="reg-email-error" role="alert" className="text-red-500 text-xs mt-1">{errors.email.message}</p>
           )}
         </div>
 
@@ -162,11 +166,13 @@ export function RegisterForm() {
             id="dateOfBirth"
             type="date"
             autoComplete="bday"
+            aria-describedby={errors.dateOfBirth ? 'dob-error' : undefined}
+            aria-invalid={errors.dateOfBirth ? true : undefined}
             className="bg-[#F8F9FA] border border-[#DEE2E6] focus:border-[#2E7D32] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#1d1d1f] rounded-xl h-11"
             {...register('dateOfBirth')}
           />
           {errors.dateOfBirth && (
-            <p className="text-red-500 text-xs mt-1">{errors.dateOfBirth.message}</p>
+            <p id="dob-error" role="alert" className="text-red-500 text-xs mt-1">{errors.dateOfBirth.message}</p>
           )}
         </div>
 
@@ -180,6 +186,8 @@ export function RegisterForm() {
               type={showPassword ? 'text' : 'password'}
               placeholder="Vytvořte bezpečné heslo"
               autoComplete="new-password"
+              aria-describedby={errors.password ? 'reg-password-error' : undefined}
+              aria-invalid={errors.password ? true : undefined}
               className="bg-[#F8F9FA] border border-[#DEE2E6] focus:border-[#2E7D32] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#1d1d1f] placeholder:text-[#aeaeb2] rounded-xl h-11 pr-11"
               {...register('password')}
             />
@@ -194,7 +202,7 @@ export function RegisterForm() {
           </div>
           <PasswordStrength password={passwordValue} />
           {errors.password && (
-            <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
+            <p id="reg-password-error" role="alert" className="text-red-500 text-xs mt-1">{errors.password.message}</p>
           )}
         </div>
 
@@ -208,6 +216,8 @@ export function RegisterForm() {
               type={showConfirm ? 'text' : 'password'}
               placeholder="Zopakujte heslo"
               autoComplete="new-password"
+              aria-describedby={errors.confirmPassword ? 'confirm-password-error' : undefined}
+              aria-invalid={errors.confirmPassword ? true : undefined}
               className="bg-[#F8F9FA] border border-[#DEE2E6] focus:border-[#2E7D32] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#1d1d1f] placeholder:text-[#aeaeb2] rounded-xl h-11 pr-11"
               {...register('confirmPassword')}
             />
@@ -221,7 +231,7 @@ export function RegisterForm() {
             </button>
           </div>
           {errors.confirmPassword && (
-            <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>
+            <p id="confirm-password-error" role="alert" className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>
           )}
         </div>
 

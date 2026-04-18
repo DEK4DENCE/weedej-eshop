@@ -39,6 +39,24 @@ const AUTH_RATE_LIMIT_MAX    = 10
 const AUTH_RATE_LIMIT_WINDOW = 60_000 // 1 minute in ms
 const authRateLimitMap = new Map<string, { count: number; resetAt: number }>()
 
+// ── ERP webhook rate limiting ───────────────────────────────────────────────
+// Prevents HMAC-brute-force / DoS on webhook endpoints.
+const ERP_WEBHOOK_RATE_LIMIT_MAX    = 60  // 60 requests per minute per IP
+const ERP_WEBHOOK_RATE_LIMIT_WINDOW = 60_000
+const erpWebhookRateLimitMap = new Map<string, { count: number; resetAt: number }>()
+
+function checkErpWebhookRateLimit(ip: string): boolean {
+  const now   = Date.now()
+  const entry = erpWebhookRateLimitMap.get(ip)
+  if (!entry || now > entry.resetAt) {
+    erpWebhookRateLimitMap.set(ip, { count: 1, resetAt: now + ERP_WEBHOOK_RATE_LIMIT_WINDOW })
+    return true
+  }
+  if (entry.count >= ERP_WEBHOOK_RATE_LIMIT_MAX) return false
+  entry.count++
+  return true
+}
+
 function checkAuthRateLimit(ip: string, pathname: string): boolean {
   if (!AUTH_RATE_LIMITED_PATHS.some((p) => pathname.startsWith(p))) return true
   const now   = Date.now()

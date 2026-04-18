@@ -16,9 +16,46 @@ export async function GET(
 
     const order = await db.order.findUnique({
       where: { id },
-      include: {
-        items: true,
-        address: true,
+      select: {
+        id: true,
+        userId: true,
+        status: true,
+        totalAmount: true,
+        subtotalAmount: true,
+        shippingAmount: true,
+        currency: true,
+        deliveryType: true,
+        erpOrderNumber: true,
+        invoiceNumber: true,
+        invoiceUrl: true,
+        trackingNumber: true,
+        carrier: true,
+        createdAt: true,
+        paidAt: true,
+        shippedAt: true,
+        deliveredAt: true,
+        items: {
+          select: {
+            id: true,
+            productId: true,
+            variantId: true,
+            productName: true,
+            variantLabel: true,
+            quantity: true,
+            unitPrice: true,
+          },
+        },
+        address: {
+          select: {
+            id: true,
+            fullName: true,
+            line1: true,
+            line2: true,
+            city: true,
+            postalCode: true,
+            country: true,
+          },
+        },
       },
     })
 
@@ -33,7 +70,9 @@ export async function GET(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    return NextResponse.json({ order })
+    // Strip internal userId from the response
+    const { userId: _userId, ...safeOrder } = order
+    return NextResponse.json({ order: safeOrder })
   } catch (error) {
     console.error('[GET /api/orders/[id]]', error)
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })

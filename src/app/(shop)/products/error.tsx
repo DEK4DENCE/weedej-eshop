@@ -2,9 +2,13 @@
 
 import { useEffect } from 'react'
 import Link from 'next/link'
+import * as Sentry from '@sentry/nextjs'
 
 export default function ProductsError({ error, reset }: { error: Error; reset: () => void }) {
-  useEffect(() => { console.error(error) }, [error])
+  useEffect(() => {
+    console.error('[Products] Unhandled error:', error)
+    Sentry.captureException(error)
+  }, [error])
   return (
     <div className="container mx-auto px-4 py-24 text-center max-w-lg">
       <p className="text-5xl mb-6">😕</p>

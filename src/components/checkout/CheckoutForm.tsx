@@ -11,6 +11,7 @@ import { formatPrice } from "@/lib/utils/formatPrice"
 import { Loader2, Truck, Store, MapPin, Plus, Shield, Lock, Phone } from "lucide-react"
 import { motion } from "framer-motion"
 import Link from "next/link"
+import Image from "next/image"
 
 type DeliveryType = "COURIER" | "PICKUP_IN_STORE"
 
@@ -418,8 +419,7 @@ export function CheckoutForm({ user, addresses }: Props) {
                 return (
                   <div key={item.id ?? item.variantId} className="flex items-center gap-3">
                     {image && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={image} alt={displayName} className="h-12 w-12 rounded-lg object-cover shrink-0 bg-muted" />
+                      <Image src={image} alt={displayName} width={48} height={48} className="h-12 w-12 rounded-lg object-cover shrink-0 bg-muted" unoptimized={!image.includes('vercel-storage.com') && !image.includes('blob.vercel.app')} />
                     )}
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{displayName}</p>

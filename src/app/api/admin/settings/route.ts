@@ -3,6 +3,20 @@ import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { invalidateEmailSettingsCache } from "@/lib/email/send"
 import { encryptSetting, decryptSetting, SENSITIVE_SETTING_KEYS } from "@/lib/encrypt"
+import { logAdminAction } from "@/lib/audit"
+import { z } from "zod"
+
+// Each setting value must be a string; keys are validated against an allowlist
+// to prevent mass-assignment of arbitrary DB keys.
+const ALLOWED_SETTING_KEYS = new Set([
+  "erpApiUrl", "erpApiKey", "resendApiKey", "resendFromEmail",
+  "orderNotificationEmail", "stripePublishableKey", "stripeSecretKey",
+  "stripeWebhookSecret", "erpWebhookSecret", "shopName", "shopEmail",
+  "shopPhone", "shopAddress", "shopCity", "shopPostalCode", "shopCountry",
+  "vatNumber", "businessId", "bankAccount", "bankIban",
+])
+
+const settingsBodySchema = z.record(z.string(), z.string().max(2048))
 
 export async function GET() {
   const session = await auth()
@@ -20,8 +34,14 @@ export async function POST(req: NextRequest) {
   const session = await auth()
   if (session?.user?.role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
-  const body = await req.json()
-  const updates = Object.entries(body as Record<string, string>)
+  const rawBody = await req.json()
+  const parsed = settingsBodySchema.safeParse(rawBody)
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid request body", issues: parsed.error.flatten() }, { status: 400 })
+  }
+
+  // Drop any keys not in the allowlist to prevent mass-assignment
+  const updates = Object.entries(parsed.data).filter(([key]) => ALLOWED_SETTING_KEYS.has(key))
 
   // SECURITY-5: Encrypt sensitive credentials before persisting
   await Promise.all(
@@ -36,5 +56,15 @@ export async function POST(req: NextRequest) {
   )
 
   invalidateEmailSettingsCache()
+
+  // Redact sensitive keys from audit log — only record which keys were changed, not their values
+  await logAdminAction({
+    adminId:    session.user.id as string,
+    action:     "UPDATE_SETTINGS",
+    entityType: "Setting",
+    entityId:   "global",
+    newValue:   { keys: updates.map(([key]) => key) },
+  }).catch((e: unknown) => console.error("[Audit] logAdminAction failed:", e))
+
   return NextResponse.json({ ok: true })
 }

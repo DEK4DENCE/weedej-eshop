@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 
+export const revalidate = 60
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
@@ -30,9 +32,24 @@ export async function GET(req: NextRequest) {
     const [products, total] = await Promise.all([
       prisma.product.findMany({
         where,
-        include: {
-          category: true,
-          variants: { orderBy: { isDefault: 'desc' } },
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          shortDescription: true,
+          basePrice: true,
+          imageUrls: true,
+          isActive: true,
+          isFeatured: true,
+          strainType: true,
+          thcContent: true,
+          cbdContent: true,
+          createdAt: true,
+          category: { select: { id: true, name: true, slug: true } },
+          variants: {
+            select: { id: true, name: true, price: true, stock: true, isDefault: true, variantValue: true, variantUnit: true, sku: true },
+            orderBy: { isDefault: 'desc' },
+          },
         },
         skip: (page - 1) * limit,
         take: limit,

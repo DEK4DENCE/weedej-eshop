@@ -140,7 +140,7 @@ export function AdminProductsTable({ products }: { products: ProductRow[] }) {
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button asChild variant="ghost" size="sm">
+                  <Button asChild variant="ghost" size="sm" aria-label={`Upravit produkt ${product.name}`}>
                     <Link href={`/admin/products/${product.id}`}>
                       <Pencil className="h-4 w-4" />
                     </Link>

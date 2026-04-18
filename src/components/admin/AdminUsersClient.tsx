@@ -108,7 +108,7 @@ export function AdminUsersClient({ users: initial }: { users: User[] }) {
                     onClick={() => handleDelete(user.id, user.email)}
                     disabled={loadingId === user.id + "_delete"}
                     className="h-7 px-2 text-xs border-[#DEE2E6] text-red-500 hover:bg-red-50 hover:border-red-200"
-                    title="Smazat účet"
+                    aria-label={`Smazat účet ${user.email}`}
                   >
                     {loadingId === user.id + "_delete" ? (
                       <Loader2 className="h-3 w-3 animate-spin" />

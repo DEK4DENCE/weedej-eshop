@@ -101,10 +101,10 @@ export function CategoryManager({ initialCategories }: { initialCategories: Cate
                     className="h-8 text-sm"
                     autoFocus
                   />
-                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-green-600" onClick={() => handleSaveEdit(cat.id)}>
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-green-600" onClick={() => handleSaveEdit(cat.id)} aria-label="Uložit kategorii">
                     <Check className="h-4 w-4" />
                   </Button>
-                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-muted-foreground" onClick={() => setEditingId(null)}>
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-muted-foreground" onClick={() => setEditingId(null)} aria-label="Zrušit úpravy">
                     <X className="h-4 w-4" />
                   </Button>
                 </>
@@ -114,10 +114,10 @@ export function CategoryManager({ initialCategories }: { initialCategories: Cate
                     <p className="font-medium text-sm">{cat.name}</p>
                     <p className="text-xs text-muted-foreground">{cat.slug}</p>
                   </div>
-                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground" onClick={() => handleEdit(cat)}>
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground" onClick={() => handleEdit(cat)} aria-label={`Upravit kategorii ${cat.name}`}>
                     <Pencil className="h-4 w-4" />
                   </Button>
-                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive" onClick={() => handleDelete(cat.id)}>
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive" onClick={() => handleDelete(cat.id)} aria-label={`Smazat kategorii ${cat.name}`}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </>

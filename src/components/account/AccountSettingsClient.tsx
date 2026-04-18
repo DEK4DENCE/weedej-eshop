@@ -268,7 +268,7 @@ export function AccountSettingsClient() {
                     {!addr.isDefault && (
                       <button
                         onClick={() => handleSetDefault(addr.id)}
-                        title="Nastavit jako výchozí"
+                        aria-label="Nastavit jako výchozí adresu"
                         className="p-1.5 text-[#6e6e73] hover:text-[#b8860b] transition-colors rounded-lg hover:bg-[#fef9ec]"
                       >
                         <Star size={15} />
@@ -276,7 +276,7 @@ export function AccountSettingsClient() {
                     )}
                     <button
                       onClick={() => handleDeleteAddress(addr.id)}
-                      title="Odstranit adresu"
+                      aria-label="Odstranit adresu"
                       className="p-1.5 text-[#6e6e73] hover:text-red-500 transition-colors rounded-lg hover:bg-red-50"
                     >
                       <Trash2 size={15} />

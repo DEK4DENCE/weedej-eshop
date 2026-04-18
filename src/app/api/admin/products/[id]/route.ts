@@ -24,7 +24,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   // H5: capture old value for audit log
   const before = await db.product.findUnique({ where: { id }, select: { name: true, isActive: true, vatRate: true, basePrice: true } })
-  const product = await db.product.update({ where: { id }, data: productData })
+  let product
+  try {
+    product = await db.product.update({ where: { id }, data: productData })
+  } catch (err: any) {
+    if (err?.code === 'P2002' && err?.meta?.target?.includes?.('slug')) {
+      return NextResponse.json({ error: `Slug "${productData.slug}" already exists. Choose a unique slug.` }, { status: 409 })
+    }
+    throw err
+  }
 
   await logAdminAction({
     adminId:    session.user.id as string,

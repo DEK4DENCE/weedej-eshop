@@ -240,9 +240,10 @@ async function processOrder(sessionId: string): Promise<{ erpOrderNumber: string
 
         if (erpOrderNumber) {
           await sendEmail({
-            to:      user.email,
-            subject: `Potvrzení objednávky ${erpOrderNumber} — Weedej`,
-            react:   OrderConfirmationWithInvoice({
+            to:        user.email,
+            subject:   `Potvrzení objednávky ${erpOrderNumber} — Weedej`,
+            emailType: 'orderConfirmation',
+            react:     OrderConfirmationWithInvoice({
               name:            firstName,
               orderNumber:     erpOrderNumber,
               items:           items.map((i) => ({ productName: i.productName, variantLabel: i.variantLabel, quantity: i.quantity, unitPrice: i.unitPrice })),
@@ -256,9 +257,10 @@ async function processOrder(sessionId: string): Promise<{ erpOrderNumber: string
           })
         } else {
           await sendEmail({
-            to:      user.email,
-            subject: "Přijali jsme vaši objednávku — Weedej",
-            react:   OrderConfirmationAck({
+            to:        user.email,
+            subject:   "Přijali jsme vaši objednávku — Weedej",
+            emailType: 'orderConfirmation',
+            react:     OrderConfirmationAck({
               name:            firstName,
               internalOrderId: order.id,
               items:           items.map((i) => ({ productName: i.productName, variantLabel: i.variantLabel, quantity: i.quantity, unitPrice: i.unitPrice })),

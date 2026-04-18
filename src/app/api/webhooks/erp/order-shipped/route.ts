@@ -11,7 +11,7 @@
  * § 28 ZDPH: invoice re-attached in mail #2 (same invoice from mail #1)
  */
 
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import crypto from 'crypto'
 import { db } from '@/lib/db'
 import { sendEmail } from '@/lib/email/send'
@@ -109,11 +109,14 @@ export async function POST(req: NextRequest) {
 
   console.log(`[ERPWebhook] Order shipped orderId=${eshopOrderId} erpOrderNumber=${erpOrderNumber}`)
 
-  // ── Send shipping email (mail #2) — respond 200 first ──────────────────────
-  // (we return 200 immediately so ERP doesn't retry, then send email async)
-  sendShippingEmail(order, updatedOrder, trackingNumber, carrier).catch(err =>
-    console.error(`[ERPWebhook] Email failed for orderId=${eshopOrderId}:`, err?.message)
-  )
+  // ── Send shipping email (mail #2) ─────────────────────────────────────────
+  // Use after() so Vercel keeps the function alive until the email is sent,
+  // but the 200 response is returned to ERP immediately (no retry risk).
+  after(async () => {
+    await sendShippingEmail(order, updatedOrder, trackingNumber, carrier).catch(err =>
+      console.error(`[ERPWebhook] Email failed for orderId=${eshopOrderId}:`, err?.message)
+    )
+  })
 
   return NextResponse.json({ received: true })
 }

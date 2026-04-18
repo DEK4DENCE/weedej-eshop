@@ -83,11 +83,13 @@ export function LoginForm() {
             type="email"
             placeholder="you@example.com"
             autoComplete="email"
+            aria-describedby={errors.email ? 'email-error' : undefined}
+            aria-invalid={errors.email ? true : undefined}
             className="bg-[#F8F9FA] border border-[#DEE2E6] focus:border-[#2E7D32] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#1d1d1f] placeholder:text-[#aeaeb2] rounded-xl h-11"
             {...register('email')}
           />
           {errors.email && (
-            <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+            <p id="email-error" role="alert" className="text-red-500 text-xs mt-1">{errors.email.message}</p>
           )}
         </div>
 
@@ -101,6 +103,8 @@ export function LoginForm() {
               type={showPassword ? 'text' : 'password'}
               placeholder="Zadejte své heslo"
               autoComplete="current-password"
+              aria-describedby={errors.password ? 'password-error' : undefined}
+              aria-invalid={errors.password ? true : undefined}
               className="bg-[#F8F9FA] border border-[#DEE2E6] focus:border-[#2E7D32] focus-visible:ring-0 focus-visible:ring-offset-0 text-[#1d1d1f] placeholder:text-[#aeaeb2] rounded-xl h-11 pr-11"
               {...register('password')}
             />
@@ -114,7 +118,7 @@ export function LoginForm() {
             </button>
           </div>
           {errors.password && (
-            <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
+            <p id="password-error" role="alert" className="text-red-500 text-xs mt-1">{errors.password.message}</p>
           )}
         </div>
 

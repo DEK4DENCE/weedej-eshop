@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendEmail } from '@/lib/email/send'
+import { checkRateLimit } from '@/lib/rateLimit'
 import React from 'react'
 
 /** Strip CR/LF characters to prevent email header injection */
@@ -9,6 +10,16 @@ function sanitizeHeader(value: string): string {
 
 export async function POST(req: NextRequest) {
   try {
+    // 5 contact form submissions per IP per 10 minutes
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+    const rl = await checkRateLimit(`contact:${ip}`, 5, 10 * 60_000)
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: 'Příliš mnoho požadavků. Zkuste to znovu za chvíli.' },
+        { status: 429, headers: rl.retryAfter ? { 'Retry-After': String(rl.retryAfter) } : {} }
+      )
+    }
+
     const { name, email, phone, message } = await req.json()
     if (!name || !email || !message) return NextResponse.json({ error: 'Vyplňte povinná pole' }, { status: 400 })
     if (typeof name !== 'string' || name.trim().length < 2 || name.length > 100) {

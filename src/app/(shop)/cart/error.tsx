@@ -3,9 +3,13 @@
 import { useEffect } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import * as Sentry from '@sentry/nextjs'
 
 export default function CartError({ error, reset }: { error: Error; reset: () => void }) {
-  useEffect(() => { console.error(error) }, [error])
+  useEffect(() => {
+    console.error('[Cart] Unhandled error:', error)
+    Sentry.captureException(error)
+  }, [error])
 
   return (
     <div className="flex min-h-[50vh] items-center justify-center flex-col gap-6 px-4 text-center">

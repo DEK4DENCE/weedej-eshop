@@ -3,6 +3,36 @@ import { auth } from "@/lib/auth"
 import { stripe } from "@/lib/stripe"
 import { db } from "@/lib/db"
 import { checkRateLimit } from "@/lib/rateLimit"
+import { z } from "zod"
+
+const checkoutItemSchema = z.object({
+  variantId: z.string().min(1).optional(),
+  quantity: z.number().int().positive().max(999),
+  // Allow legacy shape where variant is nested
+  variant: z.object({ id: z.string().min(1) }).optional(),
+  // Allow extra fields the client may send (product name for display only)
+  productName: z.string().max(200).optional(),
+  product: z.object({ name: z.string().max(200), imageUrls: z.array(z.string()).optional(), isActive: z.boolean().optional() }).optional(),
+  imageUrl: z.string().max(500).optional(),
+})
+
+const checkoutAddressSchema = z.object({
+  existingAddressId: z.string().min(1).optional(),
+  fullName: z.string().min(2).max(100).optional(),
+  line1: z.string().min(3).max(200).optional(),
+  line2: z.string().max(200).optional(),
+  city: z.string().min(1).max(100).optional(),
+  postalCode: z.string().min(3).max(20).optional(),
+  country: z.string().length(2).optional(),
+  phone: z.string().max(30).optional(),
+}).optional()
+
+const checkoutBodySchema = z.object({
+  items: z.array(checkoutItemSchema).min(1).max(100),
+  deliveryType: z.enum(["COURIER", "PICKUP_IN_STORE"]),
+  address: checkoutAddressSchema,
+  phone: z.string().max(30).optional(),
+})
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,7 +53,12 @@ export async function POST(req: NextRequest) {
     if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const userId = session.user.id
-    const { items, deliveryType, address, phone: contactPhone } = await req.json()
+    const rawBody = await req.json()
+    const parsedBody = checkoutBodySchema.safeParse(rawBody)
+    if (!parsedBody.success) {
+      return NextResponse.json({ error: "Invalid request body", issues: parsedBody.error.flatten() }, { status: 400 })
+    }
+    const { items, deliveryType, address, phone: contactPhone } = parsedBody.data
 
     if (!items?.length) return NextResponse.json({ error: "Cart is empty" }, { status: 400 })
 
@@ -121,12 +156,12 @@ export async function POST(req: NextRequest) {
         const newAddr = await db.address.create({
           data: {
             userId,
-            fullName: address.fullName,
-            line1: address.line1,
+            fullName: address.fullName ?? "",
+            line1: address.line1 ?? "",
             line2: address.line2 || null,
-            city: address.city,
-            postalCode: address.postalCode,
-            country: address.country,
+            city: address.city ?? "",
+            postalCode: address.postalCode ?? "",
+            country: address.country ?? "CZ",
             isDefault: (await db.address.count({ where: { userId } })) === 0,
           },
         })

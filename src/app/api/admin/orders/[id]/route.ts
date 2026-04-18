@@ -8,6 +8,7 @@ import { OrderCancelled } from "@/lib/email/templates/OrderCancelled"
 import { OrderDelivered } from "@/lib/email/templates/OrderDelivered"
 import { logAdminAction } from "@/lib/audit"
 import React from "react"
+import { z } from "zod"
 
 // C3: Valid order state transitions — prevents illegal moves like DELIVERED → PAID
 const VALID_TRANSITIONS: Record<string, string[]> = {
@@ -22,11 +23,25 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
   REFUNDED:         [],
 }
 
+const ALL_STATUSES = [
+  "PENDING", "PAID", "PROCESSING", "PACKED", "SHIPPED",
+  "OUT_FOR_DELIVERY", "DELIVERED", "CANCELLED", "REFUNDED",
+] as const
+
+const patchOrderSchema = z.object({
+  status: z.enum(ALL_STATUSES),
+})
+
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { session, error: authError } = await requireAdmin()
   if (authError) return authError
   const { id } = await params
-  const { status } = await req.json()
+  const rawBody = await req.json()
+  const parsed = patchOrderSchema.safeParse(rawBody)
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid request body", issues: parsed.error.flatten() }, { status: 400 })
+  }
+  const { status } = parsed.data
 
   // C3: Validate state transition before touching the DB
   const current = await db.order.findUnique({ where: { id }, select: { status: true } })
@@ -44,21 +59,45 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (status === "SHIPPED" && !extraData.shippedAt) extraData.shippedAt = new Date()
   if (status === "DELIVERED") extraData.deliveredAt = new Date()
 
-  const order = await db.order.update({
-    where: { id },
-    data: { status, ...extraData },
-    include: {
-      items: true,
-      user: { select: { email: true, name: true } },
-    },
-  })
+  // For REFUNDED or CANCELLED-from-a-paid-state: issue Stripe refund BEFORE
+  // the DB transaction so a Stripe failure aborts the flow without touching
+  // order or inventory state.
+  const paidStates = new Set(["PAID", "PROCESSING", "PACKED"])
+  const needsRefund = status === "REFUNDED" || (status === "CANCELLED" && paidStates.has(current.status))
+  if (needsRefund) {
+    const orderForRefund = await db.order.findUnique({
+      where: { id },
+      select: { stripePaymentIntentId: true },
+    })
+    if (orderForRefund?.stripePaymentIntentId) {
+      try {
+        await stripe.refunds.create({ payment_intent: orderForRefund.stripePaymentIntentId })
+      } catch (refundErr: any) {
+        if (refundErr?.code !== "charge_already_refunded") {
+          const verb = status === "CANCELLED" ? "cancel paid" : "refund"
+          return NextResponse.json({ error: `Cannot ${verb} order: Stripe refund failed — ${refundErr?.message}` }, { status: 400 })
+        }
+      }
+    }
+  }
 
-  // Handle stock transitions on status change
+  // Atomically update order status and all related stock movements so a partial
+  // failure never leaves order state and inventory out of sync.
+  let order: any
   try {
-    if (status === "SHIPPED" || status === "DELIVERED") {
-      await db.$transaction(
-        order.items.map((item) =>
-          db.stockMovement.create({
+    order = await db.$transaction(async (tx) => {
+      const updated = await tx.order.update({
+        where: { id },
+        data: { status, ...extraData },
+        include: {
+          items: true,
+          user: { select: { email: true, name: true } },
+        },
+      })
+
+      if (status === "SHIPPED" || status === "DELIVERED") {
+        for (const item of updated.items) {
+          await tx.stockMovement.create({
             data: {
               variantId: item.variantId,
               type: "SOLD",
@@ -67,62 +106,31 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
               reason: `Order ${status.toLowerCase()}`,
             },
           })
-        )
-      )
-    } else if (status === "CANCELLED") {
-      await db.$transaction(
-        order.items.flatMap((item) => [
-          db.productVariant.update({
+        }
+      } else if (status === "CANCELLED" || status === "REFUNDED") {
+        const reason = status === "CANCELLED" ? "Order cancelled" : "Order refunded"
+        for (const item of updated.items) {
+          await tx.productVariant.update({
             where: { id: item.variantId },
             data: { stock: { increment: item.quantity } },
-          }),
-          db.stockMovement.create({
+          })
+          await tx.stockMovement.create({
             data: {
               variantId: item.variantId,
               type: "RELEASED",
               quantity: item.quantity,
               orderId: id,
-              reason: "Order cancelled",
+              reason,
             },
-          }),
-        ])
-      )
-    } else if (status === "REFUNDED") {
-      // Issue Stripe refund before restoring stock
-      const orderForRefund = await db.order.findUnique({
-        where: { id },
-        select: { stripePaymentIntentId: true },
-      })
-      if (orderForRefund?.stripePaymentIntentId) {
-        try {
-          await stripe.refunds.create({ payment_intent: orderForRefund.stripePaymentIntentId })
-        } catch (refundErr: any) {
-          if (refundErr?.code !== "charge_already_refunded") {
-            return NextResponse.json({ error: `Stripe refund failed: ${refundErr?.message}` }, { status: 400 })
-          }
+          })
         }
       }
-      // Restore stock to each variant and create a RELEASED movement for audit trail
-      await db.$transaction(
-        order.items.flatMap((item) => [
-          db.productVariant.update({
-            where: { id: item.variantId },
-            data: { stock: { increment: item.quantity } },
-          }),
-          db.stockMovement.create({
-            data: {
-              variantId: item.variantId,
-              type: "RELEASED",
-              quantity: item.quantity,
-              orderId: id,
-              reason: "Order refunded",
-            },
-          }),
-        ])
-      )
-    }
+
+      return updated
+    })
   } catch (stockError) {
-    console.error("Failed to update stock on order status change:", stockError)
+    console.error("Failed to update order status + stock:", stockError)
+    return NextResponse.json({ error: "Failed to update order status" }, { status: 500 })
   }
 
   // Send email notification to customer
@@ -174,7 +182,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         react: React.createElement(OrderShippedWithTracking, {
           name: customerName,
           orderNumber,
-          items: order.items.map((i) => ({
+          items: order.items.map((i: any) => ({
             productName: i.productName,
             variantLabel: i.variantLabel,
             quantity: i.quantity,
@@ -196,7 +204,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         react: React.createElement(OrderDelivered, {
           name: customerName,
           orderNumber,
-          items: order.items.map((i) => ({
+          items: order.items.map((i: any) => ({
             productName: i.productName,
             variantLabel: i.variantLabel,
             quantity: i.quantity,
@@ -212,7 +220,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         react: React.createElement(OrderCancelled, {
           name: customerName,
           orderNumber,
-          items: order.items.map((i) => ({
+          items: order.items.map((i: any) => ({
             productName: i.productName,
             variantLabel: i.variantLabel,
             quantity: i.quantity,

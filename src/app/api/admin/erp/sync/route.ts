@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
             .map((v) =>
               db.productVariant.delete({ where: { id: v.id } })
                 .then(() => { variantsDeleted++ })
-                .catch(() => {})
+                .catch((delErr: unknown) => { console.error(`[ERP Sync] Failed to delete variant ${v.id}:`, delErr instanceof Error ? delErr.message : String(delErr)) })
             ),
           // Updates and creates
           ...erp.eshopVariants.map(async (erpVar) => {
@@ -151,7 +151,7 @@ export async function POST(req: NextRequest) {
     })
   } catch (error: any) {
     console.error("[ERP Sync] Chyba:", error)
-    return NextResponse.json({ error: `Synchronizace selhala: ${error.message}` }, { status: 500 })
+    return NextResponse.json({ error: 'Synchronizace selhala. Zkontrolujte logy serveru.' }, { status: 500 })
   }
 }
 

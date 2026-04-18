@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 
+export const revalidate = 60
+
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }

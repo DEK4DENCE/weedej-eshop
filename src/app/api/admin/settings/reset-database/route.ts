@@ -62,7 +62,7 @@ export async function POST() {
   } catch (error: any) {
     console.error("❌ Chyba při resetování e-shop databáze:", error)
     return NextResponse.json(
-      { error: "Nepodařilo se resetovat databázi", details: error?.message },
+      { error: "Nepodařilo se resetovat databázi. Zkontrolujte logy serveru." },
       { status: 500 }
     )
   }
