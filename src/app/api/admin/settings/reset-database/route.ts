@@ -1,6 +1,6 @@
 // POST /api/admin/settings/reset-database
-// Smaže objednávky, produkty, varianty, skladové pohyby a košíky.
-// Zachová: uživatele, kategorie, nastavení.
+// Smaže POUZE objednávky, košíky, skladové pohyby a ERP sync záznamy.
+// Zachová: uživatele, nastavení, produkty, varianty, kategorie.
 // Pořadí mazání respektuje FK constraints.
 
 import { NextResponse } from "next/server"
@@ -14,55 +14,49 @@ export async function POST() {
   if (authError) return authError
 
   try {
-    console.log("🗑️  Začínám reset e-shop databáze...")
+    console.log("🗑️  Začínám reset objednávek e-shop databáze...")
 
-    // 1. StockMovement → ProductVariant (musí před variantami)
+    // 1. StockMovement — nemá FK blokátory vůči objednávkám, mazáme první
     const stockMovements = await db.stockMovement.deleteMany({})
     console.log(`  ✓ Smazáno ${stockMovements.count} skladových pohybů`)
 
-    // 2. ErpSyncAttempt → Order (kaskádně z Order, ale pro jistotu napřed)
+    // 2. ErpSyncAttempt — kaskádně z Order, ale pro jistotu napřed
     const syncAttempts = await db.erpSyncAttempt.deleteMany({})
     console.log(`  ✓ Smazáno ${syncAttempts.count} ERP sync pokusů`)
 
-    // 3. CartItem → ProductVariant + Product (musí před variantami a produkty)
+    // 3. CartItem — FK na ProductVariant a Product, musí před Order
     const cartItems = await db.cartItem.deleteMany({})
     console.log(`  ✓ Smazáno ${cartItems.count} položek košíků`)
 
-    // 4. Order → kaskádně smaže OrderItem (OrderItem → ProductVariant + Product)
+    // 4. Order → kaskádně smaže OrderItem
     const orders = await db.order.deleteMany({})
     console.log(`  ✓ Smazáno ${orders.count} objednávek (+ položky)`)
 
-    // 5. ProductVariant → Product (onDelete: Cascade z Product, ale mazáme explicitně
-    //    protože Cart/StockMovement/OrderItem już smazány → žádné bloky)
-    const variants = await db.productVariant.deleteMany({})
-    console.log(`  ✓ Smazáno ${variants.count} variant produktů`)
+    // Produkty, varianty a kategorie se NEZAHAZUJÍ — jsou zachovány.
 
-    // 6. Product (musí před Category)
-    const products = await db.product.deleteMany({})
-    console.log(`  ✓ Smazáno ${products.count} produktů`)
+    console.log("\n✅ Reset objednávek e-shop databáze dokončen!")
 
-    // 7. Category
-    const categories = await db.category.deleteMany({})
-    console.log(`  ✓ Smazáno ${categories.count} kategorií`)
-
-    console.log("\n✅ Reset e-shop databáze dokončen!")
-
-    const userCount = await db.user.count()
+    const [userCount, productCount, variantCount, categoryCount] = await Promise.all([
+      db.user.count(),
+      db.product.count(),
+      db.productVariant.count(),
+      db.category.count(),
+    ])
 
     return NextResponse.json({
       success: true,
-      message: `Databáze resetována!\n\nZachováno:\n- Uživatelé: ${userCount}\n- Nastavení zachováno`,
+      message: `Reset dokončen!\n\nSmazáno:\n- Objednávky: ${orders.count}\n- Košíky: ${cartItems.count}\n- Skladové pohyby: ${stockMovements.count}\n- ERP sync: ${syncAttempts.count}\n\nZachováno:\n- Produkty: ${productCount}\n- Varianty: ${variantCount}\n- Kategorie: ${categoryCount}\n- Uživatelé: ${userCount}\n- Nastavení zachováno`,
       deleted: {
-        products: products.count,
-        variants: variants.count,
-        categories: categories.count,
         orders: orders.count,
-        stockMovements: stockMovements.count,
         cartItems: cartItems.count,
+        stockMovements: stockMovements.count,
         erpSyncAttempts: syncAttempts.count,
       },
       preserved: {
         users: userCount,
+        products: productCount,
+        variants: variantCount,
+        categories: categoryCount,
       },
     })
   } catch (error: any) {
