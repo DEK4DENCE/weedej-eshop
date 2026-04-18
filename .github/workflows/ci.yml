@@ -18,7 +18,7 @@ jobs:
       - run: corepack enable && corepack prepare npm@11.6.4 --activate
       - run: npm ci
       - run: npm run lint
-      - run: npm run build
+      - run: npx prisma generate && npx next build
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
