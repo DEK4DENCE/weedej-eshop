@@ -4,7 +4,6 @@ import { Suspense } from "react"
 import { db } from "@/lib/db"
 import { ProductGrid } from "@/components/products/ProductGrid"
 import { ProductFilters } from "@/components/products/ProductFilters"
-import { ProductSearch } from "@/components/products/ProductSearch"
 import { Skeleton } from "@/components/ui/skeleton"
 import type { Metadata } from "next"
 import type { Product } from "@/types/product"
@@ -138,10 +137,9 @@ export default async function ProductsPage({ searchParams }: Props) {
   const products = await fetchProducts(params)
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6 font-playfair text-[#1d1d1f]">Produkty</h1>
+    <div className="container mx-auto px-4 pt-4 pb-8">
       <div className="flex flex-col md:flex-row gap-8">
-        <aside className="w-full md:w-64 shrink-0">
+        <aside className="w-full md:w-60 shrink-0">
           <Suspense fallback={
             <div className="space-y-3">
               {Array.from({length: 5}).map((_, i) => (
@@ -152,12 +150,7 @@ export default async function ProductsPage({ searchParams }: Props) {
             <ProductFilters />
           </Suspense>
         </aside>
-        <div className="flex-1">
-          <div className="mb-4">
-            <Suspense fallback={<Skeleton className="h-10 w-full rounded-xl" />}>
-              <ProductSearch />
-            </Suspense>
-          </div>
+        <div className="flex-1 min-w-0">
           <p className="text-sm text-[#6e6e73] mb-3">
             Nalezeno <span className="font-semibold text-[#1d1d1f]">{products.length}</span> produktů
           </p>

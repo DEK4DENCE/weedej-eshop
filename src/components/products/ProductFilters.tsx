@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { SlidersHorizontal, RotateCcw, ChevronDown } from 'lucide-react'
+import { SlidersHorizontal, RotateCcw, ChevronDown, Search, X } from 'lucide-react'
 import type { Category, StrainType, ActiveSubstance } from '@/types/product'
 
 const STRAIN_TYPES: { value: StrainType; label: string }[] = [
@@ -13,12 +13,95 @@ const STRAIN_TYPES: { value: StrainType; label: string }[] = [
   { value: 'CBD', label: 'CBD' },
 ]
 
-const SUBSTANCE_TYPES: { value: ActiveSubstance; label: string; color: string }[] = [
-  { value: 'THC_X', label: 'THC-X', color: 'bg-blue-50 border-blue-400 text-blue-700' },
-  { value: 'THC',   label: 'THC',   color: 'bg-purple-50 border-purple-400 text-purple-700' },
-  { value: 'CBD',   label: 'CBD',   color: 'bg-green-50 border-green-500 text-green-700' },
-  { value: 'HHC',   label: 'HHC',   color: 'bg-orange-50 border-orange-400 text-orange-700' },
+const SUBSTANCE_TYPES: { value: ActiveSubstance; label: string }[] = [
+  { value: 'THC_X', label: 'THC-X' },
+  { value: 'THC',   label: 'THC'   },
+  { value: 'CBD',   label: 'CBD'   },
+  { value: 'HHC',   label: 'HHC'  },
 ]
+
+function FilterPill({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean
+  onClick: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={[
+        'px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200 whitespace-nowrap',
+        active
+          ? 'bg-[#2E7D32]/10 border-[#2E7D32] text-[#2E7D32]'
+          : 'bg-[#fafafa] border-[#DEE2E6] text-[#6e6e73] hover:border-[#2E7D32]/50 hover:text-[#1d1d1f]',
+      ].join(' ')}
+    >
+      {children}
+    </button>
+  )
+}
+
+function SidebarSearch() {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const [value, setValue] = useState(searchParams.get('search') ?? '')
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    setValue(searchParams.get('search') ?? '')
+  }, [searchParams])
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const next = e.target.value
+    setValue(next)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      const params = new URLSearchParams(searchParams.toString())
+      if (next.trim()) {
+        params.set('search', next.trim())
+      } else {
+        params.delete('search')
+      }
+      params.delete('page')
+      router.push(`${pathname}?${params.toString()}`)
+    }, 300)
+  }
+
+  function handleClear() {
+    setValue('')
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete('search')
+    params.delete('page')
+    router.push(`${pathname}?${params.toString()}`)
+  }
+
+  return (
+    <div className="relative">
+      <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#aeaeb2] pointer-events-none" />
+      <input
+        type="text"
+        value={value}
+        onChange={handleChange}
+        placeholder="Hledat produkty…"
+        className="w-full bg-[#fafafa] border border-[#DEE2E6] rounded-xl pl-8 pr-8 py-2 text-xs text-[#1d1d1f] placeholder:text-[#aeaeb2] focus:outline-none focus:border-[#2E7D32] focus:ring-1 focus:ring-[#2E7D32]/20 transition-all duration-200"
+      />
+      {value && (
+        <button
+          onClick={handleClear}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#aeaeb2] hover:text-[#6e6e73] transition-colors"
+          aria-label="Vymazat hledání"
+        >
+          <X size={12} />
+        </button>
+      )}
+    </div>
+  )
+}
 
 export function ProductFilters() {
   const router = useRouter()
@@ -35,7 +118,6 @@ export function ProductFilters() {
   )
   const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') ?? '')
   const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') ?? '')
-  // Default true unless explicitly set to 'false'
   const [inStock, setInStock] = useState(searchParams.get('inStock') !== 'false')
   const [selectedStrains, setSelectedStrains] = useState<StrainType[]>(
     (searchParams.getAll('strainType') as StrainType[]) ?? []
@@ -101,7 +183,6 @@ export function ProductFilters() {
     effects.forEach((e) => params.append('effect', e))
     if (min) params.set('minPrice', min)
     if (max) params.set('maxPrice', max)
-    // Only write inStock=false when explicitly unchecked; default (true) needs no param
     if (!stock) params.set('inStock', 'false')
     router.push(`${pathname}?${params.toString()}`)
   }
@@ -146,9 +227,10 @@ export function ProductFilters() {
     applyFilters({ effects: next })
   }
 
-  function handleInStockChange(checked: boolean) {
-    setInStock(checked)
-    applyFilters({ inStock: checked })
+  function handleInStockToggle() {
+    const next = !inStock
+    setInStock(next)
+    applyFilters({ inStock: next })
   }
 
   function resetFilters() {
@@ -159,11 +241,10 @@ export function ProductFilters() {
     setSelectedEffects([])
     setMinPrice('')
     setMaxPrice('')
-    setInStock(true) // reset back to default (in stock only)
+    setInStock(true)
     const params = new URLSearchParams()
     const search = searchParams.get('search')
     if (search) params.set('search', search)
-    // No inStock param = default true
     router.push(`${pathname}${params.toString() ? `?${params.toString()}` : ''}`)
   }
 
@@ -174,7 +255,7 @@ export function ProductFilters() {
     selectedTerpenes.length > 0 ||
     selectedEffects.length > 0 ||
     minPrice || maxPrice ||
-    !inStock // inStock=false is a non-default active filter
+    !inStock
 
   const activeCount =
     selectedCategories.length +
@@ -187,15 +268,18 @@ export function ProductFilters() {
     (!inStock ? 1 : 0)
 
   return (
-    <aside className="flex flex-col gap-4 w-full">
+    <aside className="flex flex-col gap-3 w-full">
+      {/* Search */}
+      <SidebarSearch />
+
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between pt-1">
         <button
           className="flex items-center gap-2 text-[#1d1d1f] font-semibold md:pointer-events-none"
           onClick={() => setMobileOpen((o) => !o)}
           aria-expanded={mobileOpen}
         >
-          <SlidersHorizontal size={16} className="text-[#2E7D32]" />
+          <SlidersHorizontal size={15} className="text-[#2E7D32]" />
           Filtry
           {hasActiveFilters && (
             <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-[#2E7D32] text-white text-[9px] font-bold">
@@ -207,7 +291,7 @@ export function ProductFilters() {
             transition={{ duration: 0.2 }}
             className="md:hidden"
           >
-            <ChevronDown size={16} className="text-[#6e6e73]" />
+            <ChevronDown size={15} className="text-[#6e6e73]" />
           </motion.span>
         </button>
         {hasActiveFilters && (
@@ -215,7 +299,7 @@ export function ProductFilters() {
             onClick={resetFilters}
             className="flex items-center gap-1 text-xs text-[#6e6e73] hover:text-[#2E7D32] transition-colors"
           >
-            <RotateCcw size={12} />
+            <RotateCcw size={11} />
             Resetovat
           </button>
         )}
@@ -224,110 +308,64 @@ export function ProductFilters() {
       {/* Filter body */}
       <div
         className={[
-          'flex flex-col gap-5 overflow-hidden transition-all duration-300 ease-in-out',
+          'flex flex-col gap-4 overflow-hidden transition-all duration-300 ease-in-out',
           mobileOpen ? 'max-h-[1200px] opacity-100' : 'max-h-0 opacity-0 md:max-h-[1200px] md:opacity-100',
         ].join(' ')}
       >
-
-        {/* In Stock — first, default checked */}
-        <label className="flex items-center gap-2.5 cursor-pointer group">
-          <input
-            type="checkbox"
-            checked={inStock}
-            onChange={(e) => handleInStockChange(e.target.checked)}
-            className="w-4 h-4 rounded border border-[#DEE2E6] accent-[#2E7D32] cursor-pointer"
-          />
-          <span className="text-sm text-[#6e6e73] group-hover:text-[#1d1d1f] transition-colors">
-            Pouze skladem
-          </span>
-        </label>
-
         {/* Category */}
         {categories.length > 0 && (
           <div>
-            <p className="text-sm font-medium text-[#515154] mb-3">Kategorie</p>
-            <div className="flex flex-col gap-2">
+            <p className="text-xs font-medium text-[#515154] mb-2">Kategorie</p>
+            <div className="flex flex-wrap gap-1.5">
               {categories.map((cat) => (
-                <label key={cat.id} className="flex items-center gap-2.5 cursor-pointer group">
-                  <input
-                    type="checkbox"
-                    checked={selectedCategories.includes(cat.slug)}
-                    onChange={() => toggleCategory(cat.slug)}
-                    className="w-4 h-4 rounded border border-[#DEE2E6] accent-[#2E7D32] cursor-pointer"
-                  />
-                  <span className="text-sm text-[#6e6e73] group-hover:text-[#1d1d1f] transition-colors">
-                    {cat.name}
-                  </span>
-                </label>
+                <FilterPill
+                  key={cat.id}
+                  active={selectedCategories.includes(cat.slug)}
+                  onClick={() => toggleCategory(cat.slug)}
+                >
+                  {cat.name}
+                </FilterPill>
               ))}
             </div>
           </div>
         )}
 
-        {/* Price Range */}
+        {/* In Stock */}
         <div>
-          <p className="text-sm font-medium text-[#515154] mb-3">Cenové rozmezí</p>
-          <div className="flex items-center gap-2">
-            <input
-              type="number"
-              value={minPrice}
-              onChange={(e) => setMinPrice(e.target.value)}
-              onBlur={() => applyFilters({ minPrice })}
-              placeholder="Min Kč"
-              min={0}
-              className="w-full bg-[#fafafa] border border-[#DEE2E6] rounded-xl px-3 py-2 text-sm text-[#1d1d1f] placeholder:text-[#aeaeb2] focus:outline-none focus:border-[#2E7D32] focus:ring-1 focus:ring-[#2E7D32]/30"
-            />
-            <span className="text-[#aeaeb2] text-sm flex-shrink-0">—</span>
-            <input
-              type="number"
-              value={maxPrice}
-              onChange={(e) => setMaxPrice(e.target.value)}
-              onBlur={() => applyFilters({ maxPrice })}
-              placeholder="Max Kč"
-              min={0}
-              className="w-full bg-[#fafafa] border border-[#DEE2E6] rounded-xl px-3 py-2 text-sm text-[#1d1d1f] placeholder:text-[#aeaeb2] focus:outline-none focus:border-[#2E7D32] focus:ring-1 focus:ring-[#2E7D32]/30"
-            />
-          </div>
+          <p className="text-xs font-medium text-[#515154] mb-2">Dostupnost</p>
+          <FilterPill active={inStock} onClick={handleInStockToggle}>
+            Pouze skladem
+          </FilterPill>
         </div>
 
         {/* Active Substance */}
         <div>
-          <p className="text-sm font-medium text-[#515154] mb-3">Účinná látka</p>
-          <div className="flex flex-wrap gap-2">
-            {SUBSTANCE_TYPES.map(({ value, label, color }) => (
-              <button
+          <p className="text-xs font-medium text-[#515154] mb-2">Účinná látka</p>
+          <div className="flex flex-wrap gap-1.5">
+            {SUBSTANCE_TYPES.map(({ value, label }) => (
+              <FilterPill
                 key={value}
+                active={selectedSubstances.includes(value)}
                 onClick={() => toggleSubstance(value)}
-                className={[
-                  'px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200',
-                  selectedSubstances.includes(value)
-                    ? color
-                    : 'bg-[#fafafa] border-[#DEE2E6] text-[#6e6e73] hover:border-[#2E7D32]/50 hover:text-[#1d1d1f]',
-                ].join(' ')}
               >
                 {label}
-              </button>
+              </FilterPill>
             ))}
           </div>
         </div>
 
         {/* Strain Type */}
         <div>
-          <p className="text-sm font-medium text-[#515154] mb-3">Typ odrůdy</p>
-          <div className="flex flex-wrap gap-2">
+          <p className="text-xs font-medium text-[#515154] mb-2">Typ odrůdy</p>
+          <div className="flex flex-wrap gap-1.5">
             {STRAIN_TYPES.map(({ value, label }) => (
-              <button
+              <FilterPill
                 key={value}
+                active={selectedStrains.includes(value)}
                 onClick={() => toggleStrain(value)}
-                className={[
-                  'px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200',
-                  selectedStrains.includes(value)
-                    ? 'bg-[#2E7D32]/10 border-[#2E7D32] text-[#2E7D32]'
-                    : 'bg-[#fafafa] border-[#DEE2E6] text-[#6e6e73] hover:border-[#2E7D32]/50 hover:text-[#1d1d1f]',
-                ].join(' ')}
               >
                 {label}
-              </button>
+              </FilterPill>
             ))}
           </div>
         </div>
@@ -335,21 +373,16 @@ export function ProductFilters() {
         {/* Effects */}
         {availableEffects.length > 0 && (
           <div>
-            <p className="text-sm font-medium text-[#515154] mb-3">Účinky</p>
-            <div className="flex flex-wrap gap-2">
+            <p className="text-xs font-medium text-[#515154] mb-2">Účinky</p>
+            <div className="flex flex-wrap gap-1.5">
               {availableEffects.map((effect) => (
-                <button
+                <FilterPill
                   key={effect}
+                  active={selectedEffects.includes(effect)}
                   onClick={() => toggleEffect(effect)}
-                  className={[
-                    'px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200',
-                    selectedEffects.includes(effect)
-                      ? 'bg-[#2E7D32]/10 border-[#2E7D32] text-[#2E7D32]'
-                      : 'bg-[#fafafa] border-[#DEE2E6] text-[#6e6e73] hover:border-[#2E7D32]/50 hover:text-[#1d1d1f]',
-                  ].join(' ')}
                 >
                   {effect}
-                </button>
+                </FilterPill>
               ))}
             </div>
           </div>
@@ -358,26 +391,46 @@ export function ProductFilters() {
         {/* Terpenes */}
         {availableTerpenes.length > 0 && (
           <div>
-            <p className="text-sm font-medium text-[#515154] mb-3">Terpény</p>
-            <div className="flex flex-wrap gap-2">
+            <p className="text-xs font-medium text-[#515154] mb-2">Terpény</p>
+            <div className="flex flex-wrap gap-1.5">
               {availableTerpenes.map((terpene) => (
-                <button
+                <FilterPill
                   key={terpene}
+                  active={selectedTerpenes.includes(terpene)}
                   onClick={() => toggleTerpene(terpene)}
-                  className={[
-                    'px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200',
-                    selectedTerpenes.includes(terpene)
-                      ? 'bg-amber-50 border-amber-400 text-amber-700'
-                      : 'bg-[#fafafa] border-[#DEE2E6] text-[#6e6e73] hover:border-amber-300 hover:text-[#1d1d1f]',
-                  ].join(' ')}
                 >
                   {terpene}
-                </button>
+                </FilterPill>
               ))}
             </div>
           </div>
         )}
 
+        {/* Price Range */}
+        <div>
+          <p className="text-xs font-medium text-[#515154] mb-2">Cenové rozmezí</p>
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              value={minPrice}
+              onChange={(e) => setMinPrice(e.target.value)}
+              onBlur={() => applyFilters({ minPrice })}
+              placeholder="Min Kč"
+              min={0}
+              className="w-full bg-[#fafafa] border border-[#DEE2E6] rounded-xl px-3 py-1.5 text-xs text-[#1d1d1f] placeholder:text-[#aeaeb2] focus:outline-none focus:border-[#2E7D32] focus:ring-1 focus:ring-[#2E7D32]/30"
+            />
+            <span className="text-[#aeaeb2] text-xs flex-shrink-0">—</span>
+            <input
+              type="number"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(e.target.value)}
+              onBlur={() => applyFilters({ maxPrice })}
+              placeholder="Max Kč"
+              min={0}
+              className="w-full bg-[#fafafa] border border-[#DEE2E6] rounded-xl px-3 py-1.5 text-xs text-[#1d1d1f] placeholder:text-[#aeaeb2] focus:outline-none focus:border-[#2E7D32] focus:ring-1 focus:ring-[#2E7D32]/30"
+            />
+          </div>
+        </div>
       </div>
     </aside>
   )
