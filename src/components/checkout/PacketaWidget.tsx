@@ -37,6 +37,17 @@ declare global {
 const SCRIPT_SRC = "https://widget.packeta.com/v6/www/js/library.js"
 const SCRIPT_ID = "packeta-widget-script"
 
+function fromPacketaPoint(p: Record<string, unknown>): PickupPoint | null {
+  if (!p.id || !p.name) return null
+  return {
+    id: String(p.id),
+    name: String(p.place ?? p.name),
+    nameStreet: String(p.nameStreet ?? p.street ?? p.name ?? ""),
+    city: String(p.city ?? ""),
+    zip: String(p.zip ?? ""),
+  }
+}
+
 export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
   const apiKey = process.env.NEXT_PUBLIC_PACKETA_API_KEY ?? ""
   const [scriptReady, setScriptReady] = useState(false)
@@ -45,7 +56,7 @@ export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
   const onSelectRef = useRef(onSelect)
   useEffect(() => { onSelectRef.current = onSelect }, [onSelect])
 
-  // Load Packeta script
+  // Load Packeta library script
   useEffect(() => {
     if (window.Packeta?.Widget) { setScriptReady(true); return }
     const existing = document.getElementById(SCRIPT_ID)
@@ -63,7 +74,35 @@ export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
     document.body.appendChild(script)
   }, [])
 
-  // Launch inline widget once container is mounted and visible
+  // PRIMARY: Listen for Packeta's postMessage directly.
+  // Packeta v6 sends: JSON.stringify({ packetaWidgetMessage: true, packetaPoint: <point>|null })
+  // library.js's own receiver calls close() then callback() — but callback may silently fail.
+  // We bypass that and capture the raw postMessage ourselves.
+  useEffect(() => {
+    function handleMessage(event: MessageEvent) {
+      let data: Record<string, unknown>
+      try {
+        data = typeof event.data === "string" ? JSON.parse(event.data) : event.data
+      } catch {
+        return
+      }
+      if (!data || !data.packetaWidgetMessage) return
+
+      // Close the widget container
+      setWidgetOpen(false)
+
+      const p = data.packetaPoint as Record<string, unknown> | null | undefined
+      if (!p) return // user closed without selecting
+
+      const point = fromPacketaPoint(p)
+      if (point) onSelectRef.current(point)
+    }
+
+    window.addEventListener("message", handleMessage)
+    return () => window.removeEventListener("message", handleMessage)
+  }, [])
+
+  // Launch inline widget once container is in DOM
   useEffect(() => {
     if (!widgetOpen || !containerRef.current || !window.Packeta?.Widget) return
 
@@ -72,25 +111,12 @@ export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
       window.Packeta!.Widget.pick(
         apiKey,
         { country: "cz", language: "cs" },
+        // FALLBACK callback — in case library.js does deliver the data here
         (raw) => {
-          // Close widget first
           setWidgetOpen(false)
-
           if (!raw || typeof raw !== "object") return
-          const p = raw as Record<string, unknown>
-          if (!p.id || !p.name) return
-
-          const point: PickupPoint = {
-            id: String(p.id),
-            // "place" is the display name; fall back to "name"
-            name: String(p.place ?? p.name),
-            nameStreet: String(p.nameStreet ?? p.street ?? p.name ?? ""),
-            city: String(p.city ?? ""),
-            zip: String(p.zip ?? ""),
-          }
-
-          // Defer to next tick — widget unmount must complete before parent re-renders
-          setTimeout(() => onSelectRef.current(point), 0)
+          const point = fromPacketaPoint(raw as Record<string, unknown>)
+          if (point) setTimeout(() => onSelectRef.current(point), 0)
         },
         el
       )
@@ -117,7 +143,6 @@ export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
         </div>
       )}
 
-      {/* Inline widget container — iframe rendered by Packeta library inside this div */}
       {widgetOpen && (
         <div className="space-y-2">
           <div ref={containerRef} style={{ width: "100%", height: "520px" }} />
@@ -127,7 +152,6 @@ export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
         </div>
       )}
 
-      {/* Selected point */}
       {!widgetOpen && selectedPoint && (
         <div className="rounded-lg border border-[#2E7D32] bg-[#2E7D32]/5 p-4">
           <div className="flex items-start justify-between gap-3">
@@ -146,7 +170,6 @@ export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
         </div>
       )}
 
-      {/* Open button */}
       {!widgetOpen && !selectedPoint && (
         <Button
           type="button"
