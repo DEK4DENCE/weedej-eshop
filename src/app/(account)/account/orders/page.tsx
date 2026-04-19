@@ -12,24 +12,34 @@ export default async function OrdersPage() {
   const userId = (session?.user as any)?.id as string | undefined
   if (!userId) redirect("/login")
 
-  const orders = await db.order.findMany({
-    where: { userId },
-    include: {
-      items: {
-        include: {
-          variant: {
-            include: { product: { select: { name: true, imageUrls: true } } },
+  let orders: any[] = []
+  let dbError = false
+  try {
+    orders = await db.order.findMany({
+      where: { userId },
+      include: {
+        items: {
+          include: {
+            variant: {
+              include: { product: { select: { name: true, imageUrls: true } } },
+            },
           },
         },
       },
-    },
-    orderBy: { createdAt: "desc" },
-  })
+      orderBy: { createdAt: "desc" },
+    })
+  } catch {
+    dbError = true
+  }
 
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold font-playfair">Historie objednávek</h1>
-      {orders.length === 0 ? (
+      {dbError ? (
+        <div className="text-center py-16 text-muted-foreground">
+          <p>Objednávky se nepodařilo načíst. Zkuste to prosím za chvíli.</p>
+        </div>
+      ) : orders.length === 0 ? (
         <div className="text-center py-16 text-muted-foreground">
           <p>Zatím žádné objednávky</p>
         </div>
