@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { MapPin, Loader2, X } from "lucide-react"
+import { MapPin, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export interface PickupPoint {
@@ -47,16 +47,28 @@ function normalizePoint(raw: Record<string, unknown>): PickupPoint {
   }
 }
 
+function extractPoint(d: unknown): PickupPoint | null {
+  if (!d || typeof d !== "object") return null
+  const obj = d as Record<string, unknown>
+  // {point: {...}} or point object directly
+  const raw = (obj.point && typeof obj.point === "object"
+    ? obj.point as Record<string, unknown>
+    : null) ?? (obj.id && obj.name ? obj : null)
+  if (raw?.id && raw?.name) return normalizePoint(raw)
+  return null
+}
+
 export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
   const apiKey = process.env.NEXT_PUBLIC_PACKETA_API_KEY ?? ""
   const [scriptReady, setScriptReady] = useState(false)
   const [widgetOpen, setWidgetOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const onSelectRef = useRef(onSelect)
+  // Stores the point received via postMessage or callback before widget unmounts
   const pendingPointRef = useRef<PickupPoint | null>(null)
   useEffect(() => { onSelectRef.current = onSelect }, [onSelect])
 
-  // Apply the selected point after widget closes (avoids React batching race)
+  // Apply pending point after widget closes (avoids React batching race with unmount)
   useEffect(() => {
     if (!widgetOpen && pendingPointRef.current) {
       onSelectRef.current(pendingPointRef.current)
@@ -82,25 +94,33 @@ export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
     document.body.appendChild(script)
   }, [])
 
-  function openWidget() {
-    if (!window.Packeta?.Widget) return
-    setWidgetOpen(true)
-  }
+  // Packeta sends selected point via postMessage from its iframe
+  useEffect(() => {
+    function handleMessage(event: MessageEvent) {
+      const point = extractPoint(event.data)
+      if (point) {
+        pendingPointRef.current = point
+        setWidgetOpen(false)
+      }
+    }
+    window.addEventListener("message", handleMessage)
+    return () => window.removeEventListener("message", handleMessage)
+  }, [])
 
-  // Once the container div is visible in the DOM, launch the inline widget
+  // Launch inline widget once container is in the DOM
   useEffect(() => {
     if (!widgetOpen || !containerRef.current || !window.Packeta?.Widget) return
 
     const el = containerRef.current
-    // Small delay to ensure the DOM is fully painted and container has dimensions
     const timer = setTimeout(() => {
       window.Packeta!.Widget.pick(
         apiKey,
         { country: "cz", language: "cs" },
         (raw) => {
+          // Callback may carry point data (some builds) or null (close signal)
           if (raw) {
-            // Save synchronously to ref — applied after widget unmounts
-            pendingPointRef.current = normalizePoint(raw)
+            const point = extractPoint(raw)
+            if (point) pendingPointRef.current = point
           }
           setWidgetOpen(false)
         },
@@ -110,6 +130,12 @@ export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
 
     return () => clearTimeout(timer)
   }, [widgetOpen, apiKey])
+
+  function openWidget() {
+    if (!window.Packeta?.Widget) return
+    pendingPointRef.current = null
+    setWidgetOpen(true)
+  }
 
   function closeWidget() {
     window.Packeta?.Widget?.close?.()
@@ -126,8 +152,11 @@ export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
 
       {/* Inline widget container */}
       {widgetOpen && (
-        <div className="relative rounded-lg border border-gray-200">
+        <div className="space-y-2">
           <div ref={containerRef} style={{ width: "100%", height: "520px" }} />
+          <Button type="button" variant="ghost" size="sm" className="w-full text-xs text-gray-500" onClick={closeWidget}>
+            Zrušit
+          </Button>
         </div>
       )}
 
