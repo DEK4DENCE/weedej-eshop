@@ -44,6 +44,20 @@ async function processOrder(sessionId: string): Promise<{ erpOrderNumber: string
     const addressId    = session.metadata?.addressId || null
     if (!userId || !itemsRaw) return null
 
+    // Shipping & billing snapshot from Stripe metadata
+    const pickupPointId      = session.metadata?.pickupPointId      || null
+    const pickupPointName    = session.metadata?.pickupPointName    || null
+    const pickupPointAddress = session.metadata?.pickupPointAddress || null
+    const pickupCarrier      = deliveryType === 'ZASILKOVNA_PICKUP' ? 'zasilkovna'
+                             : deliveryType === 'DPD_PICKUP'        ? 'dpd' : ''
+    const billingName        = session.metadata?.billingName    || null
+    const billingCompany     = session.metadata?.billingCompany || null
+    const billingIco         = session.metadata?.billingIco     || null
+    const billingStreet      = session.metadata?.billingLine1   || null
+    const billingCity        = session.metadata?.billingCity    || null
+    const billingZip         = session.metadata?.billingPostal  || null
+    const billingCountry     = session.metadata?.billingCountry || null
+
     // ── Resolve variants + build item list ────────────────────────────────
     const rawItems: { v: string; q: number }[] = JSON.parse(itemsRaw)
     const variants = await db.productVariant.findMany({
@@ -92,6 +106,16 @@ async function processOrder(sessionId: string): Promise<{ erpOrderNumber: string
             totalAmount,
             subtotalAmount,
             shippingAmount,
+            pickupPointId,
+            pickupPointName,
+            pickupPointAddress,
+            billingName,
+            billingCompany,
+            billingIco,
+            billingStreet,
+            billingCity,
+            billingZip,
+            billingCountry,
             items: {
               create: items.map((item) => ({
                 productId:    item.productId,
@@ -192,6 +216,26 @@ async function processOrder(sessionId: string): Promise<{ erpOrderNumber: string
         totalCzk:         totalAmount / 100,
         paymentReference: paymentRef,
         paidAt:           new Date().toISOString(),
+        shippingMethod:   deliveryType,
+        ...(pickupPointId ? {
+          pickupPoint: {
+            id:      pickupPointId,
+            name:    pickupPointName    || '',
+            address: pickupPointAddress || '',
+            carrier: pickupCarrier,
+          },
+        } : {}),
+        ...(billingName ? {
+          billingAddress: {
+            name:    billingName,
+            company: billingCompany  || null,
+            ico:     billingIco      || null,
+            street:  billingStreet   || '',
+            city:    billingCity     || '',
+            zip:     billingZip      || '',
+            country: billingCountry  || 'CZ',
+          },
+        } : {}),
       }, erpConfig)
 
       erpOrderNumber = syncResult.erpOrderNumber
