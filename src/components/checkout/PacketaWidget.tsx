@@ -53,7 +53,16 @@ export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
   const [widgetOpen, setWidgetOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const onSelectRef = useRef(onSelect)
+  const pendingPointRef = useRef<PickupPoint | null>(null)
   useEffect(() => { onSelectRef.current = onSelect }, [onSelect])
+
+  // Apply the selected point after widget closes (avoids React batching race)
+  useEffect(() => {
+    if (!widgetOpen && pendingPointRef.current) {
+      onSelectRef.current(pendingPointRef.current)
+      pendingPointRef.current = null
+    }
+  }, [widgetOpen])
 
   // Load Packeta script
   useEffect(() => {
@@ -89,11 +98,10 @@ export function PacketaWidget({ onSelect, selectedPoint, className }: Props) {
         apiKey,
         { country: "cz", language: "cs" },
         (raw) => {
-          if (!raw) {
-            setWidgetOpen(false)
-            return
+          if (raw) {
+            // Save synchronously to ref — applied after widget unmounts
+            pendingPointRef.current = normalizePoint(raw)
           }
-          onSelectRef.current(normalizePoint(raw))
           setWidgetOpen(false)
         },
         el
