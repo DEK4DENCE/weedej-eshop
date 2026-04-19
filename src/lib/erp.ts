@@ -165,6 +165,29 @@ export interface ErpOrderSyncInput {
   totalCzk:         number          // CZK incl. VAT
   paymentReference: string          // Stripe paymentIntent or session ID
   paidAt:           string          // ISO 8601
+
+  // Shipping — always present for eshop orders
+  shippingMethod?: string           // DPD_HOME | DPD_PICKUP | ZASILKOVNA_HOME | ZASILKOVNA_PICKUP
+
+  // Pickup point — only when shippingMethod ends with _PICKUP
+  pickupPoint?: {
+    id:      string                 // Zásilkovna/DPD internal branch ID
+    name:    string                 // Human-readable name
+    address: string                 // Formatted full address
+    carrier: string                 // "zasilkovna" | "dpd"
+  }
+
+  // Billing address — only when customer explicitly chose a different billing address
+  // Null = billing is same as delivery address (do not send this field)
+  billingAddress?: {
+    name:    string
+    company: string | null
+    ico:     string | null
+    street:  string
+    city:    string
+    zip:     string
+    country: string
+  }
 }
 
 export interface ErpOrderSyncResult {

@@ -133,8 +133,16 @@ export async function POST(req: NextRequest) {
         totalAmount,
         subtotalAmount,
         shippingAmount,
-        pickupPointId:   session.metadata?.pickupPointId || null,
+        pickupPointId:   session.metadata?.pickupPointId   || null,
         pickupPointName: session.metadata?.pickupPointName || null,
+        // Billing address snapshot — only set when user chose a different billing address
+        billingName:    session.metadata?.billingName    || null,
+        billingCompany: session.metadata?.billingCompany || null,
+        billingIco:     session.metadata?.billingIco     || null,
+        billingStreet:  session.metadata?.billingLine1   || null,
+        billingCity:    session.metadata?.billingCity    || null,
+        billingZip:     session.metadata?.billingPostal  || null,
+        billingCountry: session.metadata?.billingCountry || null,
         items: {
           create: items.map(item => ({
             productId:    item.productId,
@@ -221,6 +229,11 @@ export async function POST(req: NextRequest) {
         ? session.payment_intent
         : session.id
 
+      // Derive carrier from deliveryType
+      const pickupCarrier: string =
+        deliveryType === 'ZASILKOVNA_PICKUP' ? 'zasilkovna' :
+        deliveryType === 'DPD_PICKUP'        ? 'dpd'        : ''
+
       const syncResult = await syncOrderToErp({
         eshopOrderId:     order.id,    // cuid — UUID-like, used as idempotency key
         items:            erpItems,
@@ -237,6 +250,32 @@ export async function POST(req: NextRequest) {
         totalCzk,
         paymentReference: paymentRef,
         paidAt:           new Date().toISOString(),
+
+        // Shipping method — always sent for eshop orders
+        shippingMethod: deliveryType,
+
+        // Pickup point — only when a pickup point was selected
+        ...(order.pickupPointId ? {
+          pickupPoint: {
+            id:      order.pickupPointId,
+            name:    order.pickupPointName    || '',
+            address: session.metadata?.pickupPointAddress || '',
+            carrier: pickupCarrier,
+          },
+        } : {}),
+
+        // Billing address — only when customer explicitly provided a different billing address
+        ...(order.billingName ? {
+          billingAddress: {
+            name:    order.billingName,
+            company: order.billingCompany || null,
+            ico:     order.billingIco     || null,
+            street:  order.billingStreet  || '',
+            city:    order.billingCity    || '',
+            zip:     order.billingZip     || '',
+            country: order.billingCountry || 'CZ',
+          },
+        } : {}),
       }, erpConfig)
 
       // Update order with ERP data → status PROCESSING

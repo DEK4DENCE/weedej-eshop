@@ -309,6 +309,15 @@ model Order {
   pickupPointId         String?   // Zásilkovna/DPD pickup point ID
   pickupPointName       String?   // Human-readable pickup point name
   pickupPointAddress    String?   // Full address of pickup point
+  // Billing address snapshot — immutable after order creation
+  // Null = billing same as delivery address
+  billingName           String?
+  billingCompany        String?
+  billingIco            String?
+  billingStreet         String?
+  billingCity           String?
+  billingZip            String?
+  billingCountry        String?
   shippedAt             DateTime?
   deliveredAt           DateTime?
   createdAt             DateTime    @default(now())
