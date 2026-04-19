@@ -3,13 +3,17 @@ export const dynamic = 'force-dynamic'
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { OrderCard } from "@/components/orders/OrderCard"
+import { redirect } from "next/navigation"
 
 export const metadata = { title: "Objednávky — Weedej", robots: { index: false, follow: false } }
 
 export default async function OrdersPage() {
   const session = await auth()
+  const userId = (session?.user as any)?.id as string | undefined
+  if (!userId) redirect("/login")
+
   const orders = await db.order.findMany({
-    where: { userId: (session!.user as any).id },
+    where: { userId },
     include: {
       items: {
         include: {

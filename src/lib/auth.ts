@@ -27,13 +27,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       // Subsequent token refreshes — validate sessionVersion against DB
       if (token.id) {
-        const dbUser = await db.user.findUnique({
-          where: { id: token.id as string },
-          select: { sessionVersion: true },
-        })
-        if (!dbUser || dbUser.sessionVersion !== (token.sessionVersion as number)) {
-          // Session invalidated (e.g. password changed) — force re-login
-          return null
+        try {
+          const dbUser = await db.user.findUnique({
+            where: { id: token.id as string },
+            select: { sessionVersion: true },
+          })
+          if (dbUser && dbUser.sessionVersion !== (token.sessionVersion as number)) {
+            // Session invalidated (password changed) — force re-login
+            return null
+          }
+          // If dbUser is null (deleted user), allow through — page will redirect
+        } catch {
+          // DB unreachable — keep existing token rather than forcing logout
         }
       }
 

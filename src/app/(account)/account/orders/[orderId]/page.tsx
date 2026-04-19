@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 import { OrderDetail } from "@/components/orders/OrderDetail"
 
 interface Props {
@@ -14,8 +14,11 @@ export const metadata = { title: "Detail objednávky — Weedej" }
 export default async function OrderDetailPage({ params }: Props) {
   const { orderId } = await params
   const session = await auth()
+  const userId = (session?.user as any)?.id as string | undefined
+  if (!userId) redirect("/login")
+
   const order = await db.order.findFirst({
-    where: { id: orderId, userId: (session!.user as any).id },
+    where: { id: orderId, userId },
     include: {
       items: {
         include: {

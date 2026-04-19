@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { redirect } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { User, Mail, Calendar } from "lucide-react"
@@ -10,8 +11,11 @@ export const metadata = { title: "Můj účet — Weedej", robots: { index: fals
 
 export default async function AccountPage() {
   const session = await auth()
+  const userId = (session?.user as any)?.id as string | undefined
+  if (!userId) redirect("/login")
+
   const user = await db.user.findUnique({
-    where: { id: (session!.user as any).id },
+    where: { id: userId },
     select: { name: true, email: true, role: true, emailVerified: true, createdAt: true },
   })
 
