@@ -154,7 +154,7 @@ async function processOrder(sessionId: string): Promise<{ erpOrderNumber: string
 
     const user = await db.user.findUnique({
       where:  { id: userId },
-      select: { id: true, name: true, email: true },
+      select: { id: true, name: true, email: true, phone: true },
     })
     const addr = addressId ? await db.address.findUnique({ where: { id: addressId } }) : null
 
@@ -206,6 +206,7 @@ async function processOrder(sessionId: string): Promise<{ erpOrderNumber: string
         customer: {
           name:  user?.name || user?.email || "Zákazník",
           email: user?.email || "",
+          ...(user?.phone ? { phone: user.phone } : {}),
           address: {
             street:  streetLine,
             city:    addr?.city       || "Neuvedeno",

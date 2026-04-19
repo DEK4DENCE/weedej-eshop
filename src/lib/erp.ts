@@ -155,6 +155,7 @@ export interface ErpOrderSyncInput {
   customer: {
     name:    string
     email:   string
+    phone?:  string
     address: {
       street:  string
       city:    string

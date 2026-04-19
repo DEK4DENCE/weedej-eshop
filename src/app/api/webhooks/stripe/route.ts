@@ -241,6 +241,7 @@ export async function POST(req: NextRequest) {
         customer: {
           name:  user?.name  || user?.email || 'Zákazník',
           email: user?.email || '',
+          ...(user?.phone ? { phone: user.phone } : {}),
           address: {
             street:  streetLine,
             city:    cityLine,
