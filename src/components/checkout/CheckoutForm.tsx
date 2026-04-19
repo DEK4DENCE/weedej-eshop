@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { formatPrice } from "@/lib/utils/formatPrice"
-import { Loader2, MapPin, Plus, Shield, Lock, Phone, Truck } from "lucide-react"
+import { Loader2, MapPin, Plus, Shield, Lock, Phone, Truck, FileText } from "lucide-react"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import Image from "next/image"
@@ -70,9 +70,8 @@ export function CheckoutForm({ user, addresses }: Props) {
     country: "CZ",
     phone: user?.phone ?? "",
   })
-  const [billingDifferent, setBillingDifferent] = useState(false)
   const [billingAddress, setBillingAddress] = useState({
-    fullName: "",
+    fullName: user?.name ?? "",
     company: "",
     ico: "",
     line1: "",
@@ -116,7 +115,7 @@ export function CheckoutForm({ user, addresses }: Props) {
           pickupPointId: pickupPoint?.id != null ? String(pickupPoint.id) : undefined,
           pickupPointName: pickupPoint?.name ?? undefined,
           pickupPointAddress: pickupPoint ? `${pickupPoint.nameStreet}, ${pickupPoint.zip} ${pickupPoint.city}` : undefined,
-          billingAddress: billingDifferent ? billingAddress : undefined,
+          billingAddress,
         }),
       })
       const data = await res.json()
@@ -385,62 +384,49 @@ export function CheckoutForm({ user, addresses }: Props) {
 
             {/* Billing address */}
             <Card>
-              <CardContent className="pt-5">
-                <label className="flex items-center gap-3 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={billingDifferent}
-                    onChange={(e) => setBillingDifferent(e.target.checked)}
-                    className="h-4 w-4 accent-[#2E7D32] cursor-pointer"
-                  />
-                  <span className="text-sm font-medium text-[#1d1d1f]">Fakturační adresa je jiná než doručovací</span>
-                </label>
-
-                {billingDifferent && (
-                  <div className="mt-4 space-y-3 border-t border-[#DEE2E6] pt-4">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1 col-span-2">
-                        <Label>Jméno a příjmení / Název firmy *</Label>
-                        <Input value={billingAddress.fullName} onChange={(e) => setBillingAddress((p) => ({ ...p, fullName: e.target.value }))} placeholder="Jan Novák nebo Firma s.r.o." required={billingDifferent} />
-                      </div>
-                      <div className="space-y-1">
-                        <Label>Firma (nepovinné)</Label>
-                        <Input value={billingAddress.company} onChange={(e) => setBillingAddress((p) => ({ ...p, company: e.target.value }))} placeholder="Název firmy" />
-                      </div>
-                      <div className="space-y-1">
-                        <Label>IČO (nepovinné)</Label>
-                        <Input value={billingAddress.ico} onChange={(e) => setBillingAddress((p) => ({ ...p, ico: e.target.value }))} placeholder="12345678" maxLength={12} />
-                      </div>
-                      <div className="space-y-1 col-span-2">
-                        <Label>Ulice a číslo domu *</Label>
-                        <Input value={billingAddress.line1} onChange={(e) => setBillingAddress((p) => ({ ...p, line1: e.target.value }))} placeholder="Ulice a číslo domu" required={billingDifferent} />
-                      </div>
-                      <div className="space-y-1">
-                        <Label>PSČ *</Label>
-                        <Input value={billingAddress.postalCode} onChange={(e) => setBillingAddress((p) => ({ ...p, postalCode: e.target.value }))} placeholder="110 00" required={billingDifferent} />
-                      </div>
-                      <div className="space-y-1">
-                        <Label>Město *</Label>
-                        <Input value={billingAddress.city} onChange={(e) => setBillingAddress((p) => ({ ...p, city: e.target.value }))} placeholder="Praha" required={billingDifferent} />
-                      </div>
-                      <div className="space-y-1 col-span-2">
-                        <Label>Země *</Label>
-                        <select
-                          value={billingAddress.country}
-                          onChange={(e) => setBillingAddress((p) => ({ ...p, country: e.target.value }))}
-                          className="w-full h-10 px-3 rounded-md border border-[#DEE2E6] bg-[#F8F9FA] text-[#1d1d1f] text-sm outline-none focus:border-[#2E7D32]"
-                          required={billingDifferent}
-                        >
-                          <option value="CZ">Česká republika</option>
-                          <option value="SK">Slovensko</option>
-                          <option value="DE">Německo</option>
-                          <option value="AT">Rakousko</option>
-                          <option value="PL">Polsko</option>
-                        </select>
-                      </div>
-                    </div>
+              <CardHeader><CardTitle className="flex items-center gap-2"><FileText className="h-5 w-5 text-green-400" />Fakturační adresa</CardTitle></CardHeader>
+              <CardContent className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1 col-span-2">
+                    <Label>Jméno a příjmení / Název firmy *</Label>
+                    <Input value={billingAddress.fullName} onChange={(e) => setBillingAddress((p) => ({ ...p, fullName: e.target.value }))} placeholder="Jan Novák nebo Firma s.r.o." required />
                   </div>
-                )}
+                  <div className="space-y-1">
+                    <Label>Firma (nepovinné)</Label>
+                    <Input value={billingAddress.company} onChange={(e) => setBillingAddress((p) => ({ ...p, company: e.target.value }))} placeholder="Název firmy" />
+                  </div>
+                  <div className="space-y-1">
+                    <Label>IČO (nepovinné)</Label>
+                    <Input value={billingAddress.ico} onChange={(e) => setBillingAddress((p) => ({ ...p, ico: e.target.value }))} placeholder="12345678" maxLength={12} />
+                  </div>
+                  <div className="space-y-1 col-span-2">
+                    <Label>Ulice a číslo domu *</Label>
+                    <Input value={billingAddress.line1} onChange={(e) => setBillingAddress((p) => ({ ...p, line1: e.target.value }))} placeholder="Ulice a číslo domu" required />
+                  </div>
+                  <div className="space-y-1">
+                    <Label>PSČ *</Label>
+                    <Input value={billingAddress.postalCode} onChange={(e) => setBillingAddress((p) => ({ ...p, postalCode: e.target.value }))} placeholder="110 00" required />
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Město *</Label>
+                    <Input value={billingAddress.city} onChange={(e) => setBillingAddress((p) => ({ ...p, city: e.target.value }))} placeholder="Praha" required />
+                  </div>
+                  <div className="space-y-1 col-span-2">
+                    <Label>Země *</Label>
+                    <select
+                      value={billingAddress.country}
+                      onChange={(e) => setBillingAddress((p) => ({ ...p, country: e.target.value }))}
+                      className="w-full h-10 px-3 rounded-md border border-[#DEE2E6] bg-[#F8F9FA] text-[#1d1d1f] text-sm outline-none focus:border-[#2E7D32]"
+                      required
+                    >
+                      <option value="CZ">Česká republika</option>
+                      <option value="SK">Slovensko</option>
+                      <option value="DE">Německo</option>
+                      <option value="AT">Rakousko</option>
+                      <option value="PL">Polsko</option>
+                    </select>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 

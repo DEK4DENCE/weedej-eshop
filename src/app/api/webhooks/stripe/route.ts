@@ -133,8 +133,9 @@ export async function POST(req: NextRequest) {
         totalAmount,
         subtotalAmount,
         shippingAmount,
-        pickupPointId:   session.metadata?.pickupPointId   || null,
-        pickupPointName: session.metadata?.pickupPointName || null,
+        pickupPointId:      session.metadata?.pickupPointId      || null,
+        pickupPointName:    session.metadata?.pickupPointName    || null,
+        pickupPointAddress: session.metadata?.pickupPointAddress || null,
         // Billing address snapshot — only set when user chose a different billing address
         billingName:    session.metadata?.billingName    || null,
         billingCompany: session.metadata?.billingCompany || null,
@@ -259,7 +260,7 @@ export async function POST(req: NextRequest) {
           pickupPoint: {
             id:      order.pickupPointId,
             name:    order.pickupPointName    || '',
-            address: session.metadata?.pickupPointAddress || '',
+            address: order.pickupPointAddress || '',
             carrier: pickupCarrier,
           },
         } : {}),

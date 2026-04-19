@@ -228,6 +228,7 @@ export async function POST(req: NextRequest) {
         shippingAmount: String(shippingCents),
         pickupPointId: pickupPointId ?? "",
         pickupPointName: pickupPointName ?? "",
+        pickupPointAddress: pickupPointAddress ?? "",
         billingName: billingAddress?.fullName ?? "",
         billingCompany: billingAddress?.company ?? "",
         billingIco: billingAddress?.ico ?? "",
