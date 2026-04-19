@@ -131,7 +131,7 @@ export function DpdPickupSelector({ onSelect, selectedPoint, className }: Props)
           )}
 
           {!loading && results.length > 0 && (
-            <ul className="mt-3 max-h-60 divide-y divide-gray-100 overflow-y-auto rounded-md border border-gray-100">
+            <ul className="mt-3 max-h-96 divide-y divide-gray-100 overflow-y-auto rounded-md border border-gray-100">
               {results.map((point) => (
                 <li key={point.id}>
                   <button

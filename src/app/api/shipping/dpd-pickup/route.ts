@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
   const q = normalize(req.nextUrl.searchParams.get("q") ?? "")
 
   const results = q.length < 2
-    ? DPD_POINTS.slice(0, 10)
+    ? DPD_POINTS
     : DPD_POINTS.filter((p) =>
         normalize(p.city).includes(q) ||
         p.zip.includes(q) ||
