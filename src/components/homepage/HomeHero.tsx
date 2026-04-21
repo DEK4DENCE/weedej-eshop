@@ -1,5 +1,5 @@
 "use client"
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion"
+import { motion, useScroll, useTransform, useMotionValueEvent, useReducedMotion } from "framer-motion"
 import Link from "next/link"
 import Image from "next/image"
 import { useRef } from "react"
@@ -8,7 +8,7 @@ type DoorCategory = { slug: string; name: string; tagline: string }
 
 const FALLBACK: DoorCategory[] = [
   { slug: "kvety",   name: "Květy",    tagline: "Sušené CBD květy" },
-  { slug: "hasise",  name: "Hašiš",    tagline: "Tradiční konopný hašiš" },
+  { slug: "hasis",   name: "Hašiš",    tagline: "Tradiční konopný hašiš" },
   { slug: "syringe", name: "Extrakty", tagline: "Dávkované extrakty" },
 ]
 
@@ -22,77 +22,94 @@ function orderCategories(cats: { slug: string; name: string }[]): DoorCategory[]
   ]
 }
 
-const ss = (edge0: number, edge1: number, x: number) => {
-  const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)))
+const ss = (e0: number, e1: number, x: number) => {
+  const t = Math.max(0, Math.min(1, (x - e0) / (e1 - e0)))
   return t * t * (3 - 2 * t)
 }
 
 export function HomeHero({ categories }: { categories?: { slug: string; name: string }[] } = {}) {
-  const doors = categories && categories.length >= 3 ? orderCategories(categories) : FALLBACK
-  const ref = useRef<HTMLDivElement>(null)
-  const reduced = useReducedMotion()
+  const doors      = categories && categories.length >= 3 ? orderCategories(categories) : FALLBACK
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const bothRef    = useRef<HTMLDivElement>(null)
+  const doorsRef   = useRef<HTMLDivElement>(null)
+  const labelsRef  = useRef<HTMLDivElement[]>([])
+  const reduced    = useReducedMotion()
 
   const { scrollYProgress } = useScroll({
-    target: ref,
+    target: sectionRef,
     offset: ["start start", "end end"],
   })
 
-  // Title + hint
+  // ── Standard MotionValue transforms
   const titleOpacity = useTransform(scrollYProgress, [0, 0.13], [1, 0])
   const titleY        = useTransform(scrollYProgress, [0, 0.13], [0, -40])
   const hintOpacity   = useTransform(scrollYProgress, [0, 0.08], [1, 0])
 
-  // Scene 1: Nebula — fades + slides left (0–28%)
   const nebulaOpacity = useTransform(scrollYProgress, [0, 0.12, 0.28], [1, 1, 0])
   const nebulaX       = useTransform(scrollYProgress, [0.12, 0.28], ["0%", "-30%"])
   const nebulaScale   = useTransform(scrollYProgress, [0, 0.28], [1, 1.04])
 
-  // Scene 2: Wall Right — slides in from right (12–50%)
   const rightOpacity  = useTransform(scrollYProgress, [0.12, 0.26, 0.36, 0.50], [0, 1, 1, 0])
   const rightX        = useTransform(scrollYProgress, [0.12, 0.26, 0.50], ["15%", "0%", "0%"])
   const rightScale    = useTransform(scrollYProgress, [0.12, 0.26, 0.50], [0.96, 1.04, 1.04])
 
-  // Scene 3: Wall Left — zoom in (36–68%)
   const leftOpacity   = useTransform(scrollYProgress, [0.36, 0.50, 0.56, 0.68], [0, 1, 1, 0])
   const leftScale     = useTransform(scrollYProgress, [0.36, 0.68], [0.95, 1.05])
 
-  // Scene 3.5: Both sides — radial hole transition (56–94%)
-  const bothOpacity = useTransform(scrollYProgress, [0.56, 0.68, 0.76, 0.82, 0.94], [0, 1, 1, 0.5, 0])
-  const bothScale   = useTransform(scrollYProgress, [0.56, 0.94], [0.95, 1.05])
-  const bothMask    = useTransform(scrollYProgress, (p) => {
-    const transT = ss(0.76, 0.94, p)
-    if (transT <= 0) return "none"
-    const cx = Math.round(transT * 62)
-    const cy = Math.round(transT * 78)
-    return `radial-gradient(ellipse ${cx}% ${cy}% at 50% 50%, transparent 0%, transparent 55%, rgba(0,0,0,${(1 - transT).toFixed(2)}) 70%, black 100%)`
-  })
+  const bothOpacity   = useTransform(scrollYProgress, [0.56, 0.68, 0.76, 0.82, 0.94], [0, 1, 1, 0.5, 0])
+  const bothScale     = useTransform(scrollYProgress, [0.56, 0.94], [0.95, 1.05])
 
-  // Scene 5: Doors — radial reveal from center (76–100%)
-  const doorsOpacity = useTransform(scrollYProgress, [0.76, 0.96], [0, 1])
-  const doorsScale   = useTransform(scrollYProgress, [0.76, 1.0], [0.92, 1.0])
-  const doorsMask    = useTransform(scrollYProgress, (p) => {
-    const s5 = ss(0.76, 0.96, p)
-    if (s5 <= 0) return "radial-gradient(ellipse 0% 0% at 50% 52%, black 30%, transparent 100%)"
-    const rPct  = Math.round(20 + s5 * 82)
-    const rPctY = Math.round(20 + s5 * 92)
-    return `radial-gradient(ellipse ${rPct}% ${rPctY}% at 50% 52%, black 30%, rgba(0,0,0,0.6) 65%, transparent 100%)`
-  })
+  // ── Mask-based effects via direct DOM manipulation (reliable for non-standard CSS)
+  useMotionValueEvent(scrollYProgress, "change", (p) => {
+    if (reduced) return
 
-  // Door labels appear as doors fully reveal
-  const labelsOpacity = useTransform(scrollYProgress, (p) => ss(0.6, 0.85, ss(0.76, 0.96, p)))
+    if (bothRef.current) {
+      const transT = ss(0.76, 0.94, p)
+      if (transT <= 0) {
+        bothRef.current.style.webkitMaskImage = "none"
+        bothRef.current.style.maskImage = "none"
+      } else {
+        const cx = Math.round(transT * 62)
+        const cy = Math.round(transT * 78)
+        const mask = `radial-gradient(ellipse ${cx}% ${cy}% at 50% 50%, transparent 0%, transparent 55%, rgba(0,0,0,${(1 - transT).toFixed(2)}) 70%, black 100%)`
+        bothRef.current.style.webkitMaskImage = mask
+        bothRef.current.style.maskImage = mask
+      }
+    }
+
+    if (doorsRef.current) {
+      const s5 = ss(0.76, 0.96, p)
+      doorsRef.current.style.opacity = String(s5)
+      if (s5 <= 0) {
+        doorsRef.current.style.webkitMaskImage = "none"
+        doorsRef.current.style.maskImage = "none"
+        doorsRef.current.style.transform = "scale(0.92)"
+      } else {
+        const rPct  = Math.round(20 + s5 * 82)
+        const rPctY = Math.round(20 + s5 * 92)
+        const mask = `radial-gradient(ellipse ${rPct}% ${rPctY}% at 50% 52%, black 30%, rgba(0,0,0,0.6) 65%, transparent 100%)`
+        doorsRef.current.style.webkitMaskImage = mask
+        doorsRef.current.style.maskImage = mask
+        doorsRef.current.style.transform = `scale(${0.92 + s5 * 0.08})`
+      }
+    }
+
+    const labelOp = String(ss(0.6, 0.85, ss(0.76, 0.96, p)))
+    labelsRef.current.forEach(el => { if (el) el.style.opacity = labelOp })
+  })
 
   const dusts = Array.from({ length: 32 })
 
   return (
     <section
-      ref={ref}
+      ref={sectionRef}
       className="relative w-full bg-black"
       style={{ height: "600vh" }}
       aria-label="Weedej — vstupte do světa prémiového konopí"
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden">
 
-        {/* Floor — always visible at bottom */}
+        {/* Floor */}
         <div
           className="absolute left-0 right-0 z-[5]"
           style={{
@@ -128,46 +145,30 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
           <Image src="/hero/wall-left.png" alt="" fill sizes="100vw" className="object-cover object-center" />
         </motion.div>
 
-        {/* Vignette edge darkener */}
+        {/* Vignette */}
         <div
           className="absolute inset-0 z-[22] pointer-events-none"
-          style={{
-            background: "radial-gradient(ellipse 85% 75% at 50% 50%, transparent 40%, rgba(0,0,5,0.5) 75%, rgba(0,0,10,0.92) 100%)",
-          }}
+          style={{ background: "radial-gradient(ellipse 85% 75% at 50% 50%, transparent 40%, rgba(0,0,5,0.5) 75%, rgba(0,0,10,0.92) 100%)" }}
         />
 
-        {/* Scene 3.5: Both Sides */}
+        {/* Scene 3.5: Both Sides — ref used for mask updates */}
         <motion.div
-          style={reduced ? undefined : {
-            opacity: bothOpacity,
-            scale: bothScale,
-            WebkitMaskImage: bothMask,
-            maskImage: bothMask,
-          }}
+          style={reduced ? undefined : { opacity: bothOpacity, scale: bothScale }}
           className="absolute inset-0 z-[30]"
         >
-          <Image src="/hero/both-sides.png" alt="" fill sizes="100vw" className="object-cover object-center" />
+          <div ref={bothRef} className="absolute inset-0">
+            <Image src="/hero/both-sides.png" alt="" fill sizes="100vw" className="object-cover object-center" />
+          </div>
         </motion.div>
 
-        {/* Scene 5: Doors */}
-        <motion.div
-          style={reduced ? undefined : {
-            opacity: doorsOpacity,
-            scale: doorsScale,
-            WebkitMaskImage: doorsMask,
-            maskImage: doorsMask,
-          }}
+        {/* Scene 5: Doors — ref used for opacity + mask + scale updates */}
+        <div
+          ref={doorsRef}
           className="absolute inset-0 z-[35]"
+          style={{ opacity: 0, transformOrigin: "center center" }}
         >
-          <Image
-            src="/hero/doors.png"
-            alt="Tři brány — Květy, Hašiš, Extrakty"
-            fill
-            sizes="100vw"
-            className="object-cover object-center"
-          />
+          <Image src="/hero/doors.png" alt="Tři brány — Květy, Hašiš, Extrakty" fill sizes="100vw" className="object-cover object-center" />
 
-          {/* 3 clickable door hit zones */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[72%] max-w-[1100px] aspect-[3/1.7] grid grid-cols-3 gap-1">
             {doors.map((cat, idx) => {
               const glow =
@@ -186,9 +187,10 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
                     className="absolute inset-x-[8%] inset-y-[6%] rounded-t-[50%] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                     style={{ boxShadow: `inset 0 0 80px 10px ${glow}, 0 0 60px 4px ${glow}` }}
                   />
-                  <motion.div
-                    style={reduced ? { opacity: 1 } : { opacity: labelsOpacity }}
+                  <div
+                    ref={el => { if (el) labelsRef.current[idx] = el as HTMLDivElement }}
                     className="relative z-10 text-center pb-2 md:pb-4 translate-y-[105%]"
+                    style={{ opacity: 0 }}
                   >
                     <div className="text-white font-semibold text-base md:text-2xl tracking-[0.15em] uppercase drop-shadow-[0_0_14px_rgba(255,255,255,0.75)]">
                       {cat.name}
@@ -196,14 +198,14 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
                     <div className="hidden md:block text-white/70 text-xs md:text-sm mt-1 tracking-wide">
                       {cat.tagline}
                     </div>
-                  </motion.div>
+                  </div>
                 </Link>
               )
             })}
           </div>
-        </motion.div>
+        </div>
 
-        {/* Floating dust particles */}
+        {/* Floating dust */}
         <svg
           className="absolute inset-0 z-[45] pointer-events-none mix-blend-screen opacity-50"
           viewBox="0 0 1000 1000"
@@ -255,7 +257,7 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
           </div>
         </motion.div>
 
-        {/* Bottom fade into next section */}
+        {/* Bottom fade */}
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent z-[48] pointer-events-none" />
 
         <style>{`
