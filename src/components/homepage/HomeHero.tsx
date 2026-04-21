@@ -83,8 +83,8 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
         doorsRef.current.style.maskImage = "none"
         doorsRef.current.style.transform = "scale(0.92)"
       } else {
-        const rPct  = Math.round(20 + s5 * 82)
-        const rPctY = Math.round(20 + s5 * 92)
+        const rPct  = Math.round(20 + s5 * 100)
+        const rPctY = Math.round(20 + s5 * 110)
         const mask = `radial-gradient(ellipse ${rPct}% ${rPctY}% at 50% 52%, black 30%, rgba(0,0,0,0.6) 65%, transparent 100%)`
         doorsRef.current.style.webkitMaskImage = mask
         doorsRef.current.style.maskImage = mask
@@ -94,7 +94,7 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
 
   })
 
-  const dusts = Array.from({ length: 32 })
+  const dusts = Array.from({ length: 20 })
 
   return (
     <section
@@ -163,9 +163,9 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
           className="absolute inset-0 z-[35]"
           style={{ opacity: 0, transformOrigin: "center center", pointerEvents: "none" }}
         >
-          <Image src="/hero/doors.png" alt="Tři brány — Květy, Hašiš, Extrakty" fill sizes="100vw" className="object-cover object-center" />
+          <Image src="/hero/doors.png" alt="Tři brány — Květy, Hašiš, Extrakty" fill sizes="100vw" className="object-contain md:object-cover object-center" />
 
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[72%] max-w-[1100px] aspect-[3/1.7] grid grid-cols-3 gap-1">
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[96%] md:w-[72%] md:max-w-[1100px] aspect-[3/1.7] grid grid-cols-3 gap-1">
             {doors.map((cat, idx) => {
               const glow =
                 idx === 0 ? "rgba(52,211,153,0.50)"
@@ -178,9 +178,9 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
                   aria-label={`Vstoupit do sekce ${cat.name}`}
                   className="group relative flex items-center justify-center"
                 >
-                  <div className="absolute inset-x-[8%] inset-y-[6%] rounded-t-[50%] bg-white/0 transition-all duration-500 group-hover:bg-white/10" />
+                  <div className="absolute inset-0 md:inset-x-[8%] md:inset-y-[6%] rounded-t-[50%] bg-white/0 transition-all duration-500 group-hover:bg-white/10" />
                   <div
-                    className="absolute inset-x-[8%] inset-y-[6%] rounded-t-[50%] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    className="absolute inset-0 md:inset-x-[8%] md:inset-y-[6%] rounded-t-[50%] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                     style={{ boxShadow: `inset 0 0 80px 10px ${glow}, 0 0 60px 4px ${glow}` }}
                   />
                 </Link>
