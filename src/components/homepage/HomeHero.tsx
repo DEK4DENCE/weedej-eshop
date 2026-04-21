@@ -180,7 +180,7 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
                   key={cat.slug}
                   href={`/categories/${cat.slug}`}
                   aria-label={`Vstoupit do sekce ${cat.name}`}
-                  className="group relative flex items-end justify-center"
+                  className="group relative flex items-center justify-center"
                 >
                   <div className="absolute inset-x-[8%] inset-y-[6%] rounded-t-[50%] bg-white/0 transition-all duration-500 group-hover:bg-white/10" />
                   <div
@@ -189,14 +189,11 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
                   />
                   <div
                     ref={el => { if (el) labelsRef.current[idx] = el as HTMLDivElement }}
-                    className="relative z-10 text-center pb-2 md:pb-4 translate-y-[105%]"
+                    className="relative z-10 text-center -translate-y-[10%]"
                     style={{ opacity: 0 }}
                   >
-                    <div className="text-white font-semibold text-base md:text-2xl tracking-[0.15em] uppercase drop-shadow-[0_0_14px_rgba(255,255,255,0.75)]">
+                    <div className="text-white font-semibold text-base md:text-2xl tracking-[0.15em] uppercase door-label-glow">
                       {cat.name}
-                    </div>
-                    <div className="hidden md:block text-white/70 text-xs md:text-sm mt-1 tracking-wide">
-                      {cat.tagline}
                     </div>
                   </div>
                 </Link>
@@ -230,20 +227,14 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
         {/* Hero title */}
         <motion.div
           style={reduced ? undefined : { opacity: titleOpacity, y: titleY }}
-          className="absolute inset-x-0 top-0 z-[50] pointer-events-none flex flex-col items-center pt-28 md:pt-36 px-6"
+          className="absolute inset-0 z-[50] pointer-events-none flex flex-col items-center justify-center px-6"
         >
-          <p className="text-center text-[11px] md:text-sm font-semibold tracking-[0.4em] uppercase text-emerald-400 mb-5">
-            Prémiové konopné produkty — Est. 2024
-          </p>
           <h1
             className="text-center text-5xl md:text-7xl lg:text-8xl font-black tracking-[0.06em] uppercase text-white leading-none"
             style={{ textShadow: "0 0 60px rgba(0,210,255,0.5), 0 0 120px rgba(0,210,255,0.2)" }}
           >
             Weedej.cz
           </h1>
-          <p className="mt-6 text-center text-sm md:text-lg tracking-[0.25em] uppercase text-white/50">
-            Tested &amp; Trusted
-          </p>
         </motion.div>
 
         {/* Scroll hint */}
@@ -265,6 +256,13 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
             0%   { transform: translateY(-100%); opacity: 0; }
             40%  { opacity: 1; }
             100% { transform: translateY(200%); opacity: 0; }
+          }
+          @keyframes doorGlow {
+            0%, 100% { text-shadow: 0 0 14px rgba(255,255,255,0.75), 0 0 30px rgba(255,255,255,0.3); }
+            50%       { text-shadow: 0 0 24px rgba(255,255,255,1), 0 0 60px rgba(255,255,255,0.6), 0 0 100px rgba(200,230,255,0.4); }
+          }
+          .door-label-glow {
+            animation: doorGlow 2.4s ease-in-out infinite;
           }
         `}</style>
       </div>
