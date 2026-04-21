@@ -44,7 +44,7 @@ function UserMenu({ onClose }: { onClose?: () => void }) {
       <div className="hidden md:flex items-center gap-1 mr-2">
         <Link
           href="/login"
-          className="text-[#6e6e73] hover:text-[#1d1d1f] text-sm font-medium px-3 py-2 rounded-lg transition-colors duration-200"
+          className="text-white/70 hover:text-white text-sm font-medium px-3 py-2 rounded-lg transition-colors duration-200"
         >
           Přihlásit se
         </Link>
@@ -65,7 +65,7 @@ function UserMenu({ onClose }: { onClose?: () => void }) {
     <div ref={ref} className="hidden md:flex items-center mr-2 relative">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#DEE2E6] hover:border-[#1d1d1f]/30 transition-colors duration-200 text-sm text-[#1d1d1f]"
+        className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/20 hover:border-white/60 transition-colors duration-200 text-sm text-white/80"
       >
         <div className="w-6 h-6 rounded-full bg-[#2E7D32] flex items-center justify-center">
           <span className="text-white text-[10px] font-bold uppercase">
@@ -129,18 +129,25 @@ export function HomeNavbar() {
   const displayName = session?.user?.name ?? session?.user?.email?.split("@")[0] ?? "Účet"
   const isAdmin = (session?.user as any)?.role === "ADMIN"
 
+  const iconBtnClass = "border-white/20 text-white/80 hover:text-white hover:border-white/60"
+
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-16 py-3 bg-white/95 backdrop-blur border-b border-[#DEE2E6]">
+      <nav className="fixed top-0 left-0 right-0 z-[60] flex items-center justify-between px-6 md:px-16 py-3 border-b border-transparent bg-transparent transition-colors duration-300">
         {/* Logo */}
-        <Logo variant="dark" size="xl" />
+        <Logo variant="light" size="xl" />
 
         {/* Center nav — desktop only */}
         <div className="hidden md:flex items-center gap-3 text-sm">
           {navLinks.map(([label, href], i) => (
             <span key={href} className="flex items-center gap-3">
-              {i > 0 && <span className="text-[#DEE2E6]">•</span>}
-              <Link href={href} className="text-[#6e6e73] hover:text-[#1d1d1f] transition-colors duration-200">{label}</Link>
+              {i > 0 && <span className="text-white/30">•</span>}
+              <Link
+                href={href}
+                className="text-white/80 hover:text-white transition-colors duration-200"
+              >
+                {label}
+              </Link>
             </span>
           ))}
         </div>
@@ -155,7 +162,7 @@ export function HomeNavbar() {
             href="https://www.instagram.com/weedej.cz"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden md:flex w-10 h-10 rounded-full border border-[#DEE2E6] items-center justify-center text-[#6e6e73] hover:text-[#1d1d1f] hover:border-[#1d1d1f] transition-colors"
+            className={`hidden md:flex w-10 h-10 rounded-full border items-center justify-center transition-colors ${iconBtnClass}`}
           >
             <InstagramIcon />
           </a>
@@ -163,7 +170,7 @@ export function HomeNavbar() {
             href="https://www.facebook.com/weedej.cz"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden md:flex w-10 h-10 rounded-full border border-[#DEE2E6] items-center justify-center text-[#6e6e73] hover:text-[#1d1d1f] hover:border-[#1d1d1f] transition-colors"
+            className={`hidden md:flex w-10 h-10 rounded-full border items-center justify-center transition-colors ${iconBtnClass}`}
           >
             <FacebookIcon />
           </a>
@@ -171,7 +178,7 @@ export function HomeNavbar() {
           {/* Cart */}
           <button
             onClick={toggleSidebar}
-            className="w-10 h-10 rounded-full border border-[#DEE2E6] flex items-center justify-center text-[#6e6e73] hover:text-[#1d1d1f] hover:border-[#1d1d1f] transition-colors relative"
+            className={`w-10 h-10 rounded-full border flex items-center justify-center transition-colors relative ${iconBtnClass}`}
           >
             <ShoppingBag className="w-4 h-4" />
             {totalItems > 0 && (
@@ -183,7 +190,7 @@ export function HomeNavbar() {
 
           {/* Hamburger — mobile only */}
           <motion.button
-            className="md:hidden w-10 h-10 rounded-full border border-[#DEE2E6] flex items-center justify-center text-[#6e6e73] hover:text-[#1d1d1f] hover:border-[#1d1d1f] transition-colors"
+            className={`md:hidden w-10 h-10 rounded-full border flex items-center justify-center transition-colors ${iconBtnClass}`}
             onClick={() => setMobileOpen((o) => !o)}
             aria-label={mobileOpen ? "Zavřít menu" : "Otevřít menu"}
             animate={{ rotate: mobileOpen ? 90 : 0 }}
