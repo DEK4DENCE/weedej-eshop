@@ -32,7 +32,6 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
   const sectionRef = useRef<HTMLDivElement>(null)
   const bothRef    = useRef<HTMLDivElement>(null)
   const doorsRef   = useRef<HTMLDivElement>(null)
-  const labelsRef  = useRef<HTMLDivElement[]>([])
   const reduced    = useReducedMotion()
 
   const { scrollYProgress } = useScroll({
@@ -93,8 +92,6 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
       }
     }
 
-    const labelOp = String(ss(0.6, 0.85, ss(0.76, 0.96, p)))
-    labelsRef.current.forEach(el => { if (el) el.style.opacity = labelOp })
   })
 
   const dusts = Array.from({ length: 32 })
@@ -186,15 +183,6 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
                     className="absolute inset-x-[8%] inset-y-[6%] rounded-t-[50%] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                     style={{ boxShadow: `inset 0 0 80px 10px ${glow}, 0 0 60px 4px ${glow}` }}
                   />
-                  <div
-                    ref={el => { if (el) labelsRef.current[idx] = el as HTMLDivElement }}
-                    className="relative z-10 text-center translate-y-[55%]"
-                    style={{ opacity: 0 }}
-                  >
-                    <div className="text-white font-semibold text-base md:text-2xl tracking-[0.15em] uppercase door-label-glow">
-                      {cat.name}
-                    </div>
-                  </div>
                 </Link>
               )
             })}
@@ -242,13 +230,6 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
             0%   { transform: translateY(-100%); opacity: 0; }
             40%  { opacity: 1; }
             100% { transform: translateY(200%); opacity: 0; }
-          }
-          @keyframes doorGlow {
-            0%, 100% { text-shadow: 0 0 14px rgba(255,255,255,0.75), 0 0 30px rgba(255,255,255,0.3); }
-            50%       { text-shadow: 0 0 24px rgba(255,255,255,1), 0 0 60px rgba(255,255,255,0.6), 0 0 100px rgba(200,230,255,0.4); }
-          }
-          .door-label-glow {
-            animation: doorGlow 2.4s ease-in-out infinite;
           }
         `}</style>
       </div>
