@@ -163,9 +163,10 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
           className="absolute inset-0 z-[35]"
           style={{ opacity: 0, transformOrigin: "center center", pointerEvents: "none" }}
         >
-          <Image src="/hero/doors.png" alt="Tři brány — Květy, Hašiš, Extrakty" fill sizes="100vw" className="object-contain md:object-cover object-center" />
+          <Image src="/hero/doors.png" alt="Tři brány — Květy, Hašiš, Extrakty" fill sizes="100vw" className="object-cover object-center" />
 
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[96%] md:w-[72%] md:max-w-[1100px] aspect-[3/1.7] grid grid-cols-3 gap-1">
+          {/* Mobile: full-screen 3-column grid — Desktop: centered overlay matching door arch area */}
+          <div className="absolute inset-0 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[72%] md:max-w-[1100px] md:aspect-[3/1.7] grid grid-cols-3 gap-0">
             {doors.map((cat, idx) => {
               const glow =
                 idx === 0 ? "rgba(52,211,153,0.50)"
