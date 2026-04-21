@@ -7,8 +7,8 @@ interface LogoProps {
 }
 
 export function Logo({ variant = "dark", size = "md", className = "" }: LogoProps) {
-  const iconColor = variant === "dark" ? "border-[#1d1d1f]/60" : "border-white/60"
-  const textColor = variant === "dark" ? "text-[#1d1d1f]" : "text-white"
+  const iconColor = variant === "dark" ? "border-[#1d1d1f]/60 dark:border-white/60" : "border-white/60"
+  const textColor = variant === "dark" ? "text-[#1d1d1f] dark:text-white" : "text-white"
 
   const iconSizes = {
     sm: { outer: "w-5 h-5",   inner: "w-2 h-2",   border: "border-[1.5px]", innerBorder: "border" },
