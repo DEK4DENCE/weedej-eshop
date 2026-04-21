@@ -41,8 +41,6 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
   })
 
   // ── Standard MotionValue transforms
-  const titleOpacity = useTransform(scrollYProgress, [0, 0.13], [1, 0])
-  const titleY        = useTransform(scrollYProgress, [0, 0.13], [0, -40])
   const hintOpacity   = useTransform(scrollYProgress, [0, 0.08], [1, 0])
 
   const nebulaOpacity = useTransform(scrollYProgress, [0, 0.12, 0.28], [1, 1, 0])
@@ -80,6 +78,7 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
     if (doorsRef.current) {
       const s5 = ss(0.76, 0.96, p)
       doorsRef.current.style.opacity = String(s5)
+      doorsRef.current.style.pointerEvents = s5 > 0.1 ? "auto" : "none"
       if (s5 <= 0) {
         doorsRef.current.style.webkitMaskImage = "none"
         doorsRef.current.style.maskImage = "none"
@@ -165,7 +164,7 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
         <div
           ref={doorsRef}
           className="absolute inset-0 z-[35]"
-          style={{ opacity: 0, transformOrigin: "center center" }}
+          style={{ opacity: 0, transformOrigin: "center center", pointerEvents: "none" }}
         >
           <Image src="/hero/doors.png" alt="Tři brány — Květy, Hašiš, Extrakty" fill sizes="100vw" className="object-cover object-center" />
 
@@ -189,7 +188,7 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
                   />
                   <div
                     ref={el => { if (el) labelsRef.current[idx] = el as HTMLDivElement }}
-                    className="relative z-10 text-center -translate-y-[10%]"
+                    className="relative z-10 text-center translate-y-[20%]"
                     style={{ opacity: 0 }}
                   >
                     <div className="text-white font-semibold text-base md:text-2xl tracking-[0.15em] uppercase door-label-glow">
@@ -223,19 +222,6 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
             )
           })}
         </svg>
-
-        {/* Hero title */}
-        <motion.div
-          style={reduced ? undefined : { opacity: titleOpacity, y: titleY }}
-          className="absolute inset-0 z-[50] pointer-events-none flex flex-col items-center justify-center px-6"
-        >
-          <h1
-            className="text-center text-5xl md:text-7xl lg:text-8xl font-black tracking-[0.06em] uppercase text-white leading-none"
-            style={{ textShadow: "0 0 60px rgba(0,210,255,0.5), 0 0 120px rgba(0,210,255,0.2)" }}
-          >
-            Weedej.cz
-          </h1>
-        </motion.div>
 
         {/* Scroll hint */}
         <motion.div
