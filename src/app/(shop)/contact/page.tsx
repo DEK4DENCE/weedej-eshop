@@ -1,6 +1,5 @@
 import { Metadata } from 'next'
 import { ContactForm } from '@/components/contact/ContactForm'
-import { MapEmbed } from '@/components/contact/MapEmbed'
 import { MapPin, Phone, Mail, Clock } from 'lucide-react'
 
 export const metadata: Metadata = { title: 'Kontakt — Weedej' }
@@ -51,9 +50,18 @@ export default function ContactPage() {
 
             {/* Map */}
             <div className="rounded-2xl overflow-hidden border border-[#DEE2E6] shadow-sm">
-              <MapEmbed />
+              <iframe
+                src="https://maps.google.com/maps?q=50.7732,14.1487&z=16&t=m&output=embed"
+                title="Weedej — Benešovská 432/3, Děčín"
+                width="100%"
+                height="260"
+                style={{ border: 0, display: 'block' }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
               <a
-                href="https://www.google.com/maps/search/Bene%C5%A1ovsk%C3%A1+432%2F3%2C+405+02+D%C4%9B%C4%8D%C3%ADn"
+                href="https://www.google.com/maps/place/Bene%C5%A1ovsk%C3%A1+432%2F3,+405+02+D%C4%9B%C4%8D%C3%ADn+2"
                 target="_blank" rel="noopener noreferrer"
                 className="block text-center text-xs text-[#2E7D32] hover:text-[#1B5E20] py-2 bg-[#F8F9FA] transition-colors"
               >

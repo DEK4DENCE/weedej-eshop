@@ -39,3 +39,10 @@ next-env.d.ts
 
 .vercel
 .env*.local
+.env.production
+.claude/memory.db
+.claude/scheduled_tasks.lock
+.claude/worktrees/
+.claude-flow/config.json
+.claude-flow/daemon.pid
+.swarm/
