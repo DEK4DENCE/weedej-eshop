@@ -188,7 +188,7 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
                   />
                   <div
                     ref={el => { if (el) labelsRef.current[idx] = el as HTMLDivElement }}
-                    className="relative z-10 text-center translate-y-[20%]"
+                    className="relative z-10 text-center translate-y-[55%]"
                     style={{ opacity: 0 }}
                   >
                     <div className="text-white font-semibold text-base md:text-2xl tracking-[0.15em] uppercase door-label-glow">
