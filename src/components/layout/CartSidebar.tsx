@@ -114,7 +114,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed inset-0 z-40 bg-black/50"
+            className="fixed inset-0 z-[70] bg-black/50"
             onClick={onClose}
             aria-hidden="true"
           />
@@ -130,7 +130,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
             role="dialog"
             aria-modal="true"
             aria-label="Košík"
-            className="fixed right-0 top-0 z-50 h-full w-[400px] max-w-[90vw] bg-white border-l border-[#DEE2E6] shadow-[-8px_0_32px_rgba(0,0,0,0.12)] flex flex-col"
+            className="fixed right-0 top-0 z-[80] h-full w-[400px] max-w-[90vw] bg-white dark:bg-[#0d0d2b] dark:border-[#2d2d5a] border-l border-[#DEE2E6] shadow-[-8px_0_32px_rgba(0,0,0,0.12)] flex flex-col"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-[#DEE2E6] flex-shrink-0">
