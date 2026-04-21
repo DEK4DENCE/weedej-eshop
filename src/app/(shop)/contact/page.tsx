@@ -1,16 +1,19 @@
 import { Metadata } from 'next'
 import { ContactForm } from '@/components/contact/ContactForm'
+import { MapEmbed } from '@/components/contact/MapEmbed'
 import { MapPin, Phone, Mail, Clock } from 'lucide-react'
 
 export const metadata: Metadata = { title: 'Kontakt — Weedej' }
 
 export default function ContactPage() {
   const hours = [
-    { day: 'Pondělí – Úterý', time: '11:00 – 19:00' },
-    { day: 'Středa', time: '11:00 – 19:00' },
-    { day: 'Čtvrtek – Pátek', time: '11:00 – 19:00' },
-    { day: 'Sobota', time: '11:00 – 17:00' },
-    { day: 'Neděle', time: 'Zavřeno' },
+    { day: 'Pondělí',  time: '11:00 – 19:00' },
+    { day: 'Úterý',    time: '11:00 – 19:00' },
+    { day: 'Středa',   time: '11:00 – 19:00' },
+    { day: 'Čtvrtek',  time: '11:00 – 19:00' },
+    { day: 'Pátek',    time: '11:00 – 19:00' },
+    { day: 'Sobota',   time: '11:00 – 17:00' },
+    { day: 'Neděle',   time: 'Zavřeno' },
   ]
   return (
     <div className="min-h-screen bg-[#F8F9FA]">
@@ -48,12 +51,7 @@ export default function ContactPage() {
 
             {/* Map */}
             <div className="rounded-2xl overflow-hidden border border-[#DEE2E6] shadow-sm">
-              <iframe
-                src="https://www.openstreetmap.org/export/embed.html?bbox=14.145%2C50.771%2C14.157%2C50.778&layer=mapnik&marker=50.7745%2C14.1507"
-                title="Mapa - Weedej, Benešovská 432/3, Děčín"
-                width="100%" height="260" style={{border:0, display:'block'}}
-                loading="lazy"
-              />
+              <MapEmbed />
               <a
                 href="https://www.google.com/maps/search/Bene%C5%A1ovsk%C3%A1+432%2F3%2C+405+02+D%C4%9B%C4%8D%C3%ADn"
                 target="_blank" rel="noopener noreferrer"
