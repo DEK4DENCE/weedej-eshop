@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useRouter, usePathname } from "next/navigation"
+import { DarkModeToggle } from "@/components/ui/DarkModeToggle"
 
 const staticLinks = [
   { href: "/doprava", label: "Doprava" },
@@ -47,7 +48,7 @@ export function Header({ categories = [] }: HeaderProps) {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[#DEE2E6] bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+    <header className="sticky top-0 z-50 w-full border-b border-[#DEE2E6] dark:border-[#2d2d5a] bg-white/95 dark:bg-[#080910]/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 dark:supports-[backdrop-filter]:bg-[#080910]/80">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <div onClick={() => setMobileOpen(false)} className="flex-shrink-0 ml-10">
@@ -92,6 +93,7 @@ export function Header({ categories = [] }: HeaderProps) {
 
         {/* Right icons */}
         <div className="flex items-center gap-1">
+          <DarkModeToggle className="mr-1" />
           <button
             onClick={toggleSidebar}
             className="relative flex items-center gap-1.5 px-3 py-2 text-[#6e6e73] hover:text-[#1d1d1f] transition-colors rounded-lg hover:bg-[#F8F9FA]"
@@ -178,7 +180,7 @@ export function Header({ categories = [] }: HeaderProps) {
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: "auto", opacity: 1, transition: { duration: 0.22, ease: "easeOut" } }}
           exit={{ height: 0, opacity: 0, transition: { duration: 0.18, ease: "easeIn" } }}
-          className="md:hidden border-t border-[#DEE2E6] bg-white/98 backdrop-blur overflow-hidden"
+          className="md:hidden border-t border-[#DEE2E6] dark:border-[#2d2d5a] bg-white/98 dark:bg-[#080910]/98 backdrop-blur overflow-hidden"
         >
           <nav className="container mx-auto px-4 py-4 flex flex-col gap-1">
             {[{ href: "/products", label: "Vše" }, ...categories, ...staticLinks].map(({ href, label }) => (

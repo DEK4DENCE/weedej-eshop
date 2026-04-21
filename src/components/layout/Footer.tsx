@@ -3,7 +3,7 @@ import { Logo } from "@/components/ui/Logo"
 
 export function Footer() {
   return (
-    <footer className="border-t border-[#DEE2E6] bg-white mt-16">
+    <footer className="border-t border-[#DEE2E6] dark:border-[#2d2d5a] bg-white dark:bg-[#0d0d2b] mt-16">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
@@ -53,7 +53,7 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        <div className="mt-8 pt-8 border-t border-[#DEE2E6] flex flex-col md:flex-row items-center justify-between gap-2 text-xs text-[#aeaeb2]">
+        <div className="mt-8 pt-8 border-t border-[#DEE2E6] dark:border-[#2d2d5a] flex flex-col md:flex-row items-center justify-between gap-2 text-xs text-[#aeaeb2]">
           <span>© {new Date().getFullYear()} Weedej. Všechna práva vyhrazena.</span>
           <span>Produkty jsou určeny výhradně pro dospělé 18+.</span>
         </div>

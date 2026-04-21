@@ -137,18 +137,60 @@
   --chart-5: #116616;
 }
 
+/* ── Dark mode — Nebula/Space palette ─────────────────────────────────────── */
+.dark {
+  --background: #080910;
+  --foreground: #e2e8f0;
+  --card: #0d0d2b;
+  --card-foreground: #e2e8f0;
+  --popover: #0d0d2b;
+  --popover-foreground: #e2e8f0;
+  --primary: #2E7D32;
+  --primary-foreground: #ffffff;
+  --secondary: #1e1b4b;
+  --secondary-foreground: #e2e8f0;
+  --muted: #12123a;
+  --muted-foreground: #94a3b8;
+  --accent: #7c3aed;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #2d2d5a;
+  --input: #2d2d5a;
+  --ring: #8b5cf6;
+
+  /* Sidebar */
+  --sidebar: #0d0d2b;
+  --sidebar-foreground: #e2e8f0;
+  --sidebar-primary: #2E7D32;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1e1b4b;
+  --sidebar-accent-foreground: #e2e8f0;
+  --sidebar-border: #2d2d5a;
+  --sidebar-ring: #8b5cf6;
+}
+
+/* ── Broad dark-mode overrides for hardcoded Tailwind colours ──────────────── */
+.dark body { background-color: #080910; color: #e2e8f0; }
+.dark .bg-white, .dark .bg-\[\#F8F9FA\], .dark .bg-\[\#f8f9fa\] { background-color: #0d0d2b !important; }
+.dark .border-\[\#DEE2E6\], .dark .border-\[\#dee2e6\] { border-color: #2d2d5a !important; }
+.dark .text-\[\#212121\], .dark .text-\[\#1d1d1f\] { color: #e2e8f0 !important; }
+.dark .text-\[\#6e6e73\], .dark .text-\[\#6B7280\] { color: #94a3b8 !important; }
+.dark .bg-\[\#ebebeb\] { background-color: #080910 !important; }
+.dark .bg-\[\#F0F4F0\] { background-color: #0d0d2b !important; }
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-[#F8F9FA] text-[#212121] antialiased;
+    @apply bg-[#F8F9FA] dark:bg-[#080910] text-[#212121] dark:text-[#e2e8f0] antialiased;
     font-family: Inter, system-ui, sans-serif;
   }
 
   ::selection {
-    background-color: rgba(46, 125, 50, 0.15);
-    color: #212121;
+    background-color: rgba(139, 92, 246, 0.25);
+    color: #e2e8f0;
   }
 
   ::-webkit-scrollbar {
@@ -159,10 +201,14 @@
     background: #F8F9FA;
   }
 
+  .dark ::-webkit-scrollbar-track { background: #080910; }
+
   ::-webkit-scrollbar-thumb {
     background: #DEE2E6;
     border-radius: 3px;
   }
+
+  .dark ::-webkit-scrollbar-thumb { background: #2d2d5a; }
 
   ::-webkit-scrollbar-thumb:hover {
     background: #2E7D32;
