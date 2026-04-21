@@ -1,12 +1,13 @@
 "use client"
 import { useEffect, useRef } from "react"
 
-const LAT = 50.7745
-const LNG = 14.1507
+// Benešovská 432/3, 405 02 Děčín 2
+const LAT  = 50.7780
+const LNG  = 14.2100
 const ZOOM = 16
 
 export function MapEmbed() {
-  const mapRef = useRef<HTMLDivElement>(null)
+  const mapRef     = useRef<HTMLDivElement>(null)
   const initialised = useRef(false)
 
   useEffect(() => {
@@ -14,12 +15,11 @@ export function MapEmbed() {
     initialised.current = true
 
     import("leaflet").then((L) => {
-      // Fix default icon paths broken by webpack
       delete (L.Icon.Default.prototype as any)._getIconUrl
       L.Icon.Default.mergeOptions({
         iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-        iconUrl:        "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-        shadowUrl:      "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+        iconUrl:       "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+        shadowUrl:     "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
       })
 
       const map = L.map(mapRef.current!).setView([LAT, LNG], ZOOM)
@@ -38,10 +38,7 @@ export function MapEmbed() {
 
   return (
     <>
-      <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      />
+      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
       <div ref={mapRef} style={{ height: 260, width: "100%" }} />
     </>
   )
