@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import { ContactForm } from '@/components/contact/ContactForm'
-import { MapEmbed } from '@/components/contact/MapEmbed'
+import Image from 'next/image'
 import { MapPin, Phone, Mail, Clock } from 'lucide-react'
 
 export const metadata: Metadata = { title: 'Kontakt — Weedej' }
@@ -50,16 +50,23 @@ export default function ContactPage() {
             </div>
 
             {/* Map */}
-            <div className="rounded-2xl overflow-hidden border border-[#DEE2E6] shadow-sm">
-              <MapEmbed />
-              <a
-                href="https://www.google.com/maps/place/Bene%C5%A1ovsk%C3%A1+432%2F3,+405+02+D%C4%9B%C4%8D%C3%ADn+2"
-                target="_blank" rel="noopener noreferrer"
-                className="block text-center text-xs text-[#2E7D32] hover:text-[#1B5E20] py-2 bg-[#F8F9FA] transition-colors"
-              >
+            <a
+              href="https://www.google.com/maps/place/Bene%C5%A1ovsk%C3%A1+432%2F3,+405+02+D%C4%9B%C4%8D%C3%ADn+2"
+              target="_blank" rel="noopener noreferrer"
+              className="rounded-2xl overflow-hidden border border-[#DEE2E6] shadow-sm block group"
+            >
+              <div className="relative w-full h-[260px]">
+                <Image
+                  src="/locationmap.png"
+                  alt="Mapa — Weedej, Benešovská 432/3, Děčín"
+                  fill
+                  className="object-cover object-center group-hover:brightness-90 transition-all duration-200"
+                />
+              </div>
+              <div className="text-center text-xs text-[#2E7D32] hover:text-[#1B5E20] py-2 bg-[#F8F9FA] transition-colors">
                 Otevřít v Google Maps →
-              </a>
-            </div>
+              </div>
+            </a>
           </div>
         </div>
 
