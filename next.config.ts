@@ -4,10 +4,7 @@ import { withSentryConfig } from '@sentry/nextjs'
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
-      // Vercel Blob storage (production image uploads)
-      { protocol: 'https', hostname: '*.vercel-storage.com' },
-      { protocol: 'https', hostname: '*.blob.vercel.app' },
-      // Local development
+      { protocol: 'https', hostname: '**' },
       { protocol: 'http', hostname: 'localhost' },
     ],
   },

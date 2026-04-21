@@ -26,8 +26,8 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-[#6e6e73]">
               <li><Link href="/products" className="hover:text-[#2E7D32] transition-colors hover:underline underline-offset-2">Všechny produkty</Link></li>
               <li><Link href="/products?category=kvety" className="hover:text-[#2E7D32] transition-colors hover:underline underline-offset-2">Květy</Link></li>
-              <li><Link href="/products?category=extrakty" className="hover:text-[#2E7D32] transition-colors hover:underline underline-offset-2">Extrakty</Link></li>
-              <li><Link href="/products?category=edibles" className="hover:text-[#2E7D32] transition-colors hover:underline underline-offset-2">Edibles</Link></li>
+              <li><Link href="/categories/hasis" className="hover:text-[#2E7D32] transition-colors hover:underline underline-offset-2">Hašiš</Link></li>
+              <li><Link href="/categories/syringe" className="hover:text-[#2E7D32] transition-colors hover:underline underline-offset-2">Syringe</Link></li>
               <li><Link href="/blog" className="hover:text-[#2E7D32] transition-colors hover:underline underline-offset-2">Blog</Link></li>
             </ul>
           </div>

@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: 'Kontakt — Weedej' }
 export default function ContactPage() {
   const hours = [
     { day: 'Pondělí – Úterý', time: '11:00 – 19:00' },
-    { day: 'Středa', time: '11:00 – 17:00' },
+    { day: 'Středa', time: '11:00 – 19:00' },
     { day: 'Čtvrtek – Pátek', time: '11:00 – 19:00' },
     { day: 'Sobota', time: '11:00 – 17:00' },
     { day: 'Neděle', time: 'Zavřeno' },
@@ -49,11 +49,18 @@ export default function ContactPage() {
             {/* Map */}
             <div className="rounded-2xl overflow-hidden border border-[#DEE2E6] shadow-sm">
               <iframe
-                src="https://maps.google.com/maps?q=Bene%C5%A1ovsk%C3%A1+432%2F3%2C+405+02+D%C4%9B%C4%8D%C3%ADn&output=embed&z=16"
-                title="Mapa - Weedej"
+                src="https://www.openstreetmap.org/export/embed.html?bbox=14.145%2C50.771%2C14.157%2C50.778&layer=mapnik&marker=50.7745%2C14.1507"
+                title="Mapa - Weedej, Benešovská 432/3, Děčín"
                 width="100%" height="260" style={{border:0, display:'block'}}
-                allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"
+                loading="lazy"
               />
+              <a
+                href="https://www.google.com/maps/search/Bene%C5%A1ovsk%C3%A1+432%2F3%2C+405+02+D%C4%9B%C4%8D%C3%ADn"
+                target="_blank" rel="noopener noreferrer"
+                className="block text-center text-xs text-[#2E7D32] hover:text-[#1B5E20] py-2 bg-[#F8F9FA] transition-colors"
+              >
+                Otevřít v Google Maps →
+              </a>
             </div>
           </div>
         </div>
