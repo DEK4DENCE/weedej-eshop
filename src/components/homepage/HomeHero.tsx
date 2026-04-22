@@ -308,59 +308,52 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
             This avoids any sibling z-index blocking the hover/click on zones. */}
         <div className="absolute inset-0 z-[45] pointer-events-none">
 
-          {/* Zone 1: Nebula — porthole window frame */}
+          {/* Zone 1: Nebula — tight porthole window frame */}
           <div ref={zone1Ref}
             onClick={() => scrollToScene(SCENE_TARGET[1])}
-            className="absolute left-[12%] right-[12%] top-[12%] bottom-[28%] rounded-[8%] group cursor-pointer select-none"
+            className="absolute left-[11%] right-[11%] top-[8%] bottom-[35%] rounded-[5%] group cursor-pointer select-none"
             style={{ opacity: 1, pointerEvents: "auto" }}>
-            <div className="absolute inset-0 rounded-[8%] transition-colors duration-500 group-hover:bg-white/[0.04]" />
-            <div className="absolute inset-0 rounded-[8%] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+            <div className="absolute inset-0 rounded-[5%] bg-white/[0.02] transition-colors duration-500 group-hover:bg-white/[0.05]" />
+            <div className="absolute inset-0 rounded-[5%] opacity-50 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
               style={{ boxShadow: "inset 0 0 80px 8px rgba(139,92,246,0.22), 0 0 50px 4px rgba(139,92,246,0.14)" }} />
-            <span className="absolute bottom-6 left-1/2 -translate-x-1/2 pointer-events-none text-[10px] font-semibold tracking-[0.4em] uppercase text-transparent group-hover:text-white/50 transition-colors duration-300">vstoupit</span>
           </div>
 
-          {/* Zone 2: Ceiling — whole foggy background */}
+          {/* Zone 2: Ceiling — central lit-corridor rectangle */}
           <div ref={zone2Ref}
             onClick={() => scrollToScene(SCENE_TARGET[2])}
-            className="absolute inset-0 group cursor-pointer select-none"
+            className="absolute left-[33%] right-[47%] top-[32%] bottom-[10%] group cursor-pointer select-none"
             style={{ opacity: 0, pointerEvents: "none" }}>
-            <div className="absolute inset-0 transition-colors duration-500 group-hover:bg-white/[0.04]" />
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+            <div className="absolute inset-0 bg-white/[0.02] transition-colors duration-500 group-hover:bg-white/[0.05]" />
+            <div className="absolute inset-0 opacity-50 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
               style={{ boxShadow: "inset 0 0 120px 16px rgba(96,165,250,0.14)" }} />
-            <span className="absolute bottom-20 left-1/2 -translate-x-1/2 pointer-events-none text-[10px] font-semibold tracking-[0.4em] uppercase text-transparent group-hover:text-white/50 transition-colors duration-300">vstoupit</span>
           </div>
 
-          {/* Zone 3: Wall Right — right dark corridor half */}
+          {/* Zone 3: Wall Right — full-width zone, gradient fades in from left so no hard edge */}
           <div ref={zone3Ref}
             onClick={() => scrollToScene(SCENE_TARGET[3])}
-            className="absolute right-0 top-0 bottom-0 left-[50%] group cursor-pointer select-none"
+            className="absolute inset-0 group cursor-pointer select-none"
             style={{ opacity: 0, pointerEvents: "none" }}>
-            <div className="absolute inset-0 transition-colors duration-500 group-hover:bg-white/[0.04]" />
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-              style={{ boxShadow: "inset -80px 0 140px -10px rgba(103,232,249,0.18)" }} />
-            <span className="absolute top-1/2 right-[14%] -translate-y-1/2 pointer-events-none text-[11px] font-bold tracking-[0.3em] text-transparent group-hover:text-white/50 transition-colors duration-300">→</span>
+            <div className="absolute inset-0 opacity-50 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+              style={{ background: "linear-gradient(to right, transparent 20%, rgba(103,232,249,0.04) 50%, rgba(103,232,249,0.12) 85%, rgba(103,232,249,0.16) 100%)" }} />
           </div>
 
-          {/* Zone 4: Wall Left — left dark corridor half */}
+          {/* Zone 4: Wall Left — full-width zone, gradient fades in from right so no hard edge */}
           <div ref={zone4Ref}
             onClick={() => scrollToScene(SCENE_TARGET[4])}
-            className="absolute left-0 top-0 bottom-0 right-[50%] group cursor-pointer select-none"
+            className="absolute inset-0 group cursor-pointer select-none"
             style={{ opacity: 0, pointerEvents: "none" }}>
-            <div className="absolute inset-0 transition-colors duration-500 group-hover:bg-white/[0.04]" />
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-              style={{ boxShadow: "inset 80px 0 140px -10px rgba(103,232,249,0.18)" }} />
-            <span className="absolute top-1/2 left-[14%] -translate-y-1/2 pointer-events-none text-[11px] font-bold tracking-[0.3em] text-transparent group-hover:text-white/50 transition-colors duration-300">←</span>
+            <div className="absolute inset-0 opacity-50 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+              style={{ background: "linear-gradient(to left, transparent 20%, rgba(103,232,249,0.04) 50%, rgba(103,232,249,0.12) 85%, rgba(103,232,249,0.16) 100%)" }} />
           </div>
 
-          {/* Zone 5: Both Sides — centre space window in background */}
+          {/* Zone 5: Both Sides — central space window rectangle */}
           <div ref={zone5Ref}
             onClick={() => scrollToScene(SCENE_TARGET[5])}
-            className="absolute left-[22%] right-[22%] top-[10%] bottom-[30%] rounded-[12%] group cursor-pointer select-none"
+            className="absolute left-[27%] right-[35%] top-[12%] bottom-[12%] group cursor-pointer select-none"
             style={{ opacity: 0, pointerEvents: "none" }}>
-            <div className="absolute inset-0 rounded-[12%] transition-colors duration-500 group-hover:bg-white/[0.04]" />
-            <div className="absolute inset-0 rounded-[12%] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+            <div className="absolute inset-0 bg-white/[0.02] transition-colors duration-500 group-hover:bg-white/[0.05]" />
+            <div className="absolute inset-0 opacity-50 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
               style={{ boxShadow: "inset 0 0 80px 10px rgba(167,139,250,0.22), 0 0 50px 4px rgba(167,139,250,0.14)" }} />
-            <span className="absolute bottom-6 left-1/2 -translate-x-1/2 pointer-events-none text-[10px] font-semibold tracking-[0.4em] uppercase text-transparent group-hover:text-white/50 transition-colors duration-300">vstoupit</span>
           </div>
 
         </div>{/* end zones overlay */}
