@@ -94,6 +94,9 @@
   --animate-slide-in-right: slide-in-right 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --animate-pulse-green: pulse-green 2s ease-in-out infinite;
   --animate-toast-progress: toast-progress 4s linear forwards;
+  --animate-door-charge: door-charge-pulse 0.8s ease-in-out infinite alternate;
+  --animate-lab-spark: lab-spark-drift 12s ease-in-out infinite;
+  --animate-nebula-star: nebula-star-float 25s ease-in-out infinite;
 }
 
 /* Weedejna brand CSS variables — Mint Modern */
@@ -239,6 +242,25 @@
 @keyframes toast-progress {
   0% { width: 100%; }
   100% { width: 0%; }
+}
+
+@keyframes door-charge-pulse {
+  from { opacity: 0.4; transform: scale(0.98); }
+  to   { opacity: 1.0; transform: scale(1.02); }
+}
+
+@keyframes lab-spark-drift {
+  0%   { transform: translateX(0px)   translateY(0px); }
+  25%  { transform: translateX(12px)  translateY(-8px); }
+  50%  { transform: translateX(-6px)  translateY(-18px); }
+  75%  { transform: translateX(8px)   translateY(-28px); }
+  100% { transform: translateX(0px)   translateY(-40px); }
+}
+
+@keyframes nebula-star-float {
+  0%   { transform: translateY(0px); opacity: 0.1; }
+  50%  { transform: translateY(-20px); opacity: 0.9; }
+  100% { transform: translateY(-45px); opacity: 0; }
 }
 
 /* ── Liquid Glass effect ─────────────────────────────────────── */
