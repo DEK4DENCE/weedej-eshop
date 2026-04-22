@@ -315,9 +315,9 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
             className="absolute left-[8%] right-[8%] top-[17%] bottom-[32%] group cursor-pointer select-none"
             style={{
               opacity: 1, pointerEvents: "auto",
-              WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
+              WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 35%, black 65%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%)",
               WebkitMaskComposite: "destination-in",
-              maskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
+              maskImage: "linear-gradient(to right, transparent 0%, black 35%, black 65%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%)",
               maskComposite: "intersect" as React.CSSProperties["maskComposite"],
             }}>
             <div className="absolute inset-0 bg-[rgba(217,70,239,0.08)] group-hover:bg-[rgba(217,70,239,0.18)] transition-colors duration-500 pointer-events-none" />
@@ -331,9 +331,9 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
             className="absolute left-[28%] right-[27%] top-[40%] bottom-[7%] group cursor-pointer select-none"
             style={{
               opacity: 0, pointerEvents: "none",
-              WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
+              WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 35%, black 65%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%)",
               WebkitMaskComposite: "destination-in",
-              maskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
+              maskImage: "linear-gradient(to right, transparent 0%, black 35%, black 65%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%)",
               maskComposite: "intersect" as React.CSSProperties["maskComposite"],
             }}>
             <div className="absolute inset-0 bg-[rgba(217,70,239,0.08)] group-hover:bg-[rgba(217,70,239,0.18)] transition-colors duration-500 pointer-events-none" />
@@ -347,9 +347,9 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
             className="absolute left-[58%] right-[8%] top-[16%] bottom-[7%] group cursor-pointer select-none"
             style={{
               opacity: 0, pointerEvents: "none",
-              WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
+              WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 35%, black 65%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%)",
               WebkitMaskComposite: "destination-in",
-              maskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
+              maskImage: "linear-gradient(to right, transparent 0%, black 35%, black 65%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%)",
               maskComposite: "intersect" as React.CSSProperties["maskComposite"],
             }}>
             <div className="absolute inset-0 bg-[rgba(217,70,239,0.08)] group-hover:bg-[rgba(217,70,239,0.18)] transition-colors duration-500 pointer-events-none" />
@@ -363,9 +363,9 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
             className="absolute left-[4%] right-[58%] top-[17%] bottom-[5%] group cursor-pointer select-none"
             style={{
               opacity: 0, pointerEvents: "none",
-              WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
+              WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 35%, black 65%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%)",
               WebkitMaskComposite: "destination-in",
-              maskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
+              maskImage: "linear-gradient(to right, transparent 0%, black 35%, black 65%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%)",
               maskComposite: "intersect" as React.CSSProperties["maskComposite"],
             }}>
             <div className="absolute inset-0 bg-[rgba(217,70,239,0.08)] group-hover:bg-[rgba(217,70,239,0.18)] transition-colors duration-500 pointer-events-none" />
@@ -379,9 +379,9 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
             className="absolute left-[27%] right-[35%] top-[12%] bottom-[12%] group cursor-pointer select-none"
             style={{
               opacity: 0, pointerEvents: "none",
-              WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
+              WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 35%, black 65%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%)",
               WebkitMaskComposite: "destination-in",
-              maskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
+              maskImage: "linear-gradient(to right, transparent 0%, black 35%, black 65%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%)",
               maskComposite: "intersect" as React.CSSProperties["maskComposite"],
             }}>
             <div className="absolute inset-0 bg-[rgba(217,70,239,0.08)] group-hover:bg-[rgba(217,70,239,0.18)] transition-colors duration-500 pointer-events-none" />
