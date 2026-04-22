@@ -313,50 +313,80 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
           <div ref={zone1Ref}
             onClick={() => scrollToScene(SCENE_TARGET[1])}
             className="absolute left-[8%] right-[8%] top-[17%] bottom-[32%] group cursor-pointer select-none"
-            style={{ opacity: 1, pointerEvents: "auto" }}>
-            <div className="absolute inset-0 bg-[rgba(46,125,50,0.08)] group-hover:bg-[rgba(46,125,50,0.18)] transition-colors duration-500 pointer-events-none" />
+            style={{
+              opacity: 1, pointerEvents: "auto",
+              WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
+              WebkitMaskComposite: "destination-in",
+              maskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
+              maskComposite: "intersect" as React.CSSProperties["maskComposite"],
+            }}>
+            <div className="absolute inset-0 bg-[rgba(217,70,239,0.08)] group-hover:bg-[rgba(217,70,239,0.18)] transition-colors duration-500 pointer-events-none" />
             <div className="absolute inset-0 opacity-50 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-              style={{ boxShadow: "inset 0 0 80px 20px rgba(78,205,96,0.40), 0 0 50px 8px rgba(78,205,96,0.20)" }} />
+              style={{ boxShadow: "inset 0 0 80px 20px rgba(217,70,239,0.45), 0 0 50px 8px rgba(217,70,239,0.25)" }} />
           </div>
 
           {/* Zone 2: Ceiling — central corridor/shaft in lower-center */}
           <div ref={zone2Ref}
             onClick={() => scrollToScene(SCENE_TARGET[2])}
             className="absolute left-[28%] right-[27%] top-[40%] bottom-[7%] group cursor-pointer select-none"
-            style={{ opacity: 0, pointerEvents: "none" }}>
-            <div className="absolute inset-0 bg-[rgba(46,125,50,0.08)] group-hover:bg-[rgba(46,125,50,0.18)] transition-colors duration-500 pointer-events-none" />
+            style={{
+              opacity: 0, pointerEvents: "none",
+              WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
+              WebkitMaskComposite: "destination-in",
+              maskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
+              maskComposite: "intersect" as React.CSSProperties["maskComposite"],
+            }}>
+            <div className="absolute inset-0 bg-[rgba(217,70,239,0.08)] group-hover:bg-[rgba(217,70,239,0.18)] transition-colors duration-500 pointer-events-none" />
             <div className="absolute inset-0 opacity-50 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-              style={{ boxShadow: "inset 0 0 80px 20px rgba(78,205,96,0.40), 0 0 50px 8px rgba(78,205,96,0.20)" }} />
+              style={{ boxShadow: "inset 0 0 80px 20px rgba(217,70,239,0.45), 0 0 50px 8px rgba(217,70,239,0.25)" }} />
           </div>
 
-          {/* Zone 3: Wall Right scene — dark LEFT corridor (cylinders are on the right) */}
+          {/* Zone 3: Wall Right scene — dark RIGHT corridor (cylinders are on the left) */}
           <div ref={zone3Ref}
             onClick={() => scrollToScene(SCENE_TARGET[3])}
-            className="absolute left-[4%] right-[61%] top-[16%] bottom-[7%] group cursor-pointer select-none"
-            style={{ opacity: 0, pointerEvents: "none" }}>
-            <div className="absolute inset-0 bg-[rgba(46,125,50,0.08)] group-hover:bg-[rgba(46,125,50,0.18)] transition-colors duration-500 pointer-events-none" />
+            className="absolute left-[58%] right-[8%] top-[16%] bottom-[7%] group cursor-pointer select-none"
+            style={{
+              opacity: 0, pointerEvents: "none",
+              WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
+              WebkitMaskComposite: "destination-in",
+              maskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
+              maskComposite: "intersect" as React.CSSProperties["maskComposite"],
+            }}>
+            <div className="absolute inset-0 bg-[rgba(217,70,239,0.08)] group-hover:bg-[rgba(217,70,239,0.18)] transition-colors duration-500 pointer-events-none" />
             <div className="absolute inset-0 opacity-50 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-              style={{ boxShadow: "inset 0 0 80px 20px rgba(78,205,96,0.40), 0 0 50px 8px rgba(78,205,96,0.20)" }} />
+              style={{ boxShadow: "inset 0 0 80px 20px rgba(217,70,239,0.45), 0 0 50px 8px rgba(217,70,239,0.25)" }} />
           </div>
 
-          {/* Zone 4: Wall Left scene — dark RIGHT corridor (cylinders are on the left) */}
+          {/* Zone 4: Wall Left scene — dark LEFT corridor (cylinders are on the right) */}
           <div ref={zone4Ref}
             onClick={() => scrollToScene(SCENE_TARGET[4])}
-            className="absolute left-[44%] right-[2%] top-[17%] bottom-[5%] group cursor-pointer select-none"
-            style={{ opacity: 0, pointerEvents: "none" }}>
-            <div className="absolute inset-0 bg-[rgba(46,125,50,0.08)] group-hover:bg-[rgba(46,125,50,0.18)] transition-colors duration-500 pointer-events-none" />
+            className="absolute left-[4%] right-[58%] top-[17%] bottom-[5%] group cursor-pointer select-none"
+            style={{
+              opacity: 0, pointerEvents: "none",
+              WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
+              WebkitMaskComposite: "destination-in",
+              maskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
+              maskComposite: "intersect" as React.CSSProperties["maskComposite"],
+            }}>
+            <div className="absolute inset-0 bg-[rgba(217,70,239,0.08)] group-hover:bg-[rgba(217,70,239,0.18)] transition-colors duration-500 pointer-events-none" />
             <div className="absolute inset-0 opacity-50 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-              style={{ boxShadow: "inset 0 0 80px 20px rgba(78,205,96,0.40), 0 0 50px 8px rgba(78,205,96,0.20)" }} />
+              style={{ boxShadow: "inset 0 0 80px 20px rgba(217,70,239,0.45), 0 0 50px 8px rgba(217,70,239,0.25)" }} />
           </div>
 
           {/* Zone 5: Both Sides — central space window */}
           <div ref={zone5Ref}
             onClick={() => scrollToScene(SCENE_TARGET[5])}
             className="absolute left-[27%] right-[35%] top-[12%] bottom-[12%] group cursor-pointer select-none"
-            style={{ opacity: 0, pointerEvents: "none" }}>
-            <div className="absolute inset-0 bg-[rgba(46,125,50,0.08)] group-hover:bg-[rgba(46,125,50,0.18)] transition-colors duration-500 pointer-events-none" />
+            style={{
+              opacity: 0, pointerEvents: "none",
+              WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
+              WebkitMaskComposite: "destination-in",
+              maskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
+              maskComposite: "intersect" as React.CSSProperties["maskComposite"],
+            }}>
+            <div className="absolute inset-0 bg-[rgba(217,70,239,0.08)] group-hover:bg-[rgba(217,70,239,0.18)] transition-colors duration-500 pointer-events-none" />
             <div className="absolute inset-0 opacity-50 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-              style={{ boxShadow: "inset 0 0 80px 20px rgba(78,205,96,0.40), 0 0 50px 8px rgba(78,205,96,0.20)" }} />
+              style={{ boxShadow: "inset 0 0 80px 20px rgba(217,70,239,0.45), 0 0 50px 8px rgba(217,70,239,0.25)" }} />
           </div>
 
         </div>{/* end zones overlay */}
