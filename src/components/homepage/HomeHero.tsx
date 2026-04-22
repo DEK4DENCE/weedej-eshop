@@ -305,55 +305,58 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
 
         {/* ── Click Zones Overlay (z-45) — single layer above all scenes, below scroll hint
             Container is pointer-events-none; individual zones control their own events.
-            This avoids any sibling z-index blocking the hover/click on zones. */}
+            This avoids any sibling z-index blocking the hover/click on zones.
+            All zones use brand green glow; passive = 50% intensity, hover = 100%. */}
         <div className="absolute inset-0 z-[45] pointer-events-none">
 
-          {/* Zone 1: Nebula — tight porthole window frame */}
+          {/* Zone 1: Nebula — porthole glass area (full width of window, excl. dark frame) */}
           <div ref={zone1Ref}
             onClick={() => scrollToScene(SCENE_TARGET[1])}
-            className="absolute left-[11%] right-[11%] top-[8%] bottom-[35%] rounded-[5%] group cursor-pointer select-none"
+            className="absolute left-[8%] right-[8%] top-[17%] bottom-[32%] group cursor-pointer select-none"
             style={{ opacity: 1, pointerEvents: "auto" }}>
-            <div className="absolute inset-0 rounded-[5%] bg-white/[0.02] transition-colors duration-500 group-hover:bg-white/[0.05]" />
-            <div className="absolute inset-0 rounded-[5%] opacity-50 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-              style={{ boxShadow: "inset 0 0 80px 8px rgba(139,92,246,0.22), 0 0 50px 4px rgba(139,92,246,0.14)" }} />
+            <div className="absolute inset-0 bg-[rgba(46,125,50,0.08)] group-hover:bg-[rgba(46,125,50,0.18)] transition-colors duration-500 pointer-events-none" />
+            <div className="absolute inset-0 opacity-50 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+              style={{ boxShadow: "inset 0 0 80px 20px rgba(78,205,96,0.40), 0 0 50px 8px rgba(78,205,96,0.20)" }} />
           </div>
 
-          {/* Zone 2: Ceiling — central lit-corridor rectangle */}
+          {/* Zone 2: Ceiling — central corridor/shaft in lower-center */}
           <div ref={zone2Ref}
             onClick={() => scrollToScene(SCENE_TARGET[2])}
-            className="absolute left-[33%] right-[47%] top-[32%] bottom-[10%] group cursor-pointer select-none"
+            className="absolute left-[28%] right-[27%] top-[40%] bottom-[7%] group cursor-pointer select-none"
             style={{ opacity: 0, pointerEvents: "none" }}>
-            <div className="absolute inset-0 bg-white/[0.02] transition-colors duration-500 group-hover:bg-white/[0.05]" />
+            <div className="absolute inset-0 bg-[rgba(46,125,50,0.08)] group-hover:bg-[rgba(46,125,50,0.18)] transition-colors duration-500 pointer-events-none" />
             <div className="absolute inset-0 opacity-50 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-              style={{ boxShadow: "inset 0 0 120px 16px rgba(96,165,250,0.14)" }} />
+              style={{ boxShadow: "inset 0 0 80px 20px rgba(78,205,96,0.40), 0 0 50px 8px rgba(78,205,96,0.20)" }} />
           </div>
 
-          {/* Zone 3: Wall Right — full-width zone, gradient fades in from left so no hard edge */}
+          {/* Zone 3: Wall Right scene — dark LEFT corridor (cylinders are on the right) */}
           <div ref={zone3Ref}
             onClick={() => scrollToScene(SCENE_TARGET[3])}
-            className="absolute inset-0 group cursor-pointer select-none"
+            className="absolute left-[4%] right-[61%] top-[16%] bottom-[7%] group cursor-pointer select-none"
             style={{ opacity: 0, pointerEvents: "none" }}>
+            <div className="absolute inset-0 bg-[rgba(46,125,50,0.08)] group-hover:bg-[rgba(46,125,50,0.18)] transition-colors duration-500 pointer-events-none" />
             <div className="absolute inset-0 opacity-50 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-              style={{ background: "linear-gradient(to right, transparent 20%, rgba(103,232,249,0.04) 50%, rgba(103,232,249,0.12) 85%, rgba(103,232,249,0.16) 100%)" }} />
+              style={{ boxShadow: "inset 0 0 80px 20px rgba(78,205,96,0.40), 0 0 50px 8px rgba(78,205,96,0.20)" }} />
           </div>
 
-          {/* Zone 4: Wall Left — full-width zone, gradient fades in from right so no hard edge */}
+          {/* Zone 4: Wall Left scene — dark RIGHT corridor (cylinders are on the left) */}
           <div ref={zone4Ref}
             onClick={() => scrollToScene(SCENE_TARGET[4])}
-            className="absolute inset-0 group cursor-pointer select-none"
+            className="absolute left-[44%] right-[2%] top-[17%] bottom-[5%] group cursor-pointer select-none"
             style={{ opacity: 0, pointerEvents: "none" }}>
+            <div className="absolute inset-0 bg-[rgba(46,125,50,0.08)] group-hover:bg-[rgba(46,125,50,0.18)] transition-colors duration-500 pointer-events-none" />
             <div className="absolute inset-0 opacity-50 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-              style={{ background: "linear-gradient(to left, transparent 20%, rgba(103,232,249,0.04) 50%, rgba(103,232,249,0.12) 85%, rgba(103,232,249,0.16) 100%)" }} />
+              style={{ boxShadow: "inset 0 0 80px 20px rgba(78,205,96,0.40), 0 0 50px 8px rgba(78,205,96,0.20)" }} />
           </div>
 
-          {/* Zone 5: Both Sides — central space window rectangle */}
+          {/* Zone 5: Both Sides — central space window */}
           <div ref={zone5Ref}
             onClick={() => scrollToScene(SCENE_TARGET[5])}
             className="absolute left-[27%] right-[35%] top-[12%] bottom-[12%] group cursor-pointer select-none"
             style={{ opacity: 0, pointerEvents: "none" }}>
-            <div className="absolute inset-0 bg-white/[0.02] transition-colors duration-500 group-hover:bg-white/[0.05]" />
+            <div className="absolute inset-0 bg-[rgba(46,125,50,0.08)] group-hover:bg-[rgba(46,125,50,0.18)] transition-colors duration-500 pointer-events-none" />
             <div className="absolute inset-0 opacity-50 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-              style={{ boxShadow: "inset 0 0 80px 10px rgba(167,139,250,0.22), 0 0 50px 4px rgba(167,139,250,0.14)" }} />
+              style={{ boxShadow: "inset 0 0 80px 20px rgba(78,205,96,0.40), 0 0 50px 8px rgba(78,205,96,0.20)" }} />
           </div>
 
         </div>{/* end zones overlay */}
