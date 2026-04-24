@@ -322,7 +322,7 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
             }}>
             <div className="absolute inset-0 zone-bg-pulse pointer-events-none group-hover:[animation-play-state:paused]" />
             <div className="absolute inset-0 zone-glow-pulse pointer-events-none group-hover:[animation-play-state:paused]"
-              style={{ boxShadow: "inset 0 0 100px 30px rgba(217,70,239,0.70), 0 0 60px 12px rgba(217,70,239,0.45)" }} />
+              style={{ boxShadow: "inset 0 0 140px 50px rgba(217,70,239,0.90), 0 0 90px 25px rgba(217,70,239,0.65)" }} />
           </div>
 
           {/* Zone 2: Ceiling — central corridor/shaft in lower-center */}
@@ -338,7 +338,7 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
             }}>
             <div className="absolute inset-0 zone-bg-pulse pointer-events-none group-hover:[animation-play-state:paused]" />
             <div className="absolute inset-0 zone-glow-pulse pointer-events-none group-hover:[animation-play-state:paused]"
-              style={{ boxShadow: "inset 0 0 100px 30px rgba(217,70,239,0.70), 0 0 60px 12px rgba(217,70,239,0.45)" }} />
+              style={{ boxShadow: "inset 0 0 140px 50px rgba(217,70,239,0.90), 0 0 90px 25px rgba(217,70,239,0.65)" }} />
           </div>
 
           {/* Zone 3: Wall Right scene — dark RIGHT corridor (cylinders are on the left) */}
@@ -354,7 +354,7 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
             }}>
             <div className="absolute inset-0 zone-bg-pulse pointer-events-none group-hover:[animation-play-state:paused]" />
             <div className="absolute inset-0 zone-glow-pulse pointer-events-none group-hover:[animation-play-state:paused]"
-              style={{ boxShadow: "inset 0 0 100px 30px rgba(217,70,239,0.70), 0 0 60px 12px rgba(217,70,239,0.45)" }} />
+              style={{ boxShadow: "inset 0 0 140px 50px rgba(217,70,239,0.90), 0 0 90px 25px rgba(217,70,239,0.65)" }} />
           </div>
 
           {/* Zone 4: Wall Left scene — dark LEFT corridor (cylinders are on the right) */}
@@ -370,7 +370,7 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
             }}>
             <div className="absolute inset-0 zone-bg-pulse pointer-events-none group-hover:[animation-play-state:paused]" />
             <div className="absolute inset-0 zone-glow-pulse pointer-events-none group-hover:[animation-play-state:paused]"
-              style={{ boxShadow: "inset 0 0 100px 30px rgba(217,70,239,0.70), 0 0 60px 12px rgba(217,70,239,0.45)" }} />
+              style={{ boxShadow: "inset 0 0 140px 50px rgba(217,70,239,0.90), 0 0 90px 25px rgba(217,70,239,0.65)" }} />
           </div>
 
           {/* Zone 5: Both Sides — central space window */}
@@ -386,7 +386,7 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
             }}>
             <div className="absolute inset-0 zone-bg-pulse pointer-events-none group-hover:[animation-play-state:paused]" />
             <div className="absolute inset-0 zone-glow-pulse pointer-events-none group-hover:[animation-play-state:paused]"
-              style={{ boxShadow: "inset 0 0 100px 30px rgba(217,70,239,0.70), 0 0 60px 12px rgba(217,70,239,0.45)" }} />
+              style={{ boxShadow: "inset 0 0 140px 50px rgba(217,70,239,0.90), 0 0 90px 25px rgba(217,70,239,0.65)" }} />
           </div>
 
         </div>{/* end zones overlay */}
@@ -414,19 +414,19 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
             to   { opacity: 1.0; transform: scale(1.02); }
           }
           @keyframes zone-glow-kf {
-            0%, 100% { opacity: 0.45; }
+            0%, 100% { opacity: 0.1; }
             50%      { opacity: 1.0; }
           }
           @keyframes zone-bg-kf {
-            0%, 100% { opacity: 0.6; }
+            0%, 100% { opacity: 0.2; }
             50%      { opacity: 1.0; }
           }
           .zone-glow-pulse {
-            animation: zone-glow-kf 2s ease-in-out infinite;
+            animation: zone-glow-kf 1.8s ease-in-out infinite;
           }
           .zone-bg-pulse {
-            background: rgba(217,70,239,0.15);
-            animation: zone-bg-kf 2s ease-in-out infinite;
+            background: rgba(217,70,239,0.25);
+            animation: zone-bg-kf 1.8s ease-in-out infinite;
           }
           .group:hover .zone-glow-pulse,
           .group:hover .zone-bg-pulse {
