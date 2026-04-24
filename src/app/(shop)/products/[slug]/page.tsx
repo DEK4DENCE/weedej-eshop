@@ -179,11 +179,26 @@ export default async function ProductDetailPage({ params }: Props) {
           <ProductDetailClient product={product} />
         </div>
 
-        <div className="mt-12 border border-[#d1d1d6] rounded-xl p-5 bg-[#f5f5f7]">
-          <p className="text-xs text-[#6e6e73] leading-relaxed">
-            <span className="font-semibold text-[#1d1d1f]">Upozornění: </span>
-            Produkt není určený ke konzumaci a kouření. Produkt je určeny výhradně k technickému a průmyslovému využití, například k extrakci, nebo pro výrobu textilií či jiných materiálů z technického konopí. Díky vysoké kvalitě je vhodný pro zpracování ve specializovaných dílnách.
-          </p>
+        <div className="mt-12 space-y-4">
+          <div className="border border-[#d1d1d6] rounded-xl p-5 bg-[#f5f5f7]">
+            <p className="text-xs text-[#6e6e73] leading-relaxed">
+              <span className="font-semibold text-[#1d1d1f]">Upozornění: </span>
+              Produkt není určený ke konzumaci a kouření. Produkt je určeny výhradně k technickému a průmyslovému využití, například k extrakci, nebo pro výrobu textilií či jiných materiálů z technického konopí. Díky vysoké kvalitě je vhodný pro zpracování ve specializovaných dílnách.
+            </p>
+          </div>
+
+          <div className="border border-[#d1d1d6] rounded-xl p-5 bg-[#f5f5f7]">
+            <p className="text-xs font-semibold text-[#1d1d1f] mb-1.5">Co je THC-X?</p>
+            <p className="text-xs text-[#6e6e73] leading-relaxed mb-3">
+              THC-X je souhrnné označení pro syntetické nebo semisyntetické deriváty tetrahydrokanabinolu, které vznikají chemickou modifikací přírodního THC nebo CBD. Vyznačují se zvýšenou stabilitou molekuly a specifickým profilem účinků. V České republice podléhají právní regulaci — jejich prodej a držení jsou povoleny výhradně pro technické a průmyslové účely v souladu s platnou legislativou.
+            </p>
+            <Link
+              href="/blog/co-je-thc-x"
+              className="inline-flex items-center gap-1 text-xs font-medium text-[#2E7D32] hover:underline"
+            >
+              Přečíst celý článek o THC-X →
+            </Link>
+          </div>
         </div>
       </div>
     </>
