@@ -312,7 +312,7 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
           {/* Zone 1: Nebula — porthole glass area (full width of window, excl. dark frame) */}
           <div ref={zone1Ref}
             onClick={() => scrollToScene(SCENE_TARGET[1])}
-            className="absolute left-[8%] right-[8%] top-[17%] bottom-[32%] group cursor-pointer select-none"
+            className="absolute left-[8%] right-[8%] top-[24%] bottom-[25%] group cursor-pointer select-none"
             style={{
               opacity: 1, pointerEvents: "auto",
               WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 35%, black 65%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%)",
