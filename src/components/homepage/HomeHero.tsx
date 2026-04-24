@@ -320,9 +320,9 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
               maskImage: "linear-gradient(to right, transparent 0%, black 35%, black 65%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%)",
               maskComposite: "intersect" as React.CSSProperties["maskComposite"],
             }}>
-            <div className="absolute inset-0 bg-[rgba(217,70,239,0.15)] group-hover:bg-[rgba(217,70,239,0.25)] transition-colors duration-500 pointer-events-none" />
-            <div className="absolute inset-0 opacity-75 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-              style={{ boxShadow: "inset 0 0 80px 20px rgba(217,70,239,0.55), 0 0 50px 8px rgba(217,70,239,0.35)" }} />
+            <div className="absolute inset-0 zone-bg-pulse pointer-events-none group-hover:[animation-play-state:paused]" />
+            <div className="absolute inset-0 zone-glow-pulse pointer-events-none group-hover:[animation-play-state:paused]"
+              style={{ boxShadow: "inset 0 0 100px 30px rgba(217,70,239,0.70), 0 0 60px 12px rgba(217,70,239,0.45)" }} />
           </div>
 
           {/* Zone 2: Ceiling — central corridor/shaft in lower-center */}
@@ -336,9 +336,9 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
               maskImage: "linear-gradient(to right, transparent 0%, black 35%, black 65%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%)",
               maskComposite: "intersect" as React.CSSProperties["maskComposite"],
             }}>
-            <div className="absolute inset-0 bg-[rgba(217,70,239,0.15)] group-hover:bg-[rgba(217,70,239,0.25)] transition-colors duration-500 pointer-events-none" />
-            <div className="absolute inset-0 opacity-75 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-              style={{ boxShadow: "inset 0 0 80px 20px rgba(217,70,239,0.55), 0 0 50px 8px rgba(217,70,239,0.35)" }} />
+            <div className="absolute inset-0 zone-bg-pulse pointer-events-none group-hover:[animation-play-state:paused]" />
+            <div className="absolute inset-0 zone-glow-pulse pointer-events-none group-hover:[animation-play-state:paused]"
+              style={{ boxShadow: "inset 0 0 100px 30px rgba(217,70,239,0.70), 0 0 60px 12px rgba(217,70,239,0.45)" }} />
           </div>
 
           {/* Zone 3: Wall Right scene — dark RIGHT corridor (cylinders are on the left) */}
@@ -352,9 +352,9 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
               maskImage: "linear-gradient(to right, transparent 0%, black 35%, black 65%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%)",
               maskComposite: "intersect" as React.CSSProperties["maskComposite"],
             }}>
-            <div className="absolute inset-0 bg-[rgba(217,70,239,0.15)] group-hover:bg-[rgba(217,70,239,0.25)] transition-colors duration-500 pointer-events-none" />
-            <div className="absolute inset-0 opacity-75 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-              style={{ boxShadow: "inset 0 0 80px 20px rgba(217,70,239,0.55), 0 0 50px 8px rgba(217,70,239,0.35)" }} />
+            <div className="absolute inset-0 zone-bg-pulse pointer-events-none group-hover:[animation-play-state:paused]" />
+            <div className="absolute inset-0 zone-glow-pulse pointer-events-none group-hover:[animation-play-state:paused]"
+              style={{ boxShadow: "inset 0 0 100px 30px rgba(217,70,239,0.70), 0 0 60px 12px rgba(217,70,239,0.45)" }} />
           </div>
 
           {/* Zone 4: Wall Left scene — dark LEFT corridor (cylinders are on the right) */}
@@ -368,9 +368,9 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
               maskImage: "linear-gradient(to right, transparent 0%, black 35%, black 65%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%)",
               maskComposite: "intersect" as React.CSSProperties["maskComposite"],
             }}>
-            <div className="absolute inset-0 bg-[rgba(217,70,239,0.15)] group-hover:bg-[rgba(217,70,239,0.25)] transition-colors duration-500 pointer-events-none" />
-            <div className="absolute inset-0 opacity-75 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-              style={{ boxShadow: "inset 0 0 80px 20px rgba(217,70,239,0.55), 0 0 50px 8px rgba(217,70,239,0.35)" }} />
+            <div className="absolute inset-0 zone-bg-pulse pointer-events-none group-hover:[animation-play-state:paused]" />
+            <div className="absolute inset-0 zone-glow-pulse pointer-events-none group-hover:[animation-play-state:paused]"
+              style={{ boxShadow: "inset 0 0 100px 30px rgba(217,70,239,0.70), 0 0 60px 12px rgba(217,70,239,0.45)" }} />
           </div>
 
           {/* Zone 5: Both Sides — central space window */}
@@ -384,9 +384,9 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
               maskImage: "linear-gradient(to right, transparent 0%, black 35%, black 65%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%)",
               maskComposite: "intersect" as React.CSSProperties["maskComposite"],
             }}>
-            <div className="absolute inset-0 bg-[rgba(217,70,239,0.15)] group-hover:bg-[rgba(217,70,239,0.25)] transition-colors duration-500 pointer-events-none" />
-            <div className="absolute inset-0 opacity-75 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-              style={{ boxShadow: "inset 0 0 80px 20px rgba(217,70,239,0.55), 0 0 50px 8px rgba(217,70,239,0.35)" }} />
+            <div className="absolute inset-0 zone-bg-pulse pointer-events-none group-hover:[animation-play-state:paused]" />
+            <div className="absolute inset-0 zone-glow-pulse pointer-events-none group-hover:[animation-play-state:paused]"
+              style={{ boxShadow: "inset 0 0 100px 30px rgba(217,70,239,0.70), 0 0 60px 12px rgba(217,70,239,0.45)" }} />
           </div>
 
         </div>{/* end zones overlay */}
@@ -412,6 +412,26 @@ export function HomeHero({ categories }: { categories?: { slug: string; name: st
           @keyframes door-charge-pulse {
             from { opacity: 0.4; transform: scale(0.98); }
             to   { opacity: 1.0; transform: scale(1.02); }
+          }
+          @keyframes zone-glow-kf {
+            0%, 100% { opacity: 0.45; }
+            50%      { opacity: 1.0; }
+          }
+          @keyframes zone-bg-kf {
+            0%, 100% { opacity: 0.6; }
+            50%      { opacity: 1.0; }
+          }
+          .zone-glow-pulse {
+            animation: zone-glow-kf 2s ease-in-out infinite;
+          }
+          .zone-bg-pulse {
+            background: rgba(217,70,239,0.15);
+            animation: zone-bg-kf 2s ease-in-out infinite;
+          }
+          .group:hover .zone-glow-pulse,
+          .group:hover .zone-bg-pulse {
+            animation-play-state: paused;
+            opacity: 1;
           }
         `}</style>
       </div>
