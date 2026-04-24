@@ -178,6 +178,13 @@ export default async function ProductDetailPage({ params }: Props) {
           <ProductImages images={product.imageUrls} productName={product.name} adjustments={raw.imageAdjustments} />
           <ProductDetailClient product={product} />
         </div>
+
+        <div className="mt-12 border border-[#d1d1d6] rounded-xl p-5 bg-[#f5f5f7]">
+          <p className="text-xs text-[#6e6e73] leading-relaxed">
+            <span className="font-semibold text-[#1d1d1f]">Upozornění: </span>
+            Produkt není určený ke konzumaci a kouření. Produkt je určeny výhradně k technickému a průmyslovému využití, například k extrakci, nebo pro výrobu textilií či jiných materiálů z technického konopí. Díky vysoké kvalitě je vhodný pro zpracování ve specializovaných dílnách.
+          </p>
+        </div>
       </div>
     </>
   )
