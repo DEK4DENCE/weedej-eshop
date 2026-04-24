@@ -64,12 +64,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true })
   }
 
-  const userId       = session.metadata?.userId
+  const userId       = session.metadata?.userId || null
+  const guestEmail   = session.metadata?.guestEmail || null
+  const guestName    = session.metadata?.guestName  || null
+  const guestPhone   = session.metadata?.guestPhone || null
   const itemsRaw     = session.metadata?.items
   const deliveryType = (session.metadata?.deliveryType ?? 'COURIER') as 'COURIER' | 'PICKUP_IN_STORE' | 'DPD_HOME' | 'DPD_PICKUP' | 'ZASILKOVNA_HOME' | 'ZASILKOVNA_PICKUP'
   const addressId    = session.metadata?.addressId || null
 
-  if (!userId || !itemsRaw) return NextResponse.json({ received: true })
+  if ((!userId && !guestEmail) || !itemsRaw) return NextResponse.json({ received: true })
 
   // ── Resolve order items ─────────────────────────────────────────────────────
   const rawItems: { v: string; q: number }[] = JSON.parse(itemsRaw)
@@ -121,7 +124,10 @@ export async function POST(req: NextRequest) {
   } else {
     order = await db.order.create({
       data: {
-        userId,
+        userId: userId || null,
+        guestEmail: userId ? null : guestEmail,
+        guestName:  userId ? null : guestName,
+        guestPhone: userId ? null : guestPhone,
         addressId: addressId || null,
         stripeSessionId:       session.id,
         stripePaymentIntentId: typeof session.payment_intent === 'string' ? session.payment_intent : null,
@@ -161,16 +167,30 @@ export async function POST(req: NextRequest) {
   }
 
   // ── Load user for email + ERP sync ──────────────────────────────────────────
-  const user = await db.user.findUnique({
-    where:  { id: userId },
-    select: { id: true, name: true, email: true, phone: true },
-  })
+  const user = userId
+    ? await db.user.findUnique({ where: { id: userId }, select: { id: true, name: true, email: true, phone: true } })
+    : null
 
-  // Prefer address already loaded with the order; fallback to DB lookup
+  // Effective contact info (user or guest)
+  const contactEmail = user?.email ?? guestEmail ?? null
+  const contactName  = user?.name  ?? guestName  ?? null
+  const contactPhone = user?.phone ?? guestPhone ?? null
+
+  // Prefer address already loaded with the order; fallback to DB lookup; then guest metadata
   let addr: { fullName: string; line1: string; line2?: string | null; city: string; postalCode: string; country: string } | null =
     order.address ?? null
   if (!addr && addressId) {
     addr = await db.address.findUnique({ where: { id: addressId } })
+  }
+  // For guest home delivery: rebuild addr from metadata
+  if (!addr && session.metadata?.guestShippingLine1) {
+    addr = {
+      fullName:   session.metadata.guestShippingName  || contactName || '',
+      line1:      session.metadata.guestShippingLine1,
+      city:       session.metadata.guestShippingCity  || '',
+      postalCode: session.metadata.guestShippingPostal || '',
+      country:    session.metadata.guestShippingCountry || 'CZ',
+    }
   }
 
   // ── Try ERP sync (Phase 1, steps 3-5) ──────────────────────────────────────
@@ -239,9 +259,9 @@ export async function POST(req: NextRequest) {
         eshopOrderId:     order.id,    // cuid — UUID-like, used as idempotency key
         items:            erpItems,
         customer: {
-          name:  user?.name  || user?.email || 'Zákazník',
-          email: user?.email || '',
-          ...(user?.phone ? { phone: user.phone } : {}),
+          name:  contactName  || contactEmail || 'Zákazník',
+          email: contactEmail || '',
+          ...(contactPhone ? { phone: contactPhone } : {}),
           address: {
             street:  streetLine,
             city:    cityLine,
@@ -379,9 +399,10 @@ export async function POST(req: NextRequest) {
     where:  { id: order.id },
     select: { emailSent: true },
   })
-  if (user?.email && !freshOrderForEmail?.emailSent) {
+  if (contactEmail && !freshOrderForEmail?.emailSent) {
+    const emailTo = contactEmail as string
     try {
-      const firstName    = user.name?.split(' ')[0] ?? 'there'
+      const firstName    = contactName?.split(' ')[0] ?? 'zákazníku'
       const shippingAddr = addr
         ? { fullName: addr.fullName, line1: addr.line1, city: addr.city, postalCode: addr.postalCode, country: addr.country }
         : undefined
@@ -389,7 +410,7 @@ export async function POST(req: NextRequest) {
       if (erpSynced && order.erpOrderNumber) {
         // Mail #1: order confirmed with ERP number + invoice PDF attached (§ 28 ZDPH)
         await sendEmail({
-          to:          user.email,
+          to:          emailTo,
           subject:     `Potvrzení objednávky ${order.erpOrderNumber} — Weedej`,
           emailType:   'orderConfirmation',
           react:       OrderConfirmationWithInvoice({
@@ -417,7 +438,7 @@ export async function POST(req: NextRequest) {
       } else {
         // ERP unavailable — send acknowledgement without ERP number/invoice
         await sendEmail({
-          to:        user.email,
+          to:        emailTo,
           subject:   'Přijali jsme vaši objednávku — Weedej',
           emailType: 'orderConfirmation',
           react:     OrderConfirmationAck({
@@ -468,7 +489,7 @@ export async function POST(req: NextRequest) {
 
   // ── Clear cart ──────────────────────────────────────────────────────────────
   try {
-    await db.cartItem.deleteMany({ where: { cart: { userId } } })
+    if (userId) await db.cartItem.deleteMany({ where: { cart: { userId } } })
   } catch (cartErr) {
     console.error(`[Cart] Failed to clear cart for userId=${userId}:`, cartErr instanceof Error ? cartErr.message : String(cartErr))
   }

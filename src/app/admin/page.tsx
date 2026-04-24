@@ -61,7 +61,7 @@ export default async function AdminDashboard() {
             {recentOrders.map((order) => (
               <div key={order.id} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
                 <div>
-                  <p className="text-sm font-medium">{order.user.name ?? order.user.email}</p>
+                  <p className="text-sm font-medium">{order.user?.name ?? order.user?.email ?? order.guestName ?? order.guestEmail ?? "—"}</p>
                   <p className="text-xs text-muted-foreground">{new Date(order.createdAt).toLocaleDateString()}</p>
                 </div>
                 <div className="text-right">

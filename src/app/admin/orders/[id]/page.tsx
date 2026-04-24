@@ -52,8 +52,8 @@ export default async function AdminOrderDetailPage({ params }: Props) {
         <Card>
           <CardHeader><CardTitle>Zákazník</CardTitle></CardHeader>
           <CardContent>
-            <p className="font-medium">{order.user.name ?? "—"}</p>
-            <p className="text-sm text-muted-foreground">{order.user.email}</p>
+            <p className="font-medium">{order.user?.name ?? order.guestName ?? "—"}</p>
+            <p className="text-sm text-muted-foreground">{order.user?.email ?? order.guestEmail ?? "—"}</p>
             {order.notes && <p className="text-sm text-muted-foreground mt-2">{order.notes}</p>}
           </CardContent>
         </Card>

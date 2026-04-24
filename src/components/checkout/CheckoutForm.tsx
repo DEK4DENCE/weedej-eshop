@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { formatPrice } from "@/lib/utils/formatPrice"
-import { Loader2, MapPin, Plus, Shield, Lock, Phone, Truck, FileText } from "lucide-react"
+import { Loader2, MapPin, Plus, Shield, Lock, Phone, Truck, FileText, Eye, EyeOff, UserPlus } from "lucide-react"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import Image from "next/image"
@@ -55,6 +55,13 @@ export function CheckoutForm({ user, addresses }: Props) {
   const [error, setError] = useState<string | null>(null)
   const [postalError, setPostalError] = useState<string | null>(null)
 
+  // Guest-only state
+  const isGuest = !user
+  const [guestEmail, setGuestEmail] = useState("")
+  const [createAccount, setCreateAccount] = useState(false)
+  const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod | null>(null)
   const [pickupPoint, setPickupPoint] = useState<PickupPoint | null>(null)
 
@@ -94,6 +101,16 @@ export function CheckoutForm({ user, addresses }: Props) {
       return
     }
 
+    if (isGuest && !guestEmail) {
+      setError("Prosím zadejte e-mailovou adresu.")
+      return
+    }
+
+    if (createAccount && password.length < 8) {
+      setError("Heslo musí mít alespoň 8 znaků.")
+      return
+    }
+
     setLoading(true)
     setError(null)
 
@@ -116,6 +133,13 @@ export function CheckoutForm({ user, addresses }: Props) {
           pickupPointName: pickupPoint?.name ?? undefined,
           pickupPointAddress: pickupPoint ? `${pickupPoint.nameStreet}, ${pickupPoint.zip} ${pickupPoint.city}` : undefined,
           billingAddress,
+          ...(isGuest ? {
+            guestEmail,
+            guestName: newAddress.fullName || "",
+            guestPhone: phone,
+            createAccount,
+            ...(createAccount ? { password } : {}),
+          } : {}),
         }),
       })
       const data = await res.json()
@@ -225,10 +249,65 @@ export function CheckoutForm({ user, addresses }: Props) {
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label>E-mail</Label>
-                    <Input value={user?.email ?? ""} readOnly className="opacity-60 cursor-not-allowed" />
+                    <Label>E-mail *</Label>
+                    {isGuest ? (
+                      <Input
+                        type="email"
+                        value={guestEmail}
+                        onChange={(e) => setGuestEmail(e.target.value)}
+                        placeholder="vas@email.cz"
+                        required
+                        autoComplete="email"
+                      />
+                    ) : (
+                      <Input value={user?.email ?? ""} readOnly className="opacity-60 cursor-not-allowed" />
+                    )}
                   </div>
                 </div>
+
+                {/* Guest account creation */}
+                {isGuest && (
+                  <div className="rounded-xl border border-[#DEE2E6] bg-[#f8faf8] p-4 space-y-3">
+                    <label className="flex items-center gap-3 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={createAccount}
+                        onChange={(e) => setCreateAccount(e.target.checked)}
+                        className="w-4 h-4 accent-[#2E7D32] rounded"
+                      />
+                      <span className="flex items-center gap-1.5 text-sm font-medium text-[#1d1d1f]">
+                        <UserPlus className="h-4 w-4 text-[#2E7D32]" />
+                        Vytvořit uživatelský účet
+                      </span>
+                    </label>
+                    {createAccount && (
+                      <div className="space-y-1 pt-1">
+                        <Label>Heslo (min. 8 znaků) *</Label>
+                        <div className="relative">
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Zadejte heslo"
+                            minLength={8}
+                            required
+                            autoComplete="new-password"
+                            className="pr-10"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword((v) => !v)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6e6e73] hover:text-[#1d1d1f]"
+                            tabIndex={-1}
+                          >
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </button>
+                        </div>
+                        <p className="text-xs text-[#6e6e73]">Na váš e-mail bude zaslán aktivační odkaz k potvrzení účtu.</p>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <Separator />
 

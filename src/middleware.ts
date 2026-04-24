@@ -177,9 +177,8 @@ export default auth((req) => {
   // (not from session) and must be reachable even if the session cookie was dropped by
   // the browser during the cross-origin Stripe redirect. Ownership is verified server-side
   // inside the page via the cryptographically-random Stripe session_id in the URL.
-  const protectedPaths = ['/account', '/checkout', '/api/cart', '/api/orders', '/api/checkout']
+  const protectedPaths = ['/account', '/api/cart', '/api/orders']
   const isProtected = protectedPaths.some((p) => pathname.startsWith(p))
-    && !pathname.startsWith('/checkout/success')
   if (isProtected && !session) {
     if (pathname.startsWith('/api/')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
